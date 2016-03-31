@@ -11,6 +11,5 @@ Vagrant.configure(2) do |config|
     #Memory in kb
     vb.memory = "1024"
   end
-
-  
+  config.vm.provision :shell, path: "setup.sh"
 end
