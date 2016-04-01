@@ -14,7 +14,9 @@ def main():
 	background = pygame.Surface(screen.get_size())
 	background = background.convert()
 	background.fill((0,0,0))
-	#Make a black background for the game.
+	mazeFrame = pygame.image.load("assets/puzzleframe.png")
+	mazeFrame.convert_alpha()
+	#Make a black background for the game, and load the frame.
 
 	mazeLayer = pygame.Surface(screen.get_size())
 	mazeLayer = mazeLayer.convert_alpha() # give it some alpha values
@@ -40,6 +42,7 @@ def main():
 
 		newmaze.update()
 		screen.blit(background, (0,0))
+		screen.blit(mazeFrame, (0,-1))
 		newmaze.draw(screen)
 		pygame.display.flip()
 

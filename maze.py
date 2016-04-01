@@ -8,7 +8,7 @@ class Maze:
 		self.mLayer = mazeLayer
 		self.mLayer.fill((0,0,0,0))
 		self.cellSize = 4
-		self.screenSize = 64
+		self.screenSize = 56
 		if (self.screenSize/float(self.cellSize)) != (self.screenSize/self.cellSize):
 			raise ArithmeticError("Screen size must be a multiple of cell size!")
 
@@ -29,15 +29,13 @@ class Maze:
 		if self.state == "idle":
 			pass
 		elif self.state == "create":
-			#while VisitedCells < TotalCells
 			if self.visitedCells >= self.totalCells:
 				self.currentCell = 0
 				self.cellStack = []
 				self.state = "idle"
 				return
 
-			moved = False
-			while moved == False:
+			while self.visitedCells < self.totalCells:
 				x = self.currentCell % (self.screenSize/self.cellSize)
 				y = self.currentCell / (self.screenSize/self.cellSize)
 
@@ -81,13 +79,12 @@ class Maze:
 					self.currentCell = nidx
 					#add 1 to VisitedCells
 					self.visitedCells = self.visitedCells + 1
-					moved = True
 
 				else:
 				#Make the most recent cell the current cell.
 					self.currentCell = self.cellStack.pop()
 
 	def draw(self, screen):
-		screen.blit(self.mLayer, (0,0))
+		screen.blit(self.mLayer, (3,3))
 
 
