@@ -13,12 +13,12 @@ def main():
 
 	background = pygame.Surface(screen.get_size())
 	background = background.convert()
-	background.fill((0,0,0))
+	background.fill((255,255,255))
 	#Make a black background for the game.
 
 	mazeLayer = pygame.Surface(screen.get_size())
 	mazeLayer = mazeLayer.convert_alpha() # give it some alpha values
-	mazeLayer.fill((0,0,0,0,))
+	mazeLayer.fill((255,255,255,255,))
 
 	screen.blit(background, (0,0))
 	pygame.display.flip()
