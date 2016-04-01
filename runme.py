@@ -25,7 +25,7 @@ def main():
 	screen.blit(background, (0,0))
 	pygame.display.flip()
 	clock = pygame.time.Clock()
-	#I don't know what the blit thing does. The clock is so that we can update things.
+	#Blit copies one layer onto another. The clock is so that we can update things.
 
 	newmaze = maze.Maze(mazeLayer)
 
@@ -42,8 +42,8 @@ def main():
 
 		newmaze.update()
 		screen.blit(background, (0,0))
-		screen.blit(mazeFrame, (0,-1))
 		newmaze.draw(screen)
+		screen.blit(mazeFrame, (0,-1))
 		pygame.display.flip()
 
 if __name__ == '__main__': main()

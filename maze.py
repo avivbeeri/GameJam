@@ -7,7 +7,7 @@ class Maze:
 		self.state = "create"
 		self.mLayer = mazeLayer
 		self.mLayer.fill((0,0,0,0))
-		self.cellSize = 4
+		self.cellSize = 8
 		self.screenSize = 56
 		if (self.screenSize/float(self.cellSize)) != (self.screenSize/self.cellSize):
 			raise ArithmeticError("Screen size must be a multiple of cell size!")
@@ -84,6 +84,10 @@ class Maze:
 				#Make the most recent cell the current cell.
 					self.currentCell = self.cellStack.pop()
 
+			#After the while loop
+			pygame.draw.rect(self.mLayer, (255,0,255,255), Rect(1,1,self.cellSize-1,self.cellSize-1))
+			pygame.draw.rect(self.mLayer, (255,0,255,255), Rect(self.screenSize-self.cellSize+1,\
+				self.screenSize-self.cellSize+1,self.cellSize-1,self.cellSize-1))
 	def draw(self, screen):
 		screen.blit(self.mLayer, (3,3))
 
