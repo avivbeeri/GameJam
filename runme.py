@@ -21,6 +21,9 @@ def main():
 	mazeLayer = pygame.Surface(screen.get_size())
 	mazeLayer = mazeLayer.convert_alpha() # give it some alpha values
 	mazeLayer.fill((0,0,0,0))
+	timeLayer = pygame.Surface((screen.get_width()-8, 2))
+	timeLayer = timeLayer.convert_alpha()
+	timeLayer.fill((0,0,0,0))
 
 	screen.blit(background, (0,0))
 	pygame.display.flip()
@@ -28,6 +31,7 @@ def main():
 	#Blit copies one layer onto another. The clock is so that we can update things.
 
 	newmaze = maze.Maze(mazeLayer)
+	newtimer = maze.Timer(timeLayer, 10)
 
 	while True:
 	#Mainloop that runs at 60fps.
@@ -44,6 +48,7 @@ def main():
 		screen.blit(background, (0,0))
 		newmaze.draw(screen)
 		screen.blit(mazeFrame, (0,-1))
+		newtimer.draw(screen)
 		pygame.display.flip()
 
 if __name__ == '__main__': main()
