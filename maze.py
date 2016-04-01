@@ -14,11 +14,11 @@ class Maze:
 
 		#We're saying that each box of the maze is 4px*4px, so there are 16x16 boxes on the screen
 		for y in xrange(self.screenSize/self.cellSize):
-			pygame.draw.line(self.mLayer, (0,0,0,255), (0, y*self.cellSize), (self.screenSize, y*self.cellSize))
+			pygame.draw.line(self.mLayer, (0,255,0), (0, y*self.cellSize), (self.screenSize, y*self.cellSize))
 			for x in xrange(self.screenSize/self.cellSize):
 				self.mazeArray.append(0)
 				if y==0:
-					pygame.draw.line(self.mLayer, (0,0,0,255), (x*self.cellSize, 0), (x*self.cellSize, self.screenSize))
+					pygame.draw.line(self.mLayer, (0,255,0), (x*self.cellSize, 0), (x*self.cellSize, self.screenSize))
 		self.totalCells = (self.screenSize/self.cellSize)**2
 		self.currentCell = random.randint(0, self.totalCells-1)
 		self.visitedCells = 1
