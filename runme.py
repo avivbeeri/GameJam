@@ -6,7 +6,9 @@ import maze
 
 def main():
 	pygame.init()
-	screen = pygame.display.set_mode((64,64))
+	screen = pygame.Surface((64, 64))
+	outputSize = (128, 128)
+	display = pygame.display.set_mode(outputSize)
 	pygame.display.set_caption('Test')
 	pygame.mouse.set_visible(0)
 	#Create the window and caption etc.
@@ -44,6 +46,7 @@ def main():
 		screen.blit(background, (0,0))
 		newmaze.draw(screen)
 		screen.blit(mazeFrame, (0,-1))
+		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
 
 if __name__ == '__main__': main()
