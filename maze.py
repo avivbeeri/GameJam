@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, datetime
 from pygame.locals import *
 
 class Maze:
@@ -91,4 +91,20 @@ class Maze:
 	def draw(self, screen):
 		screen.blit(self.mLayer, (3,3))
 
+class Timer:
+	def __init__ (self, screenLayer, time):
+		self.timeLayer = screenLayer
+		self.period = datetime.timedelta(seconds=(time/float(self.timeLayer.get_width())))
+		self.stepno = 0
+		self.starttime = datetime.datetime.now()
+		self.endtime = self.starttime + datetime.timedelta(seconds=time)
 
+	def draw(self, screen):
+		if self.stepno == self.timeLayer.get_width():
+			return #In future we can do some function that kicks the user out.
+
+		pygame.draw.rect(self.timeLayer, (0,255,0,191), Rect(0,0,self.timeLayer.get_width(), 2))
+		if datetime.datetime.now() > self.starttime + (self.period*self.stepno):
+			pygame.draw.rect(self.timeLayer, (255,0,0,191), Rect(0,0,self.stepno,2))
+			screen.blit(self.timeLayer, ((screen.get_height()-4), 4))
+			self.stepno += 1
