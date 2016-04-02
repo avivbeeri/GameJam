@@ -7,7 +7,7 @@ class Maze:
 		self.state = "create"
 		self.mLayer = mazeLayer
 		self.mLayer.fill((0,0,0,0))
-		self.cellSize = 8
+		self.cellSize = 4
 		self.screenSize = 56
 		if (self.screenSize/float(self.cellSize)) != (self.screenSize/self.cellSize):
 			raise ArithmeticError("Screen size must be a multiple of cell size!")
@@ -108,3 +108,10 @@ class Timer:
 			pygame.draw.rect(self.timeLayer, (255,0,0,191), Rect(0,0,self.stepno,2))
 			screen.blit(self.timeLayer, ((screen.get_height()-4), 4))
 			self.stepno += 1
+			print "Completed step " + str(self.stepno) + " of " + str(self.timeLayer.get_width())
+
+def mazeUpdate(screen, maze, mazeFrame, timer):
+	maze.update()
+	maze.draw(screen)
+	screen.blit(mazeFrame, (0,-1))
+	timer.draw(screen)
