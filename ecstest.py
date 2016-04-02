@@ -1,4 +1,5 @@
 from ecs import *
+from components.Position import PositionComponent
 
 world = World()
 entity = world.createEntity()
@@ -15,5 +16,5 @@ class PrintSystem(System):
             print name.value
 
 entity.addComponent(NameComponent('Aviv'))
-world.addSystem(PrintSystem([]))
+world.addSystem(PrintSystem())
 world.update()

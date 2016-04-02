@@ -1,8 +1,8 @@
-class System:
+class System(object):
     # Represents a system that processes entities
 
-    def __init__(self, requirements):
-        self.requirements = requirements
+    def __init__(self):
+        self.requirements = []
 
     def getProcessableEntities(self, world):
         entities = world.getEntities()
