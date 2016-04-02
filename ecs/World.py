@@ -1,4 +1,4 @@
-from . import Entity
+from .Entity import Entity
 
 class World:
     def __init__(self):
@@ -7,8 +7,8 @@ class World:
         self.systems = []
 
     def createEntity(self):
-        entity = Entity(idCounter)
-        idCounter += 1
+        entity = Entity(self.idCounter)
+        self.idCounter += 1
         self.entities.append(entity)
         return entity
 
@@ -20,5 +20,5 @@ class World:
 
     def update(self):
         for system in self.systems:
-            entities = system.getProcessableEntities()
+            entities = system.getProcessableEntities(self)
             system.process(entities)

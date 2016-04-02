@@ -8,7 +8,7 @@ class System:
         entities = world.getEntities()
         entitiesToProcess = []
         # if we have specific requirements, filter those entities
-        if len(requirements) > 0:
+        if len(self.requirements) > 0:
             for entity in entities:
                 applicable = True
                 for requirement in self.requirements:
