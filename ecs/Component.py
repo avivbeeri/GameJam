@@ -1,5 +1,4 @@
-class Component:
+class Component(object):
     # Represents a component that an entity can have.
-    def __init__(self, entity):
-        self.entity = entity
-        self._name = 'Component'
+    def __init__(self):
+        self._name = self.__class__.__name__

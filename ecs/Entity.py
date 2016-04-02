@@ -23,7 +23,7 @@ class Entity:
         if isinstance(component, basestring):
             return component in self.components
         elif hasattr(component, '_name'):
-            return component.name in self.components
+            return component._name in self.components
         else:
             raise ValueError('Attempted to lookup an object which isn\'t a component')
 
