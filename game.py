@@ -19,7 +19,8 @@ def setupWorld(display):
 	entity.addComponent(DrawableComponent(city, -1))
 
 	playerEntity = world.createEntity()
-	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert()
+	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
+
 	playerEntity.addComponent(DrawableComponent(ghostSprite))
 	playerEntity.addComponent(PositionComponent((32, 32)))
 	playerEntity.addComponent(VelocityComponent((1, 0)))
@@ -65,9 +66,9 @@ def main():
 	pygame.mouse.set_visible(0)
 
 	# Create and initialise drawable canvas
-	screen = pygame.Surface((64, 64))
+	screen = pygame.Surface((64, 64), pygame.SRCALPHA)
 	screen.fill((0,0,0))
-	screen = screen.convert()
+	screen = screen.convert_alpha()
 
 	# Initalise the game loop clock
 	clock = pygame.time.Clock()
