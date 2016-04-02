@@ -11,7 +11,7 @@ def setupWorld(display):
 	world = World()
 	entity = world.createEntity()
 	entity.addComponent(PositionComponent())
-	city = pygame.image.load(os.path.join('assets', 'cityscape.png'))
+	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
 
 	entity.addComponent(DrawableComponent(city))
 	world.addSystem(RenderSystem(display))

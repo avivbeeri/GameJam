@@ -8,9 +8,13 @@ class RenderSystem(System):
         self.surface = surface
 
     def process(self, entities):
-        surface = self.surface
-        surface.fill((0, 0, 0))
+        self.surface.fill((0, 0, 0))
+        images = []
         for entity in entities:
             drawable = entity.getComponent('DrawableComponent')
             position = entity.getComponent('PositionComponent')
-            surface.blit(drawable.image, position.value)
+            images.append((drawable.image, position.value, drawable.layer))
+
+        sortedImages = sorted(images, key=lambda image: image[2])
+        for surface, position, layer in sortedImages:
+            self.surface.blit(surface, position)
