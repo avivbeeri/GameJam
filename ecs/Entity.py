@@ -9,7 +9,7 @@ class Entity:
         if hasAttr(component, 'name'):
             self.components[component.name] = component
         else:
-            # throw an error
+            raise ValueError('Attempted to add an object which isn\'t a component')
 
     def removeComponent(self, component):
         if isinstance(component, basestring):
@@ -17,7 +17,7 @@ class Entity:
         elif hasAttr(component, 'name'):
             del self.components[component.name]
         else:
-            # Throw an error here because we have no component to remove
+            raise ValueError('Attempted to remove an object which isn\'t a component')
 
     def hasComponent(self, component):
         if isinstance(component, basestring):
@@ -25,4 +25,4 @@ class Entity:
         elif hasAttr(component, 'name'):
             return component.name in self.components
         else:
-            # Throw an error here because we have no component to remove
+            raise ValueError('Attempted to lookup an object which isn\'t a component')

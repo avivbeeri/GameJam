@@ -12,14 +12,15 @@ class System:
             for entity in entities:
                 applicable = True
                 for requirement in self.requirements:
-                    applicable = applicable || entity.hasComponent(requirement)
+                    applicable = applicable or entity.hasComponent(requirement)
 
                 if applicable:
                     entitiesToProcess.append(entity)
 
-            return entitiesToProcess
+            return tuple(entitiesToProcess)
         else:
-            return entities
+            # if we have no requirements, process all entities
+            return tuple(entities)
 
     def process(self, entities):
         # Logic for processing entities

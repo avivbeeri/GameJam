@@ -1,4 +1,4 @@
-import Entity
+from . import Entity
 
 class World:
     def __init__(self):
