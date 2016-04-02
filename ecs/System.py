@@ -12,7 +12,7 @@ class System(object):
             for entity in entities:
                 applicable = True
                 for requirement in self.requirements:
-                    applicable = applicable or entity.hasComponent(requirement)
+                    applicable = applicable and entity.hasComponent(requirement)
 
                 if applicable:
                     entitiesToProcess.append(entity)

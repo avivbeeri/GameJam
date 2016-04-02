@@ -3,8 +3,11 @@
 import os, pygame, random
 from pygame.locals import *
 from ecs import *
-from components import *
-from systems import *
+from components import AccelerationComponent,\
+	VelocityComponent,\
+	PositionComponent,\
+	DrawableComponent
+from systems import RenderSystem, PhysicsSystem
 import maze
 
 # Creates a world
@@ -13,9 +16,17 @@ def setupWorld(display):
 	entity = world.createEntity()
 	entity.addComponent(PositionComponent())
 	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
-	entity.addComponent(DrawableComponent(city))
-	world.addSystem(RenderSystem(display))
+	entity.addComponent(DrawableComponent(city, -1))
 
+	playerEntity = world.createEntity()
+	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert()
+	playerEntity.addComponent(DrawableComponent(ghostSprite))
+	playerEntity.addComponent(PositionComponent((32, 32)))
+	playerEntity.addComponent(VelocityComponent((1, 0)))
+	playerEntity.addComponent(AccelerationComponent())
+
+	world.addSystem(PhysicsSystem())
+	world.addSystem(RenderSystem(display))
 	return world
 
 def setupMaze(display):
@@ -65,11 +76,9 @@ def main():
 	# Later this could be delegated to a "State" object.
 	world = setupWorld(screen)
 
-	while True:
+	while quitcheck() != 1:
 	#Mainloop that runs at 60fps.
 		clock.tick(60)
-		if quitcheck() == 1:
-			return
 		world.update()
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
