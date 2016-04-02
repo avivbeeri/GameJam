@@ -110,7 +110,7 @@ class Timer:
 			self.stepno += 1
 			print "Completed step " + str(self.stepno) + " of " + str(self.timeLayer.get_width())
 
-def MazeUpdate(screen, maze, mazeFrame, timer):
+def mazeUpdate(screen, maze, mazeFrame, timer):
 	maze.update()
 	maze.draw(screen)
 	screen.blit(mazeFrame, (0,-1))

@@ -8,14 +8,15 @@ def quitcheck(quit=True):
 	for event in pygame.event.get():
 	#Check if the user has quit, and if so quit.
 		if event.type == QUIT:
-			return
+			return 1
 		elif event.type == KEYDOWN:
 			if event.key == K_ESCAPE:
 				if quit == True:
-					return
+					return 1
 				else:
 					pass
 					#return to the menu
+	return 0
 
 def main():
 	pygame.init()
@@ -51,9 +52,10 @@ def main():
 	while True:
 	#Mainloop that runs at 60fps.
 		clock.tick(60)
-		quitcheck()
+		if quitcheck() == 1:
+			return
 		screen.blit(background, (0,0))
-		maze.mazeupdate(screen, newmaze, mazeFrame, newtimer)
+		maze.mazeUpdate(screen, newmaze, mazeFrame, newtimer)
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
 
