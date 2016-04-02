@@ -28,6 +28,8 @@ def setupWorld(display):
 	playerEntity.addComponent(VelocityComponent((1, 0)))
 	playerEntity.addComponent(AccelerationComponent())
 
+	# Demonstration of how to handle input.
+	# We should push entity creation into its own file/function
 	def handleInput(entity, keys):
 		velocityComponent = entity.getComponent('VelocityComponent')
 		newVelocity = Vector2()
