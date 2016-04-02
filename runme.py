@@ -4,6 +4,19 @@ import pygame, random
 from pygame.locals import *
 import maze
 
+def quitcheck(quit=True):
+	for event in pygame.event.get():
+	#Check if the user has quit, and if so quit.
+		if event.type == QUIT:
+			return
+		elif event.type == KEYDOWN:
+			if event.key == K_ESCAPE:
+				if quit == True:
+					return
+				else:
+					pass
+					#return to the menu
+
 def main():
 	pygame.init()
 	screen = pygame.Surface((64, 64))
@@ -38,19 +51,9 @@ def main():
 	while True:
 	#Mainloop that runs at 60fps.
 		clock.tick(60)
-		for event in pygame.event.get():
-		#Check if the user has quit, and if so quit.
-			if event.type == QUIT:
-				return
-			elif event.type == KEYDOWN:
-				if event.key == K_ESCAPE:
-					return
-
-		newmaze.update()
+		quitcheck()
 		screen.blit(background, (0,0))
-		newmaze.draw(screen)
-		screen.blit(mazeFrame, (0,-1))
-		newtimer.draw(screen)
+		maze.mazeupdate(screen, newmaze, mazeFrame, newtimer)
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
 
