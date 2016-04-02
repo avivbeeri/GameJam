@@ -5,7 +5,7 @@ entity = world.createEntity()
 
 class NameComponent(Component):
     def __init__(self, name):
-        self._name = 'NameComponent'
+        super(NameComponent, self).__init__()
         self.value = name
 
 class PrintSystem(System):
