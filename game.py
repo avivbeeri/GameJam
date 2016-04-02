@@ -5,6 +5,7 @@ from pygame.locals import *
 from ecs import *
 from components import *
 from systems import *
+import maze
 
 # Creates a world
 def setupWorld(display):
@@ -12,12 +13,21 @@ def setupWorld(display):
 	entity = world.createEntity()
 	entity.addComponent(PositionComponent())
 	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
-
 	entity.addComponent(DrawableComponent(city))
 	world.addSystem(RenderSystem(display))
 
-
 	return world
+
+def setupMaze(display):
+	maze = World()
+	frame = world.createEntity()
+	frame.addComponent(PositionComponent())
+	mazeFrame = pygame.image.load(os.path.join('assets', 'puzzleframe.png'))
+	mazeFrame.convert()
+
+	entity.addComponent(DrawableComponent(mazeFrame))
+	world.addSystem(RenderSystem(display))
+	return 0
 
 
 def quitcheck(quit=True):

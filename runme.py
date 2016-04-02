@@ -21,7 +21,7 @@ def quitcheck(quit=True):
 def main():
 	pygame.init()
 	screen = pygame.Surface((64, 64))
-	outputSize = (128, 128)
+	outputSize = (256,256)
 	display = pygame.display.set_mode(outputSize)
 	pygame.display.set_caption('Test')
 	pygame.mouse.set_visible(0)
