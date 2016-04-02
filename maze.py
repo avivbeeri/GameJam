@@ -7,7 +7,7 @@ class Maze:
 		self.state = "create"
 		self.mLayer = mazeLayer
 		self.mLayer.fill((0,0,0,0))
-		self.cellSize = 8
+		self.cellSize = 4
 		self.screenSize = 56
 		if (self.screenSize/float(self.cellSize)) != (self.screenSize/self.cellSize):
 			raise ArithmeticError("Screen size must be a multiple of cell size!")
