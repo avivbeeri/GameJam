@@ -2,12 +2,14 @@
 
 import os, pygame, random
 from pygame.locals import *
+from pygame.math import Vector2
 from ecs import *
 from components import AccelerationComponent,\
 	VelocityComponent,\
 	PositionComponent,\
-	DrawableComponent
-from systems import RenderSystem, PhysicsSystem
+	DrawableComponent, \
+	InputComponent
+from systems import RenderSystem, PhysicsSystem, InputSystem
 import maze
 
 # Creates a world
@@ -26,6 +28,20 @@ def setupWorld(display):
 	playerEntity.addComponent(VelocityComponent((1, 0)))
 	playerEntity.addComponent(AccelerationComponent())
 
+	def handleInput(entity, keys):
+		velocityComponent = entity.getComponent('VelocityComponent')
+		newVelocity = Vector2()
+		if keys[pygame.K_LEFT]: newVelocity += Vector2(-3, 0)
+		if keys[pygame.K_RIGHT]: newVelocity += Vector2(3, 0)
+
+		velocityComponent.value = newVelocity
+
+	playerEntity.addComponent(InputComponent())
+	playerInputHandler = playerEntity.getComponent('InputComponent')
+	playerInputHandler.attachHandler(handleInput)
+
+
+	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(RenderSystem(display))
 	return world

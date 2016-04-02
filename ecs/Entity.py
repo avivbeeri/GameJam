@@ -8,6 +8,7 @@ class Entity:
     def addComponent(self, component):
         if hasattr(component, '_name'):
             self.components[component._name] = component
+            setattr(component, 'entity', self)
         else:
             raise ValueError('Attempted to add an object which isn\'t a component')
 
