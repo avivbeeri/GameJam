@@ -16,14 +16,43 @@ def setupWorld(display):
 	entity = world.createEntity()
 	entity.addComponent(component.Position())
 	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
-	entity.addComponent(component.Drawable(city, -1))
+	entity.addComponent(component.Drawable(city, -2))
 	world.addEntity(entity)
+
+	mapEntity = world.createEntity()
+	mapEntity.addComponent(component.Position())
+	mapSize = (64, 64)
+	cellSize = 4
+	tileSurface = pygame.Surface(mapSize).convert_alpha()
+	tileSurface.fill((0,0,0))
+	tileTotal = (mapSize[0] / cellSize) * (mapSize[1] / cellSize)
+	tileMap = [None] * tileTotal
+	for i in xrange((mapSize[0] / cellSize) * (mapSize[1] / cellSize)):
+		tileMap[i] = 'EMPTY'
+	tileMap[tileTotal - (mapSize[1] / cellSize)] =  'GROUND'
+	tileColor = {
+		'EMPTY': (100, 100, 100, 128),
+		'GROUND': (200, 200, 200)
+	}
+
+	for i in xrange(tileTotal):
+		row = i / (mapSize[0] / cellSize)
+		column = i % (mapSize[0] / cellSize)
+		print (row, column)
+		tile = tileMap[i]
+		pygame.draw.rect(tileSurface, tileColor[tile],
+			pygame.Rect(column * cellSize, row * cellSize, cellSize, cellSize)
+		)
+
+
+	mapEntity.addComponent(component.Drawable(tileSurface, -1))
+	world.addEntity(mapEntity)
 
 	playerEntity = world.createEntity()
 	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
-	playerEntity.addComponent(component.Position((32, 32)))
+	playerEntity.addComponent(component.Position((32, 48)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
 	playerEntity.addComponent(component.TargetVelocity())
