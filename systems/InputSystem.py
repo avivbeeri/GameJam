@@ -6,11 +6,11 @@ class InputSystem(System):
 
     def __init__(self):
         super(InputSystem, self).__init__();
-        self.requirements = ('InputComponent',)
+        self.requirements = ('Input',)
 
     def process(self, entities):
         # check for input
         keys = key.get_pressed()
         for entity in entities:
-            inputComponent = entity.getComponent('InputComponent')
+            inputComponent = entity.getComponent('Input')
             inputComponent.process(keys)

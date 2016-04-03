@@ -22,18 +22,20 @@ def setupWorld(display):
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
 	playerEntity.addComponent(component.Position((32, 32)))
-	playerEntity.addComponent(component.Velocity((1, 0)))
-	playerEntity.addComponent(component.Acceleration())
+	playerEntity.addComponent(component.Velocity((0, 0)))
+	playerEntity.addComponent(component.AccelerationConstant(1.0))
+	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
 	# We should push entity creation into its own file/function
 	def handleInput(entity, keys):
+		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
-		newVelocity = Vector2()
-		if keys[pygame.K_LEFT]: newVelocity += Vector2(-12, 0)
-		if keys[pygame.K_RIGHT]: newVelocity += Vector2(12, 0)
+		target = Vector2()
+		if keys[pygame.K_LEFT]: target += Vector2(-0.5, 0)
+		if keys[pygame.K_RIGHT]: target += Vector2(0.5, 0)
 
-		velocityComponent.value = newVelocity
+		targetVelocityComponent.value = target
 
 	playerEntity.addComponent(component.Input())
 	playerInputHandler = playerEntity.getComponent('Input')

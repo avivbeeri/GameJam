@@ -2,6 +2,16 @@ from pygame import *
 from pygame.math import Vector2
 from ecs import Component
 
+class Constant(Component):
+    def __init__(self, value=0):
+        super(Constant, self).__init__()
+        self.value = value
+
+class AccelerationConstant(Constant):
+    def __init__(self, value):
+        super(AccelerationConstant, self).__init__(value)
+        self._name = 'Acceleration'
+
 class Vector(Component):
     def __init__(self, vector=Vector2()):
         super(Vector, self).__init__()
@@ -14,6 +24,9 @@ class Position(Vector):
     pass
 
 class Velocity(Vector):
+    pass
+
+class TargetVelocity(Vector):
     pass
 
 class Drawable(Component):
