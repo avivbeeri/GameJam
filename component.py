@@ -59,7 +59,3 @@ class Script(Component):
 
     def attachScript(self, script):
         self.scripts.append(script)
-
-    def process(self):
-        for script in self.scripts:
-            script(self.entity)
