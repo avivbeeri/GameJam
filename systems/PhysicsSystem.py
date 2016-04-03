@@ -23,6 +23,10 @@ class PhysicsSystem(System):
             currentVelocity = velocityComponent.value
             currentAcceleration = accelerationComponent.value
 
+            x, y = currentAcceleration * targetVelocity + (1 - currentAcceleration) * currentVelocity
+            if (math.fabs(x) < 0.01): x = 0
+            if (math.fabs(y) < 0.01): y = 0
+
             # Update components with new values
             velocityComponent.value = pygame.math.Vector2((x, y))
             positionComponent.value = currentPosition + velocityComponent.value
