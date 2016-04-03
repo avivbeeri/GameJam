@@ -59,14 +59,32 @@ def setupWorld(display):
 	world.addSystem(RenderSystem(display))
 	return world
 
-def setupMaze(display):
+def setupMaze(display, time):
 	maze = World()
+
+	# Creating the frame that goes around the maze.
 	frame = world.createEntity()
-	frame.addComponent(component.Position())
+	frame.addComponent(component.Position((0,0)))
 	mazeFrame = pygame.image.load(os.path.join('assets', 'puzzleframe.png'))
 	mazeFrame.convert()
+	frame.addComponent(component.Drawable(mazeFrame, -1))
+	maze.addEntity(frame)
 
-	entity.addComponent(component.Drawable(mazeFrame))
+	# Creating the object for the timer.
+	timer = world.createEntity()
+	timer.addComponent(component.Position((4,display.get_height()-4)))
+	timeLayer = pygame.Surface((display.get_width()-8, 2))
+	timeLayer.convert()
+	timer.addComponent(component.Drawable(timeLayer, 1))
+	timer.addComponent(maze.Timer())
+	maze.addEntity(timer)
+
+	# Creating the object for the maze.
+	mazeContent = world.createEntity()
+	mazeContent.addComponent(component.Position((4,4)))
+	mazeLayer = pygame.Surface((display.get_width()-8,display.get_height()-8))
+	maze.addEntity(mazeContent)
+
 	world.addSystem(RenderSystem(display))
 	return 0
 

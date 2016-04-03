@@ -99,7 +99,7 @@ class Timer:
 		self.starttime = datetime.datetime.now()
 		self.endtime = self.starttime + datetime.timedelta(seconds=time)
 
-	def draw(self, screen):
+	def update(self):
 		if self.stepno == self.timeLayer.get_width():
 			print "You ran out of time!"
 			quit() #In future we can do some function that kicks the user out.
@@ -109,10 +109,10 @@ class Timer:
 			self.stepno += 1
 			print "Completed step " + str(self.stepno) + " of " + str(self.timeLayer.get_width())
 		pygame.draw.rect(self.timeLayer, (255,0,0,191), Rect(0,0,self.stepno,2))
-		screen.blit(self.timeLayer, (4,screen.get_height()-4))
 
 def mazeUpdate(screen, maze, mazeFrame, timer):
 	maze.update()
 	maze.draw(screen)
 	screen.blit(mazeFrame, (0,-1))
-	timer.draw(screen)
+	timer.update(screen)
+	screen.blit(self.timeLayer, (4,screen.get_height()-4))
