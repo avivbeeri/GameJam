@@ -7,13 +7,16 @@ from ecs import *
 import component
 from systems import RenderSystem, PhysicsSystem, InputSystem
 import maze
-import pytmx
+from pytmx.util_pygame import load_pygame
 
 inputSystem = InputSystem()
-tmxdata = pytmx.TiledMap(os.path.join('assets', 'map.tmx'))
+
+
 
 # Creates a world
 def setupWorld(display):
+	tmxdata = load_pygame(os.path.join('assets', 'test.tmx'))
+
 	world = World()
 	entity = world.createEntity()
 	entity.addComponent(component.Position())
@@ -42,10 +45,13 @@ def setupWorld(display):
 		column = i % (mapSize[0] / cellSize)
 		print (row, column)
 		tile = tileMap[i]
-		pygame.draw.rect(tileSurface, tileColor[tile],
-			pygame.Rect(column * cellSize, row * cellSize, cellSize, cellSize)
-		)
-
+		image = tmxdata.get_tile_image(column, row, 0)
+		if not image == None:
+			tileSurface.blit(image, (column * cellSize, row * cellSize))
+		else:
+			pygame.draw.rect(tileSurface, tileColor[tile],
+				pygame.Rect(column * cellSize, row * cellSize, cellSize, cellSize)
+			)
 
 	mapEntity.addComponent(component.Drawable(tileSurface, -1))
 	world.addEntity(mapEntity)
