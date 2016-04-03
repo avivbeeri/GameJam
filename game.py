@@ -7,8 +7,10 @@ from ecs import *
 import component
 from systems import RenderSystem, PhysicsSystem, InputSystem
 import maze
+import pytmx
 
 inputSystem = InputSystem()
+tmxdata = pytmx.TiledMap(os.path.join('assets', 'map.tmx'))
 
 # Creates a world
 def setupWorld(display):
