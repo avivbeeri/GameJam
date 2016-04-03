@@ -8,6 +8,8 @@ import component
 from systems import RenderSystem, PhysicsSystem, InputSystem
 import maze
 
+inputSystem = InputSystem()
+
 # Creates a world
 def setupWorld(display):
 	world = World()
@@ -28,21 +30,31 @@ def setupWorld(display):
 
 	# Demonstration of how to handle input.
 	# We should push entity creation into its own file/function
-	def handleInput(entity, keys):
+	def handleInput(entity, event):
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
-		target = Vector2()
-		if keys[pygame.K_LEFT]: target += Vector2(-0.5, 0)
-		if keys[pygame.K_RIGHT]: target += Vector2(0.5, 0)
+		target = targetVelocityComponent.value
+
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_LEFT:
+				target = Vector2(-0.3, 0)
+			elif event.key == pygame.K_RIGHT:
+				target = Vector2(0.3, 0)
+		elif event.type == pygame.KEYUP:
+			if event.key == pygame.K_LEFT:
+				target = Vector2(0, 0)
+			elif event.key == pygame.K_RIGHT:
+				target = Vector2(0, 0)
 
 		targetVelocityComponent.value = target
 
-	playerEntity.addComponent(component.Input())
-	playerInputHandler = playerEntity.getComponent('Input')
-	playerInputHandler.attachHandler(handleInput)
+	playerEntity.addComponent(component.EventHandler())
+	playerInputHandler = playerEntity.getComponent('EventHandler')
+	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
+	playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
 	world.addEntity(playerEntity)
 
-	world.addSystem(InputSystem())
+	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
 	world.addSystem(RenderSystem(display))
 	return world
@@ -62,6 +74,7 @@ def setupMaze(display):
 def quitcheck(quit=True):
 	for event in pygame.event.get():
 	#Check if the user has quit, and if so quit.
+		inputSystem.eventQueue.append(event)
 		if event.type == QUIT:
 			return 1
 		elif event.type == KEYDOWN:

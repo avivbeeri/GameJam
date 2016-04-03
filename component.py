@@ -35,12 +35,29 @@ class Drawable(Component):
         self.image = surface
         self.layer = layer
 
-class Input(Component):
+class EventHandler(Component):
     def __init__(self):
-        super(Input, self).__init__()
-        self.handlers = []
+        super(EventHandler, self).__init__()
+        self.handlers = {}
 
-    def attachHandler(self, handler):
+    def attachHandler(self, eventName, handler):
+        if not eventName in self.handlers:
+            self.handlers[eventName] = []
+        self.handlers[eventName].append(handler)
+
+
+    def handle(self, event):
+        eventName = event.type
+        if eventName in self.handlers and len(self.handlers[eventName]) > 0:
+            for handler in self.handlers[eventName]:
+                handler(self.entity, event)
+
+class Script(Component):
+    def __init__(self):
+        super(Script, self).__init__()
+        self.scripts = []
+
+    def attachScript(self, script):
         self.handlers.append(handler)
 
     def process(self, keys):
