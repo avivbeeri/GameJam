@@ -41,9 +41,7 @@ def setupWorld(display):
 			elif event.key == pygame.K_RIGHT:
 				target = Vector2(0.3, 0)
 		elif event.type == pygame.KEYUP:
-			if event.key == pygame.K_LEFT:
-				target = Vector2(0, 0)
-			elif event.key == pygame.K_RIGHT:
+			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 				target = Vector2(0, 0)
 
 		targetVelocityComponent.value = target
@@ -58,6 +56,7 @@ def setupWorld(display):
 	world.addSystem(PhysicsSystem())
 	world.addSystem(RenderSystem(display))
 	return world
+
 
 def setupMaze(display):
 	maze = World()
@@ -85,6 +84,7 @@ def quitcheck(quit=True):
 					pass
 					#return to the menu
 	return 0
+
 
 def main():
 	pygame.init()
