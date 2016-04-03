@@ -20,10 +20,11 @@ class PhysicsSystem(System):
             '''
                 Velocity Verlot Method:
                 http://gamedev.stackexchange.com/questions/15708/how-can-i-implement-gravity
-            '''
+
 
             newPosition = currentPosition + dt * (currentVelocity + dt * currentAcceleration / 2)
             newVelocity = currentVelocity + dt * currentAcceleration
+            '''
 
             # Update components with new values
             positionComponent.value = newPosition

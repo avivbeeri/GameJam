@@ -19,6 +19,7 @@ def setupWorld(display):
 	entity.addComponent(PositionComponent())
 	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
 	entity.addComponent(DrawableComponent(city, -1))
+	world.addEntity(entity)
 
 	playerEntity = world.createEntity()
 	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
@@ -33,15 +34,15 @@ def setupWorld(display):
 	def handleInput(entity, keys):
 		velocityComponent = entity.getComponent('VelocityComponent')
 		newVelocity = Vector2()
-		if keys[pygame.K_LEFT]: newVelocity += Vector2(-3, 0)
-		if keys[pygame.K_RIGHT]: newVelocity += Vector2(3, 0)
+		if keys[pygame.K_LEFT]: newVelocity += Vector2(-12, 0)
+		if keys[pygame.K_RIGHT]: newVelocity += Vector2(12, 0)
 
 		velocityComponent.value = newVelocity
 
 	playerEntity.addComponent(InputComponent())
 	playerInputHandler = playerEntity.getComponent('InputComponent')
 	playerInputHandler.attachHandler(handleInput)
-
+	world.addEntity(playerEntity)
 
 	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())

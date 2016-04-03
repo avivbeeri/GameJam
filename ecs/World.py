@@ -9,8 +9,10 @@ class World:
     def createEntity(self):
         entity = Entity(self.idCounter)
         self.idCounter += 1
-        self.entities.append(entity)
         return entity
+
+    def addEntity(self, entity):
+        self.entities.append(entity)
 
     def addSystem(self, system):
         self.systems.append(system)
