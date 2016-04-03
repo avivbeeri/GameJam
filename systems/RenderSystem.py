@@ -7,7 +7,7 @@ class RenderSystem(System):
         self.requirements = ('Position', 'Drawable')
         self.surface = surface
 
-    def process(self, entities):
+    def process(self, entities, dt):
         self.surface.fill((0, 0, 0))
         images = []
         for entity in entities:

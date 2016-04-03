@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, pygame, random
+import math, os, pygame, random
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
@@ -25,7 +25,7 @@ def setupWorld(display):
 	playerEntity.addComponent(component.Drawable(ghostSprite))
 	playerEntity.addComponent(component.Position((32, 32)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
-	playerEntity.addComponent(component.AccelerationConstant(1.0))
+	playerEntity.addComponent(component.Acceleration())
 	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
@@ -33,18 +33,19 @@ def setupWorld(display):
 	def handleInput(entity, event):
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
-		target = targetVelocityComponent.value
 
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LEFT:
-				target = Vector2(-0.3, 0)
+				velocityComponent.value = Vector2(-0.3, 0)
+				targetVelocityComponent.value = Vector2(-1, 0)
 			elif event.key == pygame.K_RIGHT:
-				target = Vector2(0.3, 0)
+				velocityComponent.value = Vector2(0.3, 0)
+				targetVelocityComponent.value = Vector2(1, 0)
 		elif event.type == pygame.KEYUP:
 			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-				target = Vector2(0, 0)
+				velocityComponent.value = Vector2(0, 0)
 
-		targetVelocityComponent.value = target
+
 
 	playerEntity.addComponent(component.EventHandler())
 	playerInputHandler = playerEntity.getComponent('EventHandler')
@@ -106,11 +107,15 @@ def main():
 	# Create the world
 	# Later this could be delegated to a "State" object.
 	world = setupWorld(screen)
-
+	currentTime = pygame.time.get_ticks()
+	dt = 1 / 60.0;
 	while quitcheck() != 1:
-	#Mainloop that runs at 60fps.
-		clock.tick(60)
-		world.update()
+		newTime = pygame.time.get_ticks()
+		frameTime = newTime - currentTime
+		currentTime = newTime
+
+		world.update(frameTime / 1000.0)
+
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
 

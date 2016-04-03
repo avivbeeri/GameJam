@@ -8,9 +8,8 @@ class InputSystem(System):
         self.requirements = ('EventHandler',)
         self.eventQueue = []
 
-    def process(self, entities):
-        # check for input
-        # keys = pygame.key.get_pressed()
+    def process(self, entities, dt):
+        # process the queued events
         for event in self.eventQueue:
             for entity in entities:
                 inputComponent = entity.getComponent('EventHandler')
