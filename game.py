@@ -4,11 +4,7 @@ import os, pygame, random
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
-from components import AccelerationComponent,\
-	VelocityComponent,\
-	PositionComponent,\
-	DrawableComponent, \
-	InputComponent
+import component
 from systems import RenderSystem, PhysicsSystem, InputSystem
 import maze
 
@@ -16,30 +12,30 @@ import maze
 def setupWorld(display):
 	world = World()
 	entity = world.createEntity()
-	entity.addComponent(PositionComponent())
+	entity.addComponent(component.Position())
 	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
-	entity.addComponent(DrawableComponent(city, -1))
+	entity.addComponent(component.Drawable(city, -1))
 
 	playerEntity = world.createEntity()
 	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
 
-	playerEntity.addComponent(DrawableComponent(ghostSprite))
-	playerEntity.addComponent(PositionComponent((32, 32)))
-	playerEntity.addComponent(VelocityComponent((1, 0)))
-	playerEntity.addComponent(AccelerationComponent())
+	playerEntity.addComponent(component.Drawable(ghostSprite))
+	playerEntity.addComponent(component.Position((32, 32)))
+	playerEntity.addComponent(component.Velocity((1, 0)))
+	playerEntity.addComponent(component.Acceleration())
 
 	# Demonstration of how to handle input.
 	# We should push entity creation into its own file/function
 	def handleInput(entity, keys):
-		velocityComponent = entity.getComponent('VelocityComponent')
+		velocityComponent = entity.getComponent('Velocity')
 		newVelocity = Vector2()
 		if keys[pygame.K_LEFT]: newVelocity += Vector2(-3, 0)
 		if keys[pygame.K_RIGHT]: newVelocity += Vector2(3, 0)
 
 		velocityComponent.value = newVelocity
 
-	playerEntity.addComponent(InputComponent())
-	playerInputHandler = playerEntity.getComponent('InputComponent')
+	playerEntity.addComponent(component.Input())
+	playerInputHandler = playerEntity.getComponent('Input')
 	playerInputHandler.attachHandler(handleInput)
 
 
@@ -51,11 +47,11 @@ def setupWorld(display):
 def setupMaze(display):
 	maze = World()
 	frame = world.createEntity()
-	frame.addComponent(PositionComponent())
+	frame.addComponent(component.Position())
 	mazeFrame = pygame.image.load(os.path.join('assets', 'puzzleframe.png'))
 	mazeFrame.convert()
 
-	entity.addComponent(DrawableComponent(mazeFrame))
+	entity.addComponent(component.Drawable(mazeFrame))
 	world.addSystem(RenderSystem(display))
 	return 0
 
