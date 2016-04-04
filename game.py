@@ -43,7 +43,7 @@ def setupWorld(display):
 	for i in xrange(tileTotal):
 		row = i / (mapSize[0] / cellSize)
 		column = i % (mapSize[0] / cellSize)
-		print (row, column)
+		# print (row, column)
 		tile = tileMap[i]
 		image = tmxdata.get_tile_image(column, row, 0)
 		if not image == None:
@@ -92,7 +92,7 @@ def setupWorld(display):
 
 	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
-	world.addSystem(RenderSystem(display))
+	# world.addSystem(RenderSystem(display))
 	return world
 
 
@@ -108,8 +108,8 @@ def setupMaze(display):
 	return 0
 
 
-def quitcheck(quit=True):
-	for event in pygame.event.get():
+def quitcheck(eventQueue, quit=True):
+	for event in eventQueue:
 	#Check if the user has quit, and if so quit.
 		inputSystem.eventQueue.append(event)
 		if event.type == QUIT:
@@ -145,14 +145,24 @@ def main():
 	# Later this could be delegated to a "State" object.
 	world = setupWorld(screen)
 	currentTime = pygame.time.get_ticks()
-	dt = 1 / 60.0;
-	while quitcheck() != 1:
+	dt = (1.0 / 60.0) * 1000;
+	eventQueue = []
+	renderSystem = RenderSystem(screen)
+	while quitcheck(eventQueue) != 1:
 		newTime = pygame.time.get_ticks()
 		frameTime = newTime - currentTime
 		currentTime = newTime
+		eventQueue = pygame.event.get()
+		while (frameTime > 0.0):
 
-		world.update(frameTime / 1000.0)
+			deltaTime = min(frameTime, dt)
+			world.update(deltaTime / 1000.0)
+			frameTime -= deltaTime
 
+		# We do rendering outside the regular update loop for performance reasons
+		# See: http://gafferongames.com/game-physics/fix-your-timestep/
+		entities = renderSystem.getProcessableEntities(world)
+		renderSystem.process(entities, 0)
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
 
