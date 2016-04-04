@@ -3,6 +3,12 @@ A game for the gamejam!
 People working on this: Aviv, Sanchit, Medbh  
 As of yet we haven't assigned any kind of roles.
 
+Dependencies:
+Python 2.7.+
+PyGame
+PyTMX (For reading Tiled map files)
+
+
 Summary:  
 Cyberpunk heroes break into a building for fun, profit and adventure! Entirely within 64*64 pixels!
 

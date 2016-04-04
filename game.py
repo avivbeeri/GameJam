@@ -1,31 +1,67 @@
 #!/usr/bin/env python
 
-import os, pygame, random
+import math, os, pygame, random
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
 import component
 from systems import RenderSystem, PhysicsSystem, InputSystem
 import maze
+from pytmx.util_pygame import load_pygame
 
 inputSystem = InputSystem()
 
+
 # Creates a world
 def setupWorld(display):
+	tmxdata = load_pygame(os.path.join('assets', 'test.tmx'))
+
 	world = World()
 	entity = world.createEntity()
 	entity.addComponent(component.Position())
 	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
-	entity.addComponent(component.Drawable(city, -1))
+	entity.addComponent(component.Drawable(city, -2))
 	world.addEntity(entity)
+
+	mapEntity = world.createEntity()
+	mapEntity.addComponent(component.Position())
+	mapSize = (64, 64)
+	cellSize = 4
+	tileSurface = pygame.Surface(mapSize).convert_alpha()
+	tileSurface.fill((0,0,0))
+	tileTotal = (mapSize[0] / cellSize) * (mapSize[1] / cellSize)
+	tileMap = [None] * tileTotal
+	for i in xrange((mapSize[0] / cellSize) * (mapSize[1] / cellSize)):
+		tileMap[i] = 'EMPTY'
+	tileMap[tileTotal - (mapSize[1] / cellSize)] =  'GROUND'
+	tileColor = {
+		'EMPTY': (100, 100, 100, 128),
+		'GROUND': (200, 200, 200)
+	}
+
+	for i in xrange(tileTotal):
+		row = i / (mapSize[0] / cellSize)
+		column = i % (mapSize[0] / cellSize)
+		# print (row, column)
+		tile = tileMap[i]
+		image = tmxdata.get_tile_image(column, row, 0)
+		if not image == None:
+			tileSurface.blit(image, (column * cellSize, row * cellSize))
+		else:
+			pygame.draw.rect(tileSurface, tileColor[tile],
+				pygame.Rect(column * cellSize, row * cellSize, cellSize, cellSize)
+			)
+
+	mapEntity.addComponent(component.Drawable(tileSurface, -1))
+	world.addEntity(mapEntity)
 
 	playerEntity = world.createEntity()
 	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
-	playerEntity.addComponent(component.Position((32, 32)))
+	playerEntity.addComponent(component.Position((32, 48)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
-	playerEntity.addComponent(component.AccelerationConstant(1.0))
+	playerEntity.addComponent(component.Acceleration())
 	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
@@ -33,20 +69,19 @@ def setupWorld(display):
 	def handleInput(entity, event):
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
-		target = targetVelocityComponent.value
 
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LEFT:
-				target = Vector2(-0.3, 0)
+				velocityComponent.value = Vector2(-0.3, 0)
+				targetVelocityComponent.value = Vector2(-1, 0)
 			elif event.key == pygame.K_RIGHT:
-				target = Vector2(0.3, 0)
+				velocityComponent.value = Vector2(0.3, 0)
+				targetVelocityComponent.value = Vector2(1, 0)
 		elif event.type == pygame.KEYUP:
-			if event.key == pygame.K_LEFT:
-				target = Vector2(0, 0)
-			elif event.key == pygame.K_RIGHT:
-				target = Vector2(0, 0)
+			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+				velocityComponent.value = Vector2(0, 0)
 
-		targetVelocityComponent.value = target
+
 
 	playerEntity.addComponent(component.EventHandler())
 	playerInputHandler = playerEntity.getComponent('EventHandler')
@@ -56,10 +91,10 @@ def setupWorld(display):
 
 	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
-	world.addSystem(RenderSystem(display))
+	# world.addSystem(RenderSystem(display))
 	return world
 
-def setupMaze(display, time):
+def setupMaze(display):
 	maze = World()
 
 	# Creating the frame that goes around the maze.
@@ -89,8 +124,8 @@ def setupMaze(display, time):
 	return 0
 
 
-def quitcheck(quit=True):
-	for event in pygame.event.get():
+def quitcheck(eventQueue, quit=True):
+	for event in eventQueue:
 	#Check if the user has quit, and if so quit.
 		inputSystem.eventQueue.append(event)
 		if event.type == QUIT:
@@ -103,6 +138,7 @@ def quitcheck(quit=True):
 					pass
 					#return to the menu
 	return 0
+
 
 def main():
 	pygame.init()
@@ -124,11 +160,29 @@ def main():
 	# Create the world
 	# Later this could be delegated to a "State" object.
 	world = setupWorld(screen)
+	renderSystem = RenderSystem(screen)
+	eventQueue = []
 
-	while quitcheck() != 1:
-	#Mainloop that runs at 60fps.
-		clock.tick(60)
-		world.update()
+	dt = (0.01) * 1000;
+	accumulator = 0
+	currentTime = pygame.time.get_ticks()
+
+	while quitcheck(eventQueue) != 1:
+		newTime = pygame.time.get_ticks()
+		frameTime = newTime - currentTime
+		currentTime = newTime
+		accumulator += frameTime
+
+		# Retrieve input events for processing
+		eventQueue = pygame.event.get()
+		while (accumulator >= dt):
+			world.update(dt / 1000.0)
+			accumulator -= dt
+
+		# We do rendering outside the regular update loop for performance reasons
+		# See: http://gafferongames.com/game-physics/fix-your-timestep/
+		entities = renderSystem.getProcessableEntities(world)
+		renderSystem.process(entities, 0)
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
 

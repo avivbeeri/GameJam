@@ -22,6 +22,6 @@ class System(object):
             # if we have no requirements, process all entities
             return tuple(entities)
 
-    def process(self, entities):
+    def process(self, entities, dt):
         # Logic for processing entities
         pass

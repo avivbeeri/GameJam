@@ -58,8 +58,4 @@ class Script(Component):
         self.scripts = []
 
     def attachScript(self, script):
-        self.handlers.append(handler)
-
-    def process(self, keys):
-        for handler in self.handlers:
-            handler(self.entity, keys)
+        self.scripts.append(script)

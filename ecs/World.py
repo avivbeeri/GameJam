@@ -20,7 +20,7 @@ class World:
     def getEntities(self):
         return self.entities
 
-    def update(self):
+    def update(self, dt):
         for system in self.systems:
             entities = system.getProcessableEntities(self)
-            system.process(entities)
+            system.process(entities, dt)
