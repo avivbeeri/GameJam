@@ -144,20 +144,24 @@ def main():
 	# Create the world
 	# Later this could be delegated to a "State" object.
 	world = setupWorld(screen)
-	currentTime = pygame.time.get_ticks()
-	dt = (1.0 / 60.0) * 1000;
-	eventQueue = []
 	renderSystem = RenderSystem(screen)
+	eventQueue = []
+
+	dt = (0.01) * 1000;
+	accumulator = 0
+	currentTime = pygame.time.get_ticks()
+
 	while quitcheck(eventQueue) != 1:
 		newTime = pygame.time.get_ticks()
 		frameTime = newTime - currentTime
 		currentTime = newTime
-		eventQueue = pygame.event.get()
-		while (frameTime > 0.0):
+		accumulator += frameTime
 
-			deltaTime = min(frameTime, dt)
-			world.update(deltaTime / 1000.0)
-			frameTime -= deltaTime
+		# Retrieve input events for processing
+		eventQueue = pygame.event.get()
+		while (accumulator >= dt):
+			world.update(dt / 1000.0)
+			accumulator -= dt
 
 		# We do rendering outside the regular update loop for performance reasons
 		# See: http://gafferongames.com/game-physics/fix-your-timestep/
