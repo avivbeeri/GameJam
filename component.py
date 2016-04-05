@@ -57,5 +57,5 @@ class Script(Component):
         super(Script, self).__init__()
         self.scripts = []
 
-    def attachScript(self, script):
+    def attach(self, script):
         self.scripts.append(script)

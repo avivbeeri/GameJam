@@ -5,7 +5,7 @@ from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
 import component
-from systems import RenderSystem, PhysicsSystem, InputSystem
+from systems import RenderSystem, PhysicsSystem, InputSystem, ScriptSystem
 import maze
 from pytmx.util_pygame import load_pygame
 
@@ -112,6 +112,8 @@ def setupMaze(display, time):
 	timeLayer.convert()
 	timer.addComponent(maze.Timer(timeLayer, time))
 	timer.addComponent(component.Drawable(timer.getComponent("MazeTimer").timeLayer, 2))
+	timer.addComponent(component.Script())
+	timer.getComponent("Script").attach(timer.getComponent("MazeTimer").update)
 	world.addEntity(timer)
 
 	# Creating the object for the maze.
@@ -124,6 +126,7 @@ def setupMaze(display, time):
 	world.addEntity(mazeContent)
 
 	world.addSystem(RenderSystem(display))
+	world.addSystem(ScriptSystem())
 	return world
 
 
