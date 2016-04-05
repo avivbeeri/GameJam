@@ -1,6 +1,5 @@
 import pygame, random
 from pygame.locals import *
-from game import worlds, gamescreen
 
 class Maze:
 	def __init__(self, mazeLayer):
@@ -93,10 +92,6 @@ class Maze:
 	def draw(self, screen):
 		screen.blit(self.mLayer, (3,3))
 
-def timeUp():
-	global gamescreen, worlds
-	gamescreen = "main"
-
 class Timer:
 	# Note: the time paramenter must be in seconds!
 	def __init__ (self, screenLayer, time):
@@ -108,15 +103,17 @@ class Timer:
 		self._name = "MazeTimer"
 
 	def update(self, entity):
+		retval = 0
 		if pygame.time.get_ticks() >= self.endtime:
 			print "You ran out of time!"
-			timeUp()
+			retval = 1
 
 		pygame.draw.rect(self.timeLayer, (0,255,0,191), Rect(0,0,self.timeLayer.get_width(), 2))
 		if pygame.time.get_ticks() > self.starttime + (self.period*self.stepno):
 			self.stepno += 1
 			print "Completed step " + str(self.stepno) + " of " + str(self.timeLayer.get_width())
 		pygame.draw.rect(self.timeLayer, (255,0,0,191), Rect(0,0,self.stepno,2))
+		return retval
 
 def mazeUpdate(screen, maze, mazeFrame, timer):
 	maze.update()
