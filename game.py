@@ -53,7 +53,7 @@ def setupWorld(display):
 				pygame.Rect(column * cellSize, row * cellSize, cellSize, cellSize)
 			)
 
-	mapEntity.addComponent(component.Drawable(tileSurface, -1))
+	mapEntity.addComponent(component.Drawable(tileSurface, -2))
 	world.addEntity(mapEntity)
 
 	playerEntity = world.createEntity()
@@ -89,6 +89,12 @@ def setupWorld(display):
 	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
 	playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
 	world.addEntity(playerEntity)
+
+	terminal = world.createEntity()
+	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
+	terminal.addComponent(component.Position((52,52)))
+	terminal.addComponent(component.Drawable(termSprite, -1))
+	world.addEntity(terminal)
 
 	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
