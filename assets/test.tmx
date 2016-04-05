@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="16" height="16" tilewidth="4" tileheight="4" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="16" height="16" tilewidth="4" tileheight="4" nextobjectid="3">
  <tileset firstgid="1" name="experiment-tiles" tilewidth="4" tileheight="4" tilecount="3" columns="3">
   <image source="experiment-tiles.png" width="12" height="4"/>
  </tileset>
- <layer name="Tile Layer 1" width="16" height="16">
+ <layer name="foreground" width="16" height="16">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
