@@ -7,6 +7,7 @@ from ecs import *
 import component
 from systems import RenderSystem, PhysicsSystem, InputSystem
 import maze
+import tileMap
 from pytmx.util_pygame import load_pygame
 
 inputSystem = InputSystem()
@@ -15,8 +16,6 @@ inputSystem = InputSystem()
 
 # Creates a world
 def setupWorld(display):
-	tmxdata = load_pygame(os.path.join('assets', 'test.tmx'))
-
 	world = World()
 	entity = world.createEntity()
 	entity.addComponent(component.Position())
@@ -26,33 +25,7 @@ def setupWorld(display):
 
 	mapEntity = world.createEntity()
 	mapEntity.addComponent(component.Position())
-	mapSize = (64, 64)
-	cellSize = 4
-	tileSurface = pygame.Surface(mapSize).convert_alpha()
-	tileSurface.fill((0,0,0))
-	tileTotal = (mapSize[0] / cellSize) * (mapSize[1] / cellSize)
-	tileMap = [None] * tileTotal
-	for i in xrange((mapSize[0] / cellSize) * (mapSize[1] / cellSize)):
-		tileMap[i] = 'EMPTY'
-	tileMap[tileTotal - (mapSize[1] / cellSize)] =  'GROUND'
-	tileColor = {
-		'EMPTY': (100, 100, 100, 128),
-		'GROUND': (200, 200, 200)
-	}
-
-	for i in xrange(tileTotal):
-		row = i / (mapSize[0] / cellSize)
-		column = i % (mapSize[0] / cellSize)
-		# print (row, column)
-		tile = tileMap[i]
-		image = tmxdata.get_tile_image(column, row, 0)
-		if not image == None:
-			tileSurface.blit(image, (column * cellSize, row * cellSize))
-		else:
-			pygame.draw.rect(tileSurface, tileColor[tile],
-				pygame.Rect(column * cellSize, row * cellSize, cellSize, cellSize)
-			)
-
+	tileSurface = tileMap.TileMap('test.tmx').getLayerSurface(0)
 	mapEntity.addComponent(component.Drawable(tileSurface, -1))
 	world.addEntity(mapEntity)
 
