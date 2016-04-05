@@ -5,7 +5,7 @@ from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
 import component
-from systems import RenderSystem, PhysicsSystem, InputSystem
+from systems import RenderSystem, PhysicsSystem, InputSystem, TileCollisionSystem
 import maze
 import tileMap
 from pytmx.util_pygame import load_pygame
@@ -24,7 +24,8 @@ def setupWorld(display):
 
 	mapEntity = world.createEntity()
 	mapEntity.addComponent(component.Position())
-	tileSurface = tileMap.TileMap('test.tmx').getLayerSurface(0)
+	mapData = tileMap.TileMap('test.tmx')
+	tileSurface = mapData.getLayerSurface(0)
 	mapEntity.addComponent(component.Drawable(tileSurface, -1))
 	world.addEntity(mapEntity)
 
@@ -33,8 +34,10 @@ def setupWorld(display):
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
 	playerEntity.addComponent(component.Position((32, 48)))
+	playerEntity.addComponent(component.Dimension((4, 12)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
+	playerEntity.addComponent(component.Collidable())
 	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
@@ -64,6 +67,7 @@ def setupWorld(display):
 
 	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
 	# world.addSystem(RenderSystem(display))
 	return world
 
