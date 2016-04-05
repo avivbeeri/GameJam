@@ -11,6 +11,7 @@ from pytmx.util_pygame import load_pygame
 
 inputSystem = InputSystem()
 gamescreen = "main"
+worlds = dict()
 
 # Creates a world
 def setupWorld(display):
@@ -123,6 +124,8 @@ def setupMaze(display, time):
 	mazeLayer.convert()
 	mazeContent.addComponent(maze.Maze(mazeLayer))
 	mazeContent.addComponent(component.Drawable(mazeContent.getComponent("Maze").mLayer, 0))
+	mazeContent.addComponent(component.Script())
+	mazeContent.getComponent("Script").attach(mazeContent.getComponent("Maze").update)
 	world.addEntity(mazeContent)
 
 	world.addSystem(RenderSystem(display))
@@ -147,7 +150,7 @@ def quitcheck(eventQueue, quit=True):
 
 
 def main():
-	global gamescreen
+	global gamescreen, worlds
 	pygame.init()
 
 	outputSize = (512, 512)
@@ -166,7 +169,7 @@ def main():
 
 	# Create the world
 	# Later this could be delegated to a "State" object.
-	worlds = {"main" : setupWorld(screen)}
+	worlds["main"] = setupWorld(screen)
 	renderSystem = RenderSystem(screen)
 	eventQueue = []
 
