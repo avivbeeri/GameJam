@@ -10,7 +10,7 @@ import maze
 from pytmx.util_pygame import load_pygame
 
 inputSystem = InputSystem()
-
+gamescreen = "main"
 
 # Creates a world
 def setupWorld(display):
@@ -94,53 +94,57 @@ def setupWorld(display):
 	# world.addSystem(RenderSystem(display))
 	return world
 
-def setupMaze(display):
-	maze = World()
+def setupMaze(display, time):
+	world = World()
 
 	# Creating the frame that goes around the maze.
 	frame = world.createEntity()
 	frame.addComponent(component.Position((0,0)))
 	mazeFrame = pygame.image.load(os.path.join('assets', 'puzzleframe.png'))
 	mazeFrame.convert()
-	frame.addComponent(component.Drawable(mazeFrame, -1))
-	maze.addEntity(frame)
+	frame.addComponent(component.Drawable(mazeFrame, 1))
+	world.addEntity(frame)
 
 	# Creating the object for the timer.
 	timer = world.createEntity()
-	timer.addComponent(component.Position((4,display.get_height()-4)))
+	timer.addComponent(component.Position((4,display.get_height()-3)))
 	timeLayer = pygame.Surface((display.get_width()-8, 2))
 	timeLayer.convert()
-	timer.addComponent(component.Drawable(timeLayer, 1))
-	timer.addComponent(maze.Timer())
-	maze.addEntity(timer)
+	timer.addComponent(maze.Timer(timeLayer, time))
+	timer.addComponent(component.Drawable(timer.getComponent("MazeTimer").timeLayer, 2))
+	world.addEntity(timer)
 
 	# Creating the object for the maze.
 	mazeContent = world.createEntity()
 	mazeContent.addComponent(component.Position((4,4)))
 	mazeLayer = pygame.Surface((display.get_width()-8,display.get_height()-8))
-	maze.addEntity(mazeContent)
+	mazeLayer.convert()
+	mazeContent.addComponent(maze.Maze(mazeLayer))
+	mazeContent.addComponent(component.Drawable(mazeContent.getComponent("Maze").mLayer, 0))
+	world.addEntity(mazeContent)
 
 	world.addSystem(RenderSystem(display))
-	return 0
+	return world
 
 
 def quitcheck(eventQueue, quit=True):
+	retval = 0
 	for event in eventQueue:
 	#Check if the user has quit, and if so quit.
 		inputSystem.eventQueue.append(event)
 		if event.type == QUIT:
-			return 1
+			retval = 1
 		elif event.type == KEYDOWN:
 			if event.key == K_ESCAPE:
 				if quit == True:
-					return 1
+					retval = 1
 				else:
-					pass
-					#return to the menu
-	return 0
+					pass # In future we'll use this to return to the main menu
+	return retval
 
 
 def main():
+	global gamescreen
 	pygame.init()
 
 	outputSize = (512, 512)
@@ -159,7 +163,7 @@ def main():
 
 	# Create the world
 	# Later this could be delegated to a "State" object.
-	world = setupWorld(screen)
+	worlds = {"main" : setupWorld(screen)}
 	renderSystem = RenderSystem(screen)
 	eventQueue = []
 
@@ -175,13 +179,19 @@ def main():
 
 		# Retrieve input events for processing
 		eventQueue = pygame.event.get()
+
+		for event in eventQueue:
+			inputSystem.eventQueue.append(event)
+			if (event.type == KEYDOWN) and (event.key == K_UP):
+				worlds["maze"] = setupMaze(screen, 10)
+				gamescreen = "maze"
 		while (accumulator >= dt):
-			world.update(dt / 1000.0)
+			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt
 
 		# We do rendering outside the regular update loop for performance reasons
 		# See: http://gafferongames.com/game-physics/fix-your-timestep/
-		entities = renderSystem.getProcessableEntities(world)
+		entities = renderSystem.getProcessableEntities(worlds[gamescreen])
 		renderSystem.process(entities, 0)
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
