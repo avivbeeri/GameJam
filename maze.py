@@ -1,4 +1,4 @@
-import pygame, random, datetime
+import pygame, random
 from pygame.locals import *
 
 class Maze:
@@ -91,21 +91,24 @@ class Maze:
 	def draw(self, screen):
 		screen.blit(self.mLayer, (3,3))
 
+def timeUp():
+	quit() #In the future this can be changed so that it kicks the user out of the maze, instead of the entire game.
+
 class Timer:
 	def __init__ (self, screenLayer, time):
 		self.timeLayer = screenLayer
-		self.period = datetime.timedelta(seconds=(time/float(self.timeLayer.get_width())))
+		self.period = (time*1000)/float(self.timeLayer.get_width())
 		self.stepno = 0
-		self.starttime = datetime.datetime.now()
-		self.endtime = self.starttime + datetime.timedelta(seconds=time)
+		self.starttime = pygame.time.get_ticks()
+		self.endtime = self.starttime + time*1000
 
 	def update(self):
-		if self.stepno == self.timeLayer.get_width():
+		if pygame.time.get_ticks() >= self.endtime:
 			print "You ran out of time!"
-			quit() #In future we can do some function that kicks the user out.
+			timeUp()
 
 		pygame.draw.rect(self.timeLayer, (0,255,0,191), Rect(0,0,self.timeLayer.get_width(), 2))
-		if datetime.datetime.now() > self.starttime + (self.period*self.stepno):
+		if pygame.time.get_ticks() > self.starttime + (self.period*self.stepno):
 			self.stepno += 1
 			print "Completed step " + str(self.stepno) + " of " + str(self.timeLayer.get_width())
 		pygame.draw.rect(self.timeLayer, (255,0,0,191), Rect(0,0,self.stepno,2))
@@ -114,5 +117,5 @@ def mazeUpdate(screen, maze, mazeFrame, timer):
 	maze.update()
 	maze.draw(screen)
 	screen.blit(mazeFrame, (0,-1))
-	timer.update(screen)
-	screen.blit(self.timeLayer, (4,screen.get_height()-4))
+	timer.update()
+	screen.blit(timer.timeLayer, (4,screen.get_height()-4))
