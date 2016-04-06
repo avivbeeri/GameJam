@@ -2,12 +2,12 @@ import pygame, random
 from pygame.locals import *
 
 class Maze:
-	def __init__(self, mazeLayer):
+	def __init__(self, mazeLayer, cellSize):
 		self.mazeArray = []
 		self.state = "create"
 		self.mLayer = mazeLayer
 		self.mLayer.fill((0,0,0,0))
-		self.cellSize = 4
+		self.cellSize = cellSize
 		self.screenSize = 56
 		if (self.screenSize/float(self.cellSize)) != (self.screenSize/self.cellSize):
 			raise ArithmeticError("Screen size must be a multiple of cell size!")
@@ -104,13 +104,13 @@ class Timer:
 
 	def update(self, entity):
 		if pygame.time.get_ticks() >= self.endtime:
-			print "You ran out of time!"
+			#print "You ran out of time!"
 			pygame.event.post(pygame.event.Event(USEREVENT, code="TIMERQUIT"))
 
 		pygame.draw.rect(self.timeLayer, (0,255,0,191), Rect(0,0,self.timeLayer.get_width(), 2))
 		if pygame.time.get_ticks() > self.starttime + (self.period*self.stepno):
 			self.stepno += 1
-			print "Completed step " + str(self.stepno) + " of " + str(self.timeLayer.get_width())
+			#print "Completed step " + str(self.stepno) + " of " + str(self.timeLayer.get_width())
 		pygame.draw.rect(self.timeLayer, (255,0,0,191), Rect(0,0,self.stepno,2))
 
 def mazeUpdate(screen, maze, mazeFrame, timer):

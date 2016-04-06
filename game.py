@@ -55,8 +55,6 @@ def setupWorld(display):
 			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 				velocityComponent.value = Vector2(0, 0)
 
-
-
 	playerEntity.addComponent(component.EventHandler())
 	playerInputHandler = playerEntity.getComponent('EventHandler')
 	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
@@ -74,7 +72,7 @@ def setupWorld(display):
 	# world.addSystem(RenderSystem(display))
 	return world
 
-def setupMaze(display, time):
+def setupMaze(display, time, cellSize):
 	world = World()
 
 	# Creating the frame that goes around the maze.
@@ -101,14 +99,41 @@ def setupMaze(display, time):
 	mazeContent.addComponent(component.Position((4,4)))
 	mazeLayer = pygame.Surface((display.get_width()-8,display.get_height()-8))
 	mazeLayer.convert()
-	mazeContent.addComponent(maze.Maze(mazeLayer))
-	mazeContent.addComponent(component.Drawable(mazeContent.getComponent("Maze").mLayer, 0))
+	mazeContent.addComponent(maze.Maze(mazeLayer, cellSize))
+	mazeContent.addComponent(component.Drawable(mazeContent.getComponent("Maze").mLayer, -1))
 	mazeContent.addComponent(component.Script())
 	mazeContent.getComponent("Script").attach(mazeContent.getComponent("Maze").update)
 	world.addEntity(mazeContent)
 
+	player = world.createEntity()
+	playerMarker = pygame.Surface((cellSize-1,cellSize-1)).convert()
+	playerMarker.fill((255,0,0))
+	player.addComponent(component.Drawable(playerMarker, 0))
+	player.addComponent(component.Position((5,5)))
+	player.addComponent(component.Velocity((0,0)))
+	player.addComponent(component.EventHandler())
+	playerEventHandler = player.getComponent('EventHandler')
+
+	def move(entity, event):
+		currentVelocity = entity.getComponent("Velocity")
+		if event.key == K_UP:
+			pass
+		elif event.key == K_DOWN:
+			 currentVelocity.value = Vector2(0, 1)
+		elif event.key == K_LEFT:
+			pass
+		elif event.key == K_RIGHT:
+			pass
+		elif event.type == pygame.KEYUP:
+			currentVelocity.value = Vector2(0,0)
+
+	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
+	playerEventHandler.attachHandler(pygame.KEYUP, move)
+	world.addEntity(player)
+
 	world.addSystem(RenderSystem(display))
 	world.addSystem(ScriptSystem())
+	world.addSystem(inputSystem)
 	return world
 
 
@@ -167,9 +192,13 @@ def main():
 
 		for event in eventQueue:
 			inputSystem.eventQueue.append(event)
-			if (event.type == KEYDOWN) and (event.key == K_UP):
-				worlds["maze"] = setupMaze(screen, 10)
-				gamescreen = "maze"
+			if (event.type == KEYDOWN) and (event.key == K_SPACE):
+				if gamescreen == "main":
+					worlds["maze"] = setupMaze(screen, 10, 4)
+					gamescreen = "maze"
+				elif gamescreen == "maze":
+					worlds.pop("maze", None)
+					gamescreen = "main"
 			if (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
 				worlds.pop("maze", None)
 				gamescreen = "main"
