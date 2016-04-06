@@ -21,12 +21,14 @@ class TileCollisionSystem(System):
                     else Vector2()
 
             maxPosition = position + dimension
-            #print (position, maxPosition)
-            #print int(math.ceil((maxPosition.x - position.x) / ))
-            print "---"
-            for x in range(int(math.ceil(maxPosition.x - position.x) / self.tileMap.cellSize[0])):
-                for y in range(int(math.ceil(maxPosition.y - position.y) / self.tileMap.cellSize[1])):
-                    print Vector2(x, y) + ((position.x / Vector2(self.tileMap.cellSize).x),(position.y / Vector2(self.tileMap.cellSize).y))
+
+            for x in range(int(math.ceil(maxPosition.x / self.tileMap.cellSize[0]) - math.floor(position.x / self.tileMap.cellSize[0]))):
+                for y in range(int(math.ceil(maxPosition.y / self.tileMap.cellSize[1]) - math.floor(position.y / self.tileMap.cellSize[1]))):
+
+                    tileX, tileY = Vector2(x, y) + (int(position.x / Vector2(self.tileMap.cellSize).x),int(position.y / Vector2(self.tileMap.cellSize).y))
+                    tile = self.tileMap.getTileData(tileX, tileY, 0)
+                    print (tileX, tileY, tile)
+                    # print
 
 
 
