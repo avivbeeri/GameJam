@@ -103,17 +103,15 @@ class Timer:
 		self._name = "MazeTimer"
 
 	def update(self, entity):
-		retval = 0
 		if pygame.time.get_ticks() >= self.endtime:
 			print "You ran out of time!"
-			retval = 1
+			pygame.event.post(pygame.event.Event(USEREVENT, code="TIMERQUIT"))
 
 		pygame.draw.rect(self.timeLayer, (0,255,0,191), Rect(0,0,self.timeLayer.get_width(), 2))
 		if pygame.time.get_ticks() > self.starttime + (self.period*self.stepno):
 			self.stepno += 1
 			print "Completed step " + str(self.stepno) + " of " + str(self.timeLayer.get_width())
 		pygame.draw.rect(self.timeLayer, (255,0,0,191), Rect(0,0,self.stepno,2))
-		return retval
 
 def mazeUpdate(screen, maze, mazeFrame, timer):
 	maze.update()

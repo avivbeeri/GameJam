@@ -197,6 +197,9 @@ def main():
 			if (event.type == KEYDOWN) and (event.key == K_UP):
 				worlds["maze"] = setupMaze(screen, 10)
 				gamescreen = "maze"
+			if (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
+				worlds.pop("maze", None)
+				gamescreen = "main"
 		while (accumulator >= dt):
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt
