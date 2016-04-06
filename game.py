@@ -115,17 +115,16 @@ def setupMaze(display, time, cellSize):
 	playerEventHandler = player.getComponent('EventHandler')
 
 	def move(entity, event):
-		currentVelocity = entity.getComponent("Velocity")
-		if event.key == K_UP:
-			pass
-		elif event.key == K_DOWN:
-			 currentVelocity.value = Vector2(0, 1)
-		elif event.key == K_LEFT:
-			pass
-		elif event.key == K_RIGHT:
-			pass
-		elif event.type == pygame.KEYUP:
-			currentVelocity.value = Vector2(0,0)
+		currentPosition = entity.getComponent("Position")
+		if event.type == pygame.KEYDOWN:
+			if event.key == K_UP:
+				currentPosition.value += Vector2(0, -8)
+			elif event.key == K_DOWN:
+				currentPosition.value += Vector2(0, 8)
+			elif event.key == K_LEFT:
+				currentPosition.value += Vector2(-8, 0)
+			elif event.key == K_RIGHT:
+				currentPosition.value += Vector2(8, 0)
 
 	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
 	playerEventHandler.attachHandler(pygame.KEYUP, move)
@@ -141,7 +140,7 @@ def quitcheck(eventQueue, quit=True):
 	retval = 0
 	for event in eventQueue:
 	#Check if the user has quit, and if so quit.
-		inputSystem.eventQueue.append(event)
+
 		if event.type == QUIT:
 			retval = 1
 		elif event.type == KEYDOWN:
@@ -150,6 +149,7 @@ def quitcheck(eventQueue, quit=True):
 					retval = 1
 				else:
 					pass # In future we'll use this to return to the main menu
+	eventQueue = []
 	return retval
 
 
@@ -189,9 +189,8 @@ def main():
 
 		# Retrieve input events for processing
 		eventQueue = pygame.event.get()
-
+		inputSystem.eventQueue += eventQueue
 		for event in eventQueue:
-			inputSystem.eventQueue.append(event)
 			if (event.type == KEYDOWN) and (event.key == K_SPACE):
 				if gamescreen == "main":
 					worlds["maze"] = setupMaze(screen, 10, 8)
