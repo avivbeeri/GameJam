@@ -24,8 +24,9 @@ class Maze:
 		self.visitedCells = 1
 		self.cellStack = []
 		self.compass = [(-1,0),(0,1),(1,0),(0,-1)]
+		self._name = "Maze"
 
-	def update(self):
+	def update(self, entity):
 		if self.state == "idle":
 			pass
 		elif self.state == "create":
@@ -91,21 +92,20 @@ class Maze:
 	def draw(self, screen):
 		screen.blit(self.mLayer, (3,3))
 
-def timeUp():
-	quit() #In the future this can be changed so that it kicks the user out of the maze, instead of the entire game.
-
 class Timer:
+	# Note: the time paramenter must be in seconds!
 	def __init__ (self, screenLayer, time):
 		self.timeLayer = screenLayer
 		self.period = (time*1000)/float(self.timeLayer.get_width())
 		self.stepno = 0
 		self.starttime = pygame.time.get_ticks()
 		self.endtime = self.starttime + time*1000
+		self._name = "MazeTimer"
 
-	def update(self):
+	def update(self, entity):
 		if pygame.time.get_ticks() >= self.endtime:
 			print "You ran out of time!"
-			timeUp()
+			pygame.event.post(pygame.event.Event(USEREVENT, code="TIMERQUIT"))
 
 		pygame.draw.rect(self.timeLayer, (0,255,0,191), Rect(0,0,self.timeLayer.get_width(), 2))
 		if pygame.time.get_ticks() > self.starttime + (self.period*self.stepno):
