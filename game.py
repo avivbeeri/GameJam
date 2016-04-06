@@ -194,7 +194,7 @@ def main():
 			inputSystem.eventQueue.append(event)
 			if (event.type == KEYDOWN) and (event.key == K_SPACE):
 				if gamescreen == "main":
-					worlds["maze"] = setupMaze(screen, 10, 4)
+					worlds["maze"] = setupMaze(screen, 10, 8)
 					gamescreen = "maze"
 				elif gamescreen == "maze":
 					worlds.pop("maze", None)

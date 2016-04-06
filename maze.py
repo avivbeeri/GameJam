@@ -2,7 +2,7 @@ import pygame, random
 from pygame.locals import *
 
 class Maze:
-	def __init__(self, mazeLayer, cellSize):
+	def __init__(self, mazeLayer, cellSize=4):
 		self.mazeArray = []
 		self.state = "create"
 		self.mLayer = mazeLayer
