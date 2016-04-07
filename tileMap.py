@@ -44,3 +44,12 @@ class TileMap:
             tileSurface = self.surfaces[layer]
 
         return tileSurface
+
+    def getTileData(self, x, y, layer):
+        if x > self.mapSize[0] or y > self.mapSize[1]:
+            raise ValueError('Position is outside of tilemap')
+        if not layer in self.mapLayer:
+            raise ValueError('Layer does not exist or has not been initialised')
+
+        index = int(y * self.mapSize[0] + x)
+        return self.mapLayer[layer][index]

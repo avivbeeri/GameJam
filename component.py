@@ -26,6 +26,9 @@ class Position(Vector):
 class Velocity(Vector):
     pass
 
+class Dimension(Vector):
+    pass
+
 class TargetVelocity(Vector):
     pass
 
@@ -34,6 +37,9 @@ class Drawable(Component):
         super(Drawable, self).__init__()
         self.image = surface
         self.layer = layer
+
+class Collidable(Component):
+    pass
 
 class EventHandler(Component):
     def __init__(self):
