@@ -14,3 +14,4 @@ class InputSystem(System):
             for entity in entities:
                 inputComponent = entity.getComponent('EventHandler')
                 inputComponent.handle(event)
+        del self.eventQueue[:]
