@@ -73,7 +73,7 @@ def setupWorld(display):
 	terminal.addComponent(component.Position((20, 52)))
 	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
-	terminal.addComponent(component.Collidable())
+	# terminal.addComponent(component.Collidable())
 	world.addEntity(terminal)
 
 	world.addSystem(inputSystem)
