@@ -41,7 +41,7 @@ def setupWorld(display):
 	collidable = playerEntity.addComponent(component.Collidable())
 
 	def handleCollision(entity, event):
-		print event.other
+		print event
 
 	collidable.attachHandler(handleCollision)
 	playerEntity.addComponent(component.TargetVelocity())
@@ -70,8 +70,10 @@ def setupWorld(display):
 
 	terminal = world.createEntity()
 	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
-	terminal.addComponent(component.Position((52,52)))
+	terminal.addComponent(component.Position((20, 52)))
+	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
+	terminal.addComponent(component.Collidable())
 	world.addEntity(terminal)
 
 	world.addSystem(inputSystem)
