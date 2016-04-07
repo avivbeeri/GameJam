@@ -1,0 +1,13 @@
+Handling multiple key input:
+
+a key event happened!
+	if a key was pressed
+		which key?
+		move in that direction.
+
+	if a key was released
+		check the state of keys.
+		if a movement key is currently pressed
+			keep moving according to said movement key.
+		if no movement key is pressed
+			stop all movement.
