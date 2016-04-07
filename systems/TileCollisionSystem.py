@@ -68,15 +68,12 @@ class TileCollisionSystem(System):
                 velocityComponent.value = Vector2()
 
         # Process E-E collisions
-        processedEvents = set()
         for key in tileEntityMap:
             entities = tileEntityMap[key]
             currentEntity = entities.pop()
             collidable = currentEntity.getComponent('Collidable')
             for other in entities:
-                eventTuple = (entity, other) if entity.id < other.id else (other, entity)
-                if not eventTuple in processedEvents:
-                    data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': other }
-                    event = pygame.event.Event(pygame.USEREVENT, data)
-                    collidable.handle(event)
-                    processedEvents.add(eventTuple)
+                data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': (currentEntity, other) }
+                event = pygame.event.Event(pygame.USEREVENT, data)
+                collidable.handle(event)
+                other.getComponent('Collidable').handle(event)
