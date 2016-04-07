@@ -16,7 +16,7 @@ class TileCollisionSystem(System):
         tileEntityMap = {}
         # Events occurring in a given tile
         # Dictionary to store items who we need to correct the physics of
-        collidedEntities = set()
+        tileCollidedEntities = set()
         for entity in entities:
             positionComponent = entity.getComponent('Position')
             position = positionComponent.value
@@ -49,16 +49,17 @@ class TileCollisionSystem(System):
                         tileEntityMap[tileIndex] = set()
                     tileEntityMap[tileIndex].add(entity)
                     if tile == 'SOLID':
-                        collidedEntities.add(entity)
+                        tileCollidedEntities.add(entity)
 
 
         # Correct the entity position
         # This method is really dumb and should be improved
         # for high-speed objects
-        for entity in collidedEntities:
-            print entity
+        for entity in tileCollidedEntities:
             # Dispatch a collision event
-            data = {'code': 'COLLISION', 'collisionType': 'tile', 'other': (tileX, tileY), }
+            position = entity.getComponent('Position').value
+            collidable = entity.getComponent('Collidable')
+            data = {'code': 'COLLISION', 'collisionType': 'tile' }
             event = pygame.event.Event(pygame.USEREVENT, data)
             collidable.handle(event)
             if entity.hasComponent('Velocity'):
@@ -67,17 +68,15 @@ class TileCollisionSystem(System):
                 velocityComponent.value = Vector2()
 
         # Process E-E collisions
-        # processedEvents = set()
-        # print (tileEntityMap)
-        # for key in tileEntityMap:
-        #     entities = tileEntityMap[key]
-        #     currentEntity = entities.pop()
-        #     collidable = currentEntity.getComponent('Collidable')
-        #     for other in entities:
-        #         eventTuple = (entity, other) if entity.id < other.id else (other, entity)
-        #         if not eventTuple in processedEvents:
-        #             data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': other }
-        #             event = pygame.event.Event(pygame.USEREVENT, data)
-        #             collidable.handle(event)
-        #             processedEvents.add(eventTuple)
-        #     # quit()
+        processedEvents = set()
+        for key in tileEntityMap:
+            entities = tileEntityMap[key]
+            currentEntity = entities.pop()
+            collidable = currentEntity.getComponent('Collidable')
+            for other in entities:
+                eventTuple = (entity, other) if entity.id < other.id else (other, entity)
+                if not eventTuple in processedEvents:
+                    data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': other }
+                    event = pygame.event.Event(pygame.USEREVENT, data)
+                    collidable.handle(event)
+                    processedEvents.add(eventTuple)
