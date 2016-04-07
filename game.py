@@ -41,7 +41,7 @@ def setupWorld(display):
 	collidable = playerEntity.addComponent(component.Collidable())
 
 	def handleCollision(entity, event):
-		pass#print event
+		pass
 
 	collidable.attachHandler(handleCollision)
 	playerEntity.addComponent(component.TargetVelocity())
@@ -51,17 +51,18 @@ def setupWorld(display):
 	def handleInput(entity, event):
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
-
+		result = Vector2()
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LEFT:
-				velocityComponent.value = Vector2(-0.3, 0)
-				targetVelocityComponent.value = Vector2(-1, 0)
+				result += Vector2(-0.3, 0)
 			elif event.key == pygame.K_RIGHT:
-				velocityComponent.value = Vector2(0.3, 0)
-				targetVelocityComponent.value = Vector2(1, 0)
+				result += Vector2(+0.3, 0)
 		elif event.type == pygame.KEYUP:
-			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-				velocityComponent.value = Vector2(0, 0)
+			if event.key == pygame.K_LEFT:
+				result += Vector2(+0.3, 0)
+			elif event.key == pygame.K_RIGHT:
+				result += Vector2(-0.3, 0)
+		velocityComponent.value += result
 
 	playerInputHandler = playerEntity.addComponent(component.EventHandler())
 	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
