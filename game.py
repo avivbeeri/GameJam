@@ -38,7 +38,12 @@ def setupWorld(display):
 	playerEntity.addComponent(component.Dimension((4, 12)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
-	playerEntity.addComponent(component.Collidable())
+	collidable = playerEntity.addComponent(component.Collidable())
+
+	def handleCollision(entity, event):
+		print event.code
+
+	collidable.attachHandler(handleCollision)
 	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
@@ -58,8 +63,7 @@ def setupWorld(display):
 			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 				velocityComponent.value = Vector2(0, 0)
 
-	playerEntity.addComponent(component.EventHandler())
-	playerInputHandler = playerEntity.getComponent('EventHandler')
+	playerInputHandler = playerEntity.addComponent(component.EventHandler())
 	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
 	playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
 	world.addEntity(playerEntity)
@@ -105,8 +109,8 @@ def setupMaze(display, time, cellSize):
 	mazeLayer.convert()
 	mazeContent.addComponent(maze.Maze(mazeLayer, cellSize))
 	mazeContent.addComponent(component.Drawable(mazeContent.getComponent("Maze").mLayer, -1))
-	mazeContent.addComponent(component.Script())
-	mazeContent.getComponent("Script").attach(mazeContent.getComponent("Maze").update)
+	scriptComponent = mazeContent.addComponent(component.Script())
+	scriptComponent.attach(mazeContent.getComponent("Maze").update)
 	world.addEntity(mazeContent)
 
 	player = world.createEntity()
@@ -115,8 +119,7 @@ def setupMaze(display, time, cellSize):
 	player.addComponent(component.Drawable(playerMarker, 0))
 	player.addComponent(component.Position((5,5)))
 	player.addComponent(component.Velocity((0,0)))
-	player.addComponent(component.EventHandler())
-	playerEventHandler = player.getComponent('EventHandler')
+	playerEventHandler = player.addComponent(component.EventHandler())
 
 	def move(entity, event):
 		currentPosition = entity.getComponent("Position")
@@ -181,7 +184,7 @@ def main():
 	renderSystem = RenderSystem(screen)
 	eventQueue = []
 
-	dt = (0.01) * 1000;
+	dt = (1.0 / 60.0) * 1000;
 	accumulator = 0
 	currentTime = pygame.time.get_ticks()
 
