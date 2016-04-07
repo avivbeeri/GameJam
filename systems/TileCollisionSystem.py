@@ -39,5 +39,6 @@ class TileCollisionSystem(System):
                     if tile == 'SOLID':
                         position -= velocityComponent.value
                         velocityComponent.value = Vector2()
-                        event = pygame.event.Event(pygame.USEREVENT, code="COLLISION")
+                        data = {'code':"COLLISION", 'other': (tileX, tileY)}
+                        event = pygame.event.Event(pygame.USEREVENT, data)
                         collidable.handle(event)

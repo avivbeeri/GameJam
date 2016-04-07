@@ -41,7 +41,7 @@ def setupWorld(display):
 	collidable = playerEntity.addComponent(component.Collidable())
 
 	def handleCollision(entity, event):
-		print event.code
+		print event.other
 
 	collidable.attachHandler(handleCollision)
 	playerEntity.addComponent(component.TargetVelocity())
