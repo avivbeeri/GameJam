@@ -22,8 +22,9 @@ class TileCollisionSystem(System):
                     if entity.hasComponent('Dimension') \
                     else Vector2()
 
-            maxPosition = position + dimension
+            maxPosition = position + dimension # This might be 1 pixel too big?
 
+            # Calculate tiles which entity overlaps.
             for x in range(int(math.ceil(maxPosition.x / self.tileMap.cellSize[0]) - math.floor(position.x / self.tileMap.cellSize[0]))):
                 for y in range(int(math.ceil(maxPosition.y / self.tileMap.cellSize[1]) - math.floor(position.y / self.tileMap.cellSize[1]))):
 
@@ -32,10 +33,3 @@ class TileCollisionSystem(System):
                     if tile == 'SOLID':
                         position -= velocityComponent.value
                         velocityComponent.value = Vector2()
-                    #print (tileX, tileY, tile)
-                    # print
-
-
-
-
-            # Calculate tiles which entity overlaps.
