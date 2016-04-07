@@ -11,6 +11,7 @@ class Entity:
             setattr(component, 'entity', self)
         else:
             raise ValueError('Attempted to add an object which isn\'t a component')
+        return component
 
     def removeComponent(self, component):
         if isinstance(component, basestring):
