@@ -43,7 +43,6 @@ def setupWorld(display):
 	def handleCollision(entity, event):
 		pass
 
-
 	collidable.attachHandler(handleCollision)
 	playerEntity.addComponent(component.TargetVelocity())
 
