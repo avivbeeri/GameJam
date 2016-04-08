@@ -81,3 +81,4 @@ class TileCollisionSystem(System):
                     event = pygame.event.Event(pygame.USEREVENT, data)
                     collidable.handle(event)
                     other.getComponent('Collidable').handle(event)
+                    collisions.add(collision)
