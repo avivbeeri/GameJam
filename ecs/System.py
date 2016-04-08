@@ -3,9 +3,10 @@ class System(object):
 
     def __init__(self):
         self.requirements = []
+        self.world = None
 
     def getProcessableEntities(self, world):
-        entities = world.getEntities()
+        entities = world.getAllEntities()
         entitiesToProcess = []
         # if we have specific requirements, filter those entities
         if len(self.requirements) > 0:
