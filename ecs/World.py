@@ -20,6 +20,12 @@ class World:
     def getEntities(self):
         return self.entities
 
+    def getSystem(self, systemName):
+        for system in self.systems:
+            if system.__class__.__name__ == systemName:
+                return system
+        return None
+
     def update(self, dt):
         for system in self.systems:
             entities = system.getProcessableEntities(self)
