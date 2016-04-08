@@ -13,6 +13,9 @@ class AccelerationConstant(Constant):
         super(AccelerationConstant, self).__init__(value)
         self._name = 'Acceleration'
 
+class Group(Constant):
+    pass
+
 class Vector(Component):
     def __init__(self, vector=Vector2()):
         super(Vector, self).__init__()

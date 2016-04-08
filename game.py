@@ -41,7 +41,8 @@ def setupWorld(display):
 	collidable = playerEntity.addComponent(component.Collidable())
 
 	def handleCollision(entity, event):
-		pass#print event
+		pass
+
 
 	collidable.attachHandler(handleCollision)
 	playerEntity.addComponent(component.TargetVelocity())
@@ -53,14 +54,21 @@ def setupWorld(display):
 		velocityComponent = entity.getComponent('Velocity')
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LEFT:
-				targetVelocityComponent.value += Vector2(-0.3, 0)
+				targetVelocityComponent.value += Vector2(-0.5, 0)
 			elif event.key == pygame.K_RIGHT:
-				targetVelocityComponent.value += Vector2(0.3, 0)
+				targetVelocityComponent.value += Vector2(0.5, 0)
+			elif event.key == pygame.K_LSHIFT:
+				collisionSystem = world.getSystem('TileCollisionSystem')
+				collisions = collisionSystem.getEntityCollisions(entity.id)
+				for other in collisions:
+					if other.hasComponent('Group'):
+						group = other.getComponent('Group')
+						print group.value
 		elif event.type == pygame.KEYUP:
 			if event.key == pygame.K_LEFT:
-				targetVelocityComponent.value += Vector2(+0.3, 0)
+				targetVelocityComponent.value += Vector2(+0.5, 0)
 			elif event.key == pygame.K_RIGHT:
-				targetVelocityComponent.value += Vector2(-0.3, 0)
+				targetVelocityComponent.value += Vector2(-0.5, 0)
 
 		velocityComponent.value = targetVelocityComponent.value
 
@@ -75,6 +83,7 @@ def setupWorld(display):
 	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
 	terminal.addComponent(component.Collidable())
+	terminal.addComponent(component.Group('terminal'))
 	world.addEntity(terminal)
 
 	world.addSystem(inputSystem)
