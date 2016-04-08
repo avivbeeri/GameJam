@@ -51,17 +51,18 @@ def setupWorld(display):
 	def handleInput(entity, event):
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
-
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LEFT:
-				velocityComponent.value = Vector2(-0.3, 0)
-				targetVelocityComponent.value = Vector2(-1, 0)
+				targetVelocityComponent.value += Vector2(-0.3, 0)
 			elif event.key == pygame.K_RIGHT:
-				velocityComponent.value = Vector2(0.3, 0)
-				targetVelocityComponent.value = Vector2(1, 0)
+				targetVelocityComponent.value += Vector2(0.3, 0)
 		elif event.type == pygame.KEYUP:
-			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-				velocityComponent.value = Vector2(0, 0)
+			if event.key == pygame.K_LEFT:
+				targetVelocityComponent.value += Vector2(+0.3, 0)
+			elif event.key == pygame.K_RIGHT:
+				targetVelocityComponent.value += Vector2(-0.3, 0)
+
+		velocityComponent.value = targetVelocityComponent.value
 
 	playerInputHandler = playerEntity.addComponent(component.EventHandler())
 	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
