@@ -87,9 +87,30 @@ class TileCollisionSystem(System):
             currentEntity = entities.pop()
             collidable = currentEntity.getComponent('Collidable')
             for other in entities:
-                if other not in self.entityCollisionSet[currentEntity.id]:
+                if other not in self.entityCollisionSet[currentEntity.id] and \
+                    areEntitiesColliding(currentEntity, other):
+                    # Check if the two entities are actually colliding
                     self.entityCollisionSet[currentEntity.id].add(other)
                     data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': entity.id }
                     event = pygame.event.Event(pygame.USEREVENT, data)
                     collidable.handle(event)
                     other.getComponent('Collidable').handle(event)
+
+
+def areEntitiesColliding(entity1, entity2):
+    # return (abs(a.x - b.x) * 2 < (a.width + b.width)) &&
+    #     (abs(a.y - b.y) * 2 < (a.height + b.height));
+    position1 = entity1.getComponent('Position').value
+    dimension1 = getEntityDimension(entity1)
+    position2 = entity2.getComponent('Position').value
+    dimension2 = getEntityDimension(entity2)
+
+    return (position1.x < position2.x + dimension2.x) and \
+        (position1.x + dimension1.x > position2.x) and \
+        (position1.y < position2.y + dimension2.y) and \
+        (position1.y + dimension1.y > position2.y)
+
+def getEntityDimension(entity):
+    return entity.getComponent('Dimension').value \
+            if entity.hasComponent('Dimension') \
+            else Vector2(0, 0)

@@ -34,7 +34,7 @@ def setupWorld(display):
 	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
-	playerEntity.addComponent(component.Position((32, 48)))
+	playerEntity.addComponent(component.Position((8, 48)))
 	playerEntity.addComponent(component.Dimension((4, 12)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
@@ -78,7 +78,7 @@ def setupWorld(display):
 
 	terminal = world.createEntity()
 	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
-	terminal.addComponent(component.Position((20, 52)))
+	terminal.addComponent(component.Position((56, 52)))
 	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
 	terminal.addComponent(component.Collidable())
