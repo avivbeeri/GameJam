@@ -42,6 +42,7 @@ class Drawable(Component):
         self.image = surface
         self.layer = layer
 
+
 class EventHandler(Component):
     def __init__(self):
         super(EventHandler, self).__init__()
@@ -58,9 +59,20 @@ class EventHandler(Component):
             for handler in self.handlers[eventName]:
                 handler(self.entity, event)
 
+
+class State(Component):
+    def __init__(self):
+        super(State, self).__init__()
+        self.state = {}
+
+    def __getitem__(self, key):
+        return self.state[key]
+
+
 class Collidable(EventHandler):
     def attachHandler(self, handler):
         super(Collidable, self).attachHandler(pygame.USEREVENT, handler)
+
 
 class Script(Component):
     def __init__(self):
