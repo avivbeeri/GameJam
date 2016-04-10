@@ -68,6 +68,7 @@ class TileCollisionSystem(System):
         # Dispatch events and correct the physics
         # This method is really dumb and should be improved
         # for high-speed objects
+        # NOTE: We currently don't update the tileEntityMap with physics corrections
         for entity in tileCollidedEntities:
             # Dispatch a collision event
             data = {'code': 'COLLISION', 'collisionType': 'tile' }
@@ -84,17 +85,17 @@ class TileCollisionSystem(System):
         # For simplification reasons
         for key in self.tileEntityMap:
             entities = self.tileEntityMap[key]
-            currentEntity = entities.pop()
-            collidable = currentEntity.getComponent('Collidable')
-            for other in entities:
-                if other not in self.entityCollisionSet[currentEntity.id] and \
-                    areEntitiesColliding(currentEntity, other):
-                    # Check if the two entities are actually colliding
-                    self.entityCollisionSet[currentEntity.id].add(other)
-                    data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': entity.id }
-                    event = pygame.event.Event(pygame.USEREVENT, data)
-                    collidable.handle(event)
-                    other.getComponent('Collidable').handle(event)
+            while len(entities) > 1:
+                currentEntity = entities.pop()
+                for other in entities:
+                    if other not in self.entityCollisionSet[currentEntity.id] and \
+                        areEntitiesColliding(currentEntity, other):
+                        # Check if the two entities are actually colliding
+                        self.entityCollisionSet[currentEntity.id].add(other)
+                        data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': entity.id }
+                        event = pygame.event.Event(pygame.USEREVENT, data)
+                        currentEntity.getComponent('Collidable').handle(event)
+                        other.getComponent('Collidable').handle(event)
 
 
 def areEntitiesColliding(entity1, entity2):
