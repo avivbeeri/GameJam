@@ -17,6 +17,14 @@ class TileCollisionSystem(System):
     def getEntityCollisions(self, id):
         return self.entityCollisionSet[id]
 
+    def getEntitiesInTile(self, x, y):
+        return self.tileEntityMap[x, y]
+
+    def getTilePosition(self, vector):
+        tileX = math.floor(vector.x / self.tileMap.cellSize[0])
+        tileY = math.floor(vector.y / self.tileMap.cellSize[1])
+        return Vector2(tileX, tileY)
+
     def process(self, entities, dt):
         # Dictionary to store items who we need to correct the physics of
         tileCollidedEntities = set()
@@ -43,13 +51,12 @@ class TileCollisionSystem(System):
 
             # Calculate the number of tiles entity overlaps
             maxPosition = position + dimension
-            startTileX = math.floor(position.x / self.tileMap.cellSize[0])
-            startTileY = math.floor(position.y / self.tileMap.cellSize[1])
-            startTile = Vector2(startTileX, startTileY)
+            startTile = self.getTilePosition(position)
 
+            # We can't refactor this calculation because we use math.ceil here.
             endTileX = math.ceil(maxPosition.x / self.tileMap.cellSize[0])
             endTileY = math.ceil(maxPosition.y / self.tileMap.cellSize[1])
-            endTile = (endTileX, endTileY)
+            endTile = Vector2(endTileX, endTileY)
 
             tileDimensions = endTile - startTile
 
