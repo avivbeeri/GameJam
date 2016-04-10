@@ -98,8 +98,6 @@ class TileCollisionSystem(System):
 
 
 def areEntitiesColliding(entity1, entity2):
-    # return (abs(a.x - b.x) * 2 < (a.width + b.width)) &&
-    #     (abs(a.y - b.y) * 2 < (a.height + b.height));
     position1 = entity1.getComponent('Position').value
     dimension1 = getEntityDimension(entity1)
     position2 = entity2.getComponent('Position').value
