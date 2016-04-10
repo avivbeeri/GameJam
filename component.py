@@ -1,4 +1,5 @@
 from pygame import *
+import pygame
 from pygame.math import Vector2
 from ecs import Component
 
@@ -12,6 +13,9 @@ class AccelerationConstant(Constant):
         super(AccelerationConstant, self).__init__(value)
         self._name = 'Acceleration'
 
+class Group(Constant):
+    pass
+
 class Vector(Component):
     def __init__(self, vector=Vector2()):
         super(Vector, self).__init__()
@@ -24,6 +28,9 @@ class Position(Vector):
     pass
 
 class Velocity(Vector):
+    pass
+
+class Dimension(Vector):
     pass
 
 class TargetVelocity(Vector):
@@ -45,12 +52,15 @@ class EventHandler(Component):
             self.handlers[eventName] = []
         self.handlers[eventName].append(handler)
 
-
     def handle(self, event):
         eventName = event.type
         if eventName in self.handlers and len(self.handlers[eventName]) > 0:
             for handler in self.handlers[eventName]:
                 handler(self.entity, event)
+
+class Collidable(EventHandler):
+    def attachHandler(self, handler):
+        super(Collidable, self).attachHandler(pygame.USEREVENT, handler)
 
 class Script(Component):
     def __init__(self):

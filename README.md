@@ -22,7 +22,7 @@ So the game is not getting caught by guards or cameras, using an invisibility po
 Controls (those not yet implemented are in *italics*):
 * Left/right arrows (move left/right)
 * Arrow keys (move in maze)
-* *Down arrow (crouch)~~*~~
+* *Down arrow (crouch)*
 * Space (interact or quit hacking)
 * *Ctrl (thermoptic Camo)*
 

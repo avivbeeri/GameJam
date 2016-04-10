@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 import math, os, pygame, random
+import component
+import maze
+import tileMap
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
-import component
-from systems import RenderSystem, PhysicsSystem, InputSystem, ScriptSystem
-import maze
-import tileMap
+from systems import RenderSystem, PhysicsSystem, InputSystem, ScriptSystem, TileCollisionSystem
 from pytmx.util_pygame import load_pygame
 
 inputSystem = InputSystem()
@@ -25,7 +25,8 @@ def setupWorld(display):
 
 	mapEntity = world.createEntity()
 	mapEntity.addComponent(component.Position())
-	tileSurface = tileMap.TileMap('test.tmx').getLayerSurface(0)
+	mapData = tileMap.TileMap('test.tmx')
+	tileSurface = mapData.getLayerSurface(0)
 	mapEntity.addComponent(component.Drawable(tileSurface, -1))
 	world.addEntity(mapEntity)
 
@@ -33,9 +34,16 @@ def setupWorld(display):
 	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
-	playerEntity.addComponent(component.Position((32, 48)))
+	playerEntity.addComponent(component.Position((8, 48)))
+	playerEntity.addComponent(component.Dimension((4, 12)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
+	collidable = playerEntity.addComponent(component.Collidable())
+
+	def handleCollision(entity, event):
+		pass
+
+	collidable.attachHandler(handleCollision)
 	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
@@ -43,32 +51,43 @@ def setupWorld(display):
 	def handleInput(entity, event):
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
-
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LEFT:
-				velocityComponent.value = Vector2(-0.3, 0)
-				targetVelocityComponent.value = Vector2(-1, 0)
+				targetVelocityComponent.value += Vector2(-0.5, 0)
 			elif event.key == pygame.K_RIGHT:
-				velocityComponent.value = Vector2(0.3, 0)
-				targetVelocityComponent.value = Vector2(1, 0)
+				targetVelocityComponent.value += Vector2(0.5, 0)
+			elif event.key == pygame.K_LSHIFT:
+				collisionSystem = world.getSystem('TileCollisionSystem')
+				collisions = collisionSystem.getEntityCollisions(entity.id)
+				for other in collisions:
+					if other.hasComponent('Group'):
+						group = other.getComponent('Group')
+						print group.value
 		elif event.type == pygame.KEYUP:
-			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-				velocityComponent.value = Vector2(0, 0)
+			if event.key == pygame.K_LEFT:
+				targetVelocityComponent.value += Vector2(+0.5, 0)
+			elif event.key == pygame.K_RIGHT:
+				targetVelocityComponent.value += Vector2(-0.5, 0)
 
-	playerEntity.addComponent(component.EventHandler())
-	playerInputHandler = playerEntity.getComponent('EventHandler')
+		velocityComponent.value = targetVelocityComponent.value
+
+	playerInputHandler = playerEntity.addComponent(component.EventHandler())
 	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
 	playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
 	world.addEntity(playerEntity)
 
 	terminal = world.createEntity()
 	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
-	terminal.addComponent(component.Position((52,52)))
+	terminal.addComponent(component.Position((56, 52)))
+	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
+	terminal.addComponent(component.Collidable())
+	terminal.addComponent(component.Group('terminal'))
 	world.addEntity(terminal)
 
 	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
 	# world.addSystem(RenderSystem(display))
 	return world
 
@@ -102,8 +121,8 @@ def setupMaze(display, time, cellSize):
 	mazeLayer.convert()
 	mazeContent.addComponent(maze.Maze(mazeLayer, cellSize))
 	mazeContent.addComponent(component.Drawable(mazeContent.getComponent("Maze").mLayer, -1))
-	mazeContent.addComponent(component.Script())
-	mazeContent.getComponent("Script").attach(mazeContent.getComponent("Maze").update)
+	scriptComponent = mazeContent.addComponent(component.Script())
+	scriptComponent.attach(mazeContent.getComponent("Maze").update)
 	world.addEntity(mazeContent)
 
 	# Setting the walls
@@ -121,8 +140,7 @@ def setupMaze(display, time, cellSize):
 	player.addComponent(component.Drawable(playerMarker, 0))
 	player.addComponent(component.Position((5,5)))
 	player.addComponent(component.Velocity((0,0)))
-	player.addComponent(component.EventHandler())
-	playerEventHandler = player.getComponent('EventHandler')
+	playerEventHandler = player.addComponent(component.EventHandler())
 
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
@@ -192,7 +210,7 @@ def main():
 	renderSystem = RenderSystem(screen)
 	eventQueue = []
 
-	dt = (0.01) * 1000;
+	dt = (1.0 / 60.0) * 1000;
 	accumulator = 0
 	currentTime = pygame.time.get_ticks()
 
