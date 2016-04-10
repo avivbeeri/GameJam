@@ -78,6 +78,7 @@ class TileCollisionSystem(System):
         # Dispatch events and correct the physics
         # This method is really dumb and should be improved
         # for high-speed objects
+        # NOTE: We currently don't update the tileEntityMap with physics corrections
         for entity in tileCollidedEntities:
             # Dispatch a collision event
             data = {'code': 'COLLISION', 'collisionType': 'tile' }
@@ -93,24 +94,23 @@ class TileCollisionSystem(System):
         # This will eventually be refactored into its own system
         # For simplification reasons
         for key in self.tileEntityMap:
-
             checkedEntities = set()
             entities = self.tileEntityMap[key]
-            currentEntity = entities.pop()
-            print (key, len(entities))
-            checkedEntities.add(currentEntity)
+            while len(entities) > 1:
+                currentEntity = entities.pop()
+                checkedEntities.add(currentEntity)
+                for other in entities:
+                    if other not in self.entityCollisionSet[currentEntity.id] and \
+                        areEntitiesColliding(currentEntity, other):
+                        # Check if the two entities are actually colliding
+                        self.entityCollisionSet[currentEntity.id].add(other)
+                        self.entityCollisionSet[other.id].add(currentEntity)
+                        data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': entity.id }
+                        event = pygame.event.Event(pygame.USEREVENT, data)
+                        currentEntity.getComponent('Collidable').handle(event)
+                        other.getComponent('Collidable').handle(event)
+                self.tileEntityMap[key] = checkedEntities
 
-            collidable = currentEntity.getComponent('Collidable')
-            for other in entities:
-                if other not in self.entityCollisionSet[currentEntity.id] and \
-                    areEntitiesColliding(currentEntity, other):
-                    # Check if the two entities are actually colliding
-                    self.entityCollisionSet[currentEntity.id].add(other)
-                    data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': entity.id }
-                    event = pygame.event.Event(pygame.USEREVENT, data)
-                    collidable.handle(event)
-                    other.getComponent('Collidable').handle(event)
-            self.tileEntityMap[key] = checkedEntities
 
 def areEntitiesColliding(entity1, entity2):
     position1 = entity1.getComponent('Position').value
