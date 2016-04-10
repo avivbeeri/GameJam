@@ -81,6 +81,7 @@ def setupMaze(display, time, cellSize):
 	mazeFrame = pygame.image.load(os.path.join('assets', 'puzzleframe.png'))
 	mazeFrame.convert()
 	frame.addComponent(component.Drawable(mazeFrame, 1))
+	frame.addComponent(component.Collidable())
 	world.addEntity(frame)
 
 	# Creating the object for the timer.
@@ -105,6 +106,15 @@ def setupMaze(display, time, cellSize):
 	mazeContent.getComponent("Script").attach(mazeContent.getComponent("Maze").update)
 	world.addEntity(mazeContent)
 
+	# Setting the walls
+	mapEntity = world.createEntity()
+	mapEntity.addComponent(component.Position())
+	mapData = tileMap.TileMap('maze.tmx')
+	tileSurface = mapData.getLayerSurface(0)
+	mapEntity.addComponent(component.Drawable(tileSurface, 2))
+	world.addEntity(mapEntity)
+
+	# Creating the player
 	player = world.createEntity()
 	playerMarker = pygame.Surface((cellSize-1,cellSize-1)).convert()
 	playerMarker.fill((255,0,0))
@@ -114,25 +124,30 @@ def setupMaze(display, time, cellSize):
 	player.addComponent(component.EventHandler())
 	playerEventHandler = player.getComponent('EventHandler')
 
+	collidable = player.addComponent(component.Collidable())
+	def handleCollision(entity, event):
+		pass
+	collidable.attachHandler(handleCollision)
+
+	playerEventHandler = player.addComponent(component.EventHandler())
 	def move(entity, event):
 		currentPosition = entity.getComponent("Position")
 		if event.type == pygame.KEYDOWN:
 			if event.key == K_UP:
-				currentPosition.value += Vector2(0, -8)
+				currentPosition.value += Vector2(0, -cellSize)
 			elif event.key == K_DOWN:
-				currentPosition.value += Vector2(0, 8)
+				currentPosition.value += Vector2(0, cellSize)
 			elif event.key == K_LEFT:
-				currentPosition.value += Vector2(-8, 0)
+				currentPosition.value += Vector2(-cellSize, 0)
 			elif event.key == K_RIGHT:
-				currentPosition.value += Vector2(8, 0)
-
+				currentPosition.value += Vector2(cellSize, 0)
 	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
-	playerEventHandler.attachHandler(pygame.KEYUP, move)
 	world.addEntity(player)
 
 	world.addSystem(RenderSystem(display))
 	world.addSystem(ScriptSystem())
 	world.addSystem(inputSystem)
+	world.addSystem(TileCollisionSystem(mapData))
 	return world
 
 
@@ -193,7 +208,7 @@ def main():
 		for event in eventQueue:
 			if (event.type == KEYDOWN) and (event.key == K_SPACE):
 				if gamescreen == "main":
-					worlds["maze"] = setupMaze(screen, 10, 8)
+					worlds["maze"] = setupMaze(screen, 15, 4)
 					gamescreen = "maze"
 				elif gamescreen == "maze":
 					worlds.pop("maze", None)
