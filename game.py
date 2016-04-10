@@ -68,15 +68,15 @@ def setupWorld(display):
 				collisions = collisionSystem.getEntityCollisions(entity.id)
 				for other in collisions:
 					if other.hasComponent('Group') and other.getComponent('Group').value == 'lift':
-						position = other.getComponent('Position').value
-						oldPosition = entity.getComponent('Position').value
-						tilePosition = collisionSystem.getTilePosition(position)
+						liftPosition = other.getComponent('Position').value
+						liftTilePosition = collisionSystem.getTilePosition(liftPosition)
 						for height in range(collisionSystem.tileMap.mapSize[1]):
-							entities = collisionSystem.getEntitiesInTile(tilePosition.x, height)
+							entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
 							for other in entities:
 								if other.hasComponent('Group') and other.getComponent('Group').value == 'lift':
 									newPosition = entity.getComponent('Position').value
-									oldPosition.y = newPosition.y
+									liftPosition = other.getComponent('Position').value
+									newPosition.y = liftPosition.y
 		elif event.type == pygame.KEYUP:
 			if event.key == pygame.K_LEFT:
 				targetVelocityComponent.value += Vector2(+0.5, 0)

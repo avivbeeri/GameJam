@@ -19,7 +19,7 @@ class TileCollisionSystem(System):
 
     def getEntitiesInTile(self, x, y):
         if (x, y) in self.tileEntityMap:
-            return self.tileEntityMap[x, y]
+            return self.tileEntityMap[int(x), int(y)]
         else:
             return []
 
