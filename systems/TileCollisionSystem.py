@@ -18,7 +18,10 @@ class TileCollisionSystem(System):
         return self.entityCollisionSet[id]
 
     def getEntitiesInTile(self, x, y):
-        return self.tileEntityMap[x, y]
+        if (x, y) in self.tileEntityMap:
+            return self.tileEntityMap[x, y]
+        else:
+            return []
 
     def getTilePosition(self, vector):
         tileX = math.floor(vector.x / self.tileMap.cellSize[0])
@@ -90,8 +93,13 @@ class TileCollisionSystem(System):
         # This will eventually be refactored into its own system
         # For simplification reasons
         for key in self.tileEntityMap:
+
+            checkedEntities = set()
             entities = self.tileEntityMap[key]
             currentEntity = entities.pop()
+            print (key, len(entities))
+            checkedEntities.add(currentEntity)
+
             collidable = currentEntity.getComponent('Collidable')
             for other in entities:
                 if other not in self.entityCollisionSet[currentEntity.id] and \
@@ -102,7 +110,7 @@ class TileCollisionSystem(System):
                     event = pygame.event.Event(pygame.USEREVENT, data)
                     collidable.handle(event)
                     other.getComponent('Collidable').handle(event)
-
+            self.tileEntityMap[key] = checkedEntities
 
 def areEntitiesColliding(entity1, entity2):
     position1 = entity1.getComponent('Position').value

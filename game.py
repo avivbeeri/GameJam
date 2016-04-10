@@ -67,11 +67,19 @@ def setupWorld(display):
 				collisionSystem = world.getSystem('TileCollisionSystem')
 				collisions = collisionSystem.getEntityCollisions(entity.id)
 				for other in collisions:
+					print other
+					'''
 					if other.hasComponent('Group') and other.getComponent('Group').value == 'lift':
-						print 'LIFT'
 						position = entity.getComponent('Position').value
-						position += Vector2(0, -20)
-
+						tilePosition = collisionSystem.getTilePosition(position)
+						print tilePosition
+						for height in range(collisionSystem.tileMap.mapSize[1]):
+							entities = collisionSystem.getEntitiesInTile(tilePosition.x, height)
+							for other in entities:
+								if other.hasComponent('Group') and other.getComponent('Group').value == 'lift':
+									newPosition = entity.getComponent('Position').value
+									position.y = newPosition.y
+					'''
 		elif event.type == pygame.KEYUP:
 			if event.key == pygame.K_LEFT:
 				targetVelocityComponent.value += Vector2(+0.5, 0)
@@ -94,9 +102,18 @@ def setupWorld(display):
 	terminal.addComponent(component.Group('terminal'))
 	world.addEntity(terminal)
 
-	doorEntity = world.createEntity()
 	liftSprite = pygame.image.load(os.path.join('assets', 'lift.png')).convert_alpha()
+	doorEntity = world.createEntity()
 	doorEntity.addComponent(component.Position((40, 48)))
+	doorEntity.addComponent(component.Dimension((4, 12)))
+	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity.addComponent(component.Collidable())
+	doorEntity.addComponent(component.Group('lift'))
+	world.addEntity(doorEntity)
+
+
+	doorEntity = world.createEntity()
+	doorEntity.addComponent(component.Position((40, 28)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
