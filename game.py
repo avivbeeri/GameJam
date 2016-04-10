@@ -63,6 +63,15 @@ def setupWorld(display):
 					if other.hasComponent('Group'):
 						group = other.getComponent('Group')
 						print group.value
+			elif event.key == pygame.K_UP:
+				collisionSystem = world.getSystem('TileCollisionSystem')
+				collisions = collisionSystem.getEntityCollisions(entity.id)
+				for other in collisions:
+					if other.hasComponent('Group') and other.getComponent('Group').value == 'lift':
+						print 'LIFT'
+						position = entity.getComponent('Position').value
+						position += Vector2(0, -20)
+
 		elif event.type == pygame.KEYUP:
 			if event.key == pygame.K_LEFT:
 				targetVelocityComponent.value += Vector2(+0.5, 0)
@@ -84,6 +93,16 @@ def setupWorld(display):
 	terminal.addComponent(component.Collidable())
 	terminal.addComponent(component.Group('terminal'))
 	world.addEntity(terminal)
+
+	doorEntity = world.createEntity()
+	liftSprite = pygame.image.load(os.path.join('assets', 'lift.png')).convert_alpha()
+	doorEntity.addComponent(component.Position((40, 48)))
+	doorEntity.addComponent(component.Dimension((4, 12)))
+	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity.addComponent(component.Collidable())
+	doorEntity.addComponent(component.Group('lift'))
+	world.addEntity(doorEntity)
+
 
 	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
