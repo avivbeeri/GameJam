@@ -152,22 +152,18 @@ def setupWorld(display):
 							worlds["maze"] = setupMaze(display, time, size)
 							gamescreen = "maze"
 						elif group.value == 'lift':
-							collisionSystem = world.getSystem('TileCollisionSystem')
-							collisions = collisionSystem.getEntityCollisions(entity.id)
-							for other in collisions:
-								if other.hasComponent('Group') and other.getComponent('Group').value == 'lift':
-									originalLiftId = other.id
-									liftPosition = other.getComponent('Position').value
-									liftTilePosition = collisionSystem.getTilePosition(liftPosition)
-									for height in range(collisionSystem.tileMap.mapSize[1]):
-										entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
-										for other in entities:
-											if other.hasComponent('Group') and other.getComponent('Group').value == 'lift' \
-													and other.id != originalLiftId:
-												newPosition = entity.getComponent('Position').value
-												liftPosition = other.getComponent('Position').value
-												newPosition.y = liftPosition.y
-												return
+							originalLiftId = other.id
+							liftPosition = other.getComponent('Position').value
+							liftTilePosition = collisionSystem.getTilePosition(liftPosition)
+							for height in range(collisionSystem.tileMap.mapSize[1]):
+								entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
+								for other in entities:
+									if other.hasComponent('Group') and other.getComponent('Group').value == 'lift' \
+											and other.id != originalLiftId:
+										newPosition = entity.getComponent('Position').value
+										liftPosition = other.getComponent('Position').value
+										newPosition.y = liftPosition.y
+										return
 		elif event.type == pygame.KEYUP:
 			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(+0.5, 0)

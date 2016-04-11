@@ -15,7 +15,10 @@ class TileCollisionSystem(System):
         self.entityCollisionSet = {}
 
     def getEntityCollisions(self, id):
-        return self.entityCollisionSet[id]
+        if id in self.entityCollisionSet:
+            return self.entityCollisionSet[id]
+        else:
+            return []
 
     def getEntitiesInTile(self, x, y):
         if (x, y) in self.tileEntityMap:
