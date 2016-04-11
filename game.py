@@ -248,7 +248,7 @@ def setupMenu(display):
 
 def quitcheck(eventQueue):
 	retval = 0
-	global gamescreen, worlds
+	global gamescreen
 	for event in eventQueue:
 	# Check if the user has quit, and if so quit.
 		if event.type == QUIT:
@@ -261,6 +261,8 @@ def quitcheck(eventQueue):
 				elif gamescreen == "maze":
 					worlds.pop(gamescreen)
 					gamescreen = "level"
+		elif (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
+			gamescreen = "level"
 	eventQueue = []
 	return retval
 
@@ -302,7 +304,6 @@ def main():
 		# Retrieve input events for processing
 		eventQueue = pygame.event.get()
 		inputSystem.eventQueue += eventQueue
-#			if (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
 		while (accumulator >= dt):
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt
