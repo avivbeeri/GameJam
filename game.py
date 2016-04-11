@@ -130,7 +130,7 @@ def setupMaze(display, time, cellSize):
 	mapEntity.addComponent(component.Position())
 	mapData = tileMap.TileMap('maze.tmx')
 	tileSurface = mapData.getLayerSurface(0)
-	mapEntity.addComponent(component.Drawable(tileSurface, 2))
+	mapEntity.addComponent(component.Drawable(tileSurface, -1))
 	world.addEntity(mapEntity)
 
 	# Creating the player
@@ -145,7 +145,6 @@ def setupMaze(display, time, cellSize):
 
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
-		print "Collided!"
 		currentPosition = entity.getComponent("Position")
 		lastPosition = entity.getComponent("LastPosition")
 		currentPosition.value = lastPosition.value
@@ -157,18 +156,17 @@ def setupMaze(display, time, cellSize):
 		lastPosition = entity.getComponent("LastPosition")
 		if event.type == pygame.KEYDOWN:
 			if event.key == K_UP:
-				lastPosition.value = currentPosition.value
+				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(0, -cellSize)
 			elif event.key == K_DOWN:
-				lastPosition.value = currentPosition.value
+				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(0, cellSize)
 			elif event.key == K_LEFT:
-				lastPosition.value = currentPosition.value
+				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(-cellSize, 0)
 			elif event.key == K_RIGHT:
-				lastPosition.value = currentPosition.value
+				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(cellSize, 0)
-		print "Current Position is " + str(currentPosition.value) + " and previous position is " + str(lastPosition.value)
 	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(player)
 
@@ -236,7 +234,7 @@ def main():
 		for event in eventQueue:
 			if (event.type == KEYDOWN) and (event.key == K_SPACE):
 				if gamescreen == "main":
-					worlds["maze"] = setupMaze(screen, 15, 4)
+					worlds["maze"] = setupMaze(screen, 15, 8)
 					gamescreen = "maze"
 				elif gamescreen == "maze":
 					worlds.pop("maze", None)
