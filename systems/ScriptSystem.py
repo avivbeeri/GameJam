@@ -10,4 +10,4 @@ class ScriptSystem(System):
 		for entity in entities:
 			Script = entity.getComponent("Script")
 			for script in Script.scripts:
-				script(entity)
+				script(entity, dt)

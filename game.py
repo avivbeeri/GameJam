@@ -184,12 +184,22 @@ def setupWorld(display):
 	guardEntity.addComponent(component.Dimension((4, 12)))
 	guardEntity.addComponent(component.Velocity((0, 0)))
 	guardEntity.addComponent(component.Acceleration())
+	guardState = guardEntity.addComponent(component.State())
+
+	guardState.accumulator = 0
+	def guardScript(entity, dt):
+		state = entity.getComponent('State')
+		state.accumulator += dt
+		if state.accumulator > 5:
+			drawable = entity.getComponent('Drawable')
+			drawable.image = pygame.transform.flip(drawable.image, True, False)
+			state.accumulator = 0
+
+
 	scriptComponent = guardEntity.addComponent(component.Script())
+	scriptComponent.attach(guardScript)
 	collidable = guardEntity.addComponent(component.Collidable())
 	world.addEntity(guardEntity)
-
-	# def guardScript(entity, dt):
-
 
 	terminal = world.createEntity()
 	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png')).convert_alpha()
@@ -236,6 +246,7 @@ def setupWorld(display):
 
 
 	world.addSystem(inputSystem)
+	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(RenderSystem(display))

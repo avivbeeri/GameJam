@@ -26,7 +26,7 @@ class Maze:
 		self.compass = [(-1,0),(0,1),(1,0),(0,-1)]
 		self._name = "Maze"
 
-	def update(self, entity):
+	def update(self, entity, dt):
 		if self.state == "idle":
 			pass
 		elif self.state == "create":
@@ -74,9 +74,9 @@ class Maze:
 						pygame.draw.line(self.mLayer, (0,0,0,0), (dx+1,dy),(dx+self.cellSize-1,dy))
 					self.mazeArray[self.currentCell] |= direction
 
-					#push CurrentCell location on the CellStack 
+					#push CurrentCell location on the CellStack
 					self.cellStack.append(self.currentCell)
-					#make the new cell CurrentCell 
+					#make the new cell CurrentCell
 					self.currentCell = nidx
 					#add 1 to VisitedCells
 					self.visitedCells = self.visitedCells + 1
@@ -102,7 +102,7 @@ class Timer:
 		self.endtime = self.starttime + time*1000
 		self._name = "MazeTimer"
 
-	def update(self, entity):
+	def update(self, entity, dt):
 		if pygame.time.get_ticks() >= self.endtime:
 			#print "You ran out of time!"
 			pygame.event.post(pygame.event.Event(USEREVENT, code="TIMERQUIT"))
