@@ -15,30 +15,39 @@ gamescreen = "main"
 worlds = dict()
 
 def setupMenu(display):
-	menu = World()
+	world = World()
 
 	# Add the background image
-	background = menu.createEntity()
+	background = world.createEntity()
 	background.addComponent(component.Position())
 	menuImage = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
 	background.addComponent(component.Drawable(menuImage, -2))
-	menu.addEntity(background)
+	world.addEntity(background)
 
-	text = menu.createEntity()
+	# The text that goes on top of the world is here.
+	text = world.createEntity()
 	text.addComponent(component.Position())
-	menuText = pygame.image.load(os.path.join('assets', 'menu.png')).convert_alpha() #TODO
+	menuText = pygame.image.load(os.path.join('assets', 'menu.png')).convert_alpha()
 	text.addComponent(component.Drawable(menuText, -1))
-	menu.addEntity(text)
+	world.addEntity(text)
+
+	# We use this tmx because I (Sanchit) am too lazy to make custom collision handling :p
+	mapEntity = world.createEntity()
+	mapEntity.addComponent(component.Position())
+	mapData = tileMap.TileMap('menu.tmx')
+	tileSurface = mapData.getLayerSurface(0)
+	mapEntity.addComponent(component.Drawable(tileSurface, -3))
+	world.addEntity(mapEntity)
 
 	# Add the movable component
 	#cursor = world.createEntity()
 	#cursor.addComponent(component.Position()) #TODO - Work out where we start
 	#cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert() #TODO
 	#cursor.addComponent(component.Drawable(cursorImage))
-	#menu.addEntity(cursor)
+	#world.addEntity(cursor)
 
-	menu.addSystem(RenderSystem(display))
-	return menu
+	world.addSystem(RenderSystem(display))
+	return world
 
 # Creates a world
 def setupWorld(display):
