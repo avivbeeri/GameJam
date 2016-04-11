@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import math, os, pygame, random
 import component
@@ -104,7 +105,7 @@ def setupWorld(display):
 	entity.addComponent(component.Position())
 	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
 	entity.addComponent(component.Drawable(city, -2))
-	world.addEntity(entity)
+	# world.addEntity(entity)
 
 	mapEntity = world.createEntity()
 	mapEntity.addComponent(component.Position())
@@ -150,6 +151,23 @@ def setupWorld(display):
 							time, size = 10, 8 #Get these from the terminal?
 							worlds["maze"] = setupMaze(display, time, size)
 							gamescreen = "maze"
+						elif group.value == 'lift':
+							collisionSystem = world.getSystem('TileCollisionSystem')
+							collisions = collisionSystem.getEntityCollisions(entity.id)
+							for other in collisions:
+								if other.hasComponent('Group') and other.getComponent('Group').value == 'lift':
+									originalLiftId = other.id
+									liftPosition = other.getComponent('Position').value
+									liftTilePosition = collisionSystem.getTilePosition(liftPosition)
+									for height in range(collisionSystem.tileMap.mapSize[1]):
+										entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
+										for other in entities:
+											if other.hasComponent('Group') and other.getComponent('Group').value == 'lift' \
+													and other.id != originalLiftId:
+												newPosition = entity.getComponent('Position').value
+												liftPosition = other.getComponent('Position').value
+												newPosition.y = liftPosition.y
+												return
 		elif event.type == pygame.KEYUP:
 			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(+0.5, 0)
@@ -165,12 +183,48 @@ def setupWorld(display):
 
 	terminal = world.createEntity()
 	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
-	terminal.addComponent(component.Position((56, 52)))
+	terminal.addComponent(component.Position((56, 12)))
 	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
 	terminal.addComponent(component.Collidable())
 	terminal.addComponent(component.Group('terminal'))
 	world.addEntity(terminal)
+
+	liftSprite = pygame.image.load(os.path.join('assets', 'lift.png')).convert_alpha()
+	doorEntity = world.createEntity()
+	doorEntity.addComponent(component.Position((52, 48)))
+	doorEntity.addComponent(component.Dimension((4, 12)))
+	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity.addComponent(component.Collidable())
+	doorEntity.addComponent(component.Group('lift'))
+	world.addEntity(doorEntity)
+
+
+	doorEntity = world.createEntity()
+	doorEntity.addComponent(component.Position((52, 28)))
+	doorEntity.addComponent(component.Dimension((4, 12)))
+	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity.addComponent(component.Collidable())
+	doorEntity.addComponent(component.Group('lift'))
+	world.addEntity(doorEntity)
+
+	doorEntity = world.createEntity()
+	doorEntity.addComponent(component.Position((8, 8)))
+	doorEntity.addComponent(component.Dimension((4, 12)))
+	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity.addComponent(component.Collidable())
+	doorEntity.addComponent(component.Group('lift'))
+	world.addEntity(doorEntity)
+
+
+	doorEntity = world.createEntity()
+	doorEntity.addComponent(component.Position((8, 28)))
+	doorEntity.addComponent(component.Dimension((4, 12)))
+	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity.addComponent(component.Collidable())
+	doorEntity.addComponent(component.Group('lift'))
+	world.addEntity(doorEntity)
+
 
 	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
@@ -240,7 +294,7 @@ def setupMenu(display):
 				print "Out of bounds D:"
 		elif keys[event.key] == "Exit":
 			quit()
-	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)	
+	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
 	world.addSystem(RenderSystem(display))

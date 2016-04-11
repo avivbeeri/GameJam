@@ -17,6 +17,17 @@ class TileCollisionSystem(System):
     def getEntityCollisions(self, id):
         return self.entityCollisionSet[id]
 
+    def getEntitiesInTile(self, x, y):
+        if (x, y) in self.tileEntityMap:
+            return self.tileEntityMap[int(x), int(y)]
+        else:
+            return []
+
+    def getTilePosition(self, vector):
+        tileX = math.floor(vector.x / self.tileMap.cellSize[0])
+        tileY = math.floor(vector.y / self.tileMap.cellSize[1])
+        return Vector2(tileX, tileY)
+
     def process(self, entities, dt):
         # Dictionary to store items who we need to correct the physics of
         tileCollidedEntities = set()
@@ -43,13 +54,12 @@ class TileCollisionSystem(System):
 
             # Calculate the number of tiles entity overlaps
             maxPosition = position + dimension
-            startTileX = math.floor(position.x / self.tileMap.cellSize[0])
-            startTileY = math.floor(position.y / self.tileMap.cellSize[1])
-            startTile = Vector2(startTileX, startTileY)
+            startTile = self.getTilePosition(position)
 
+            # We can't refactor this calculation because we use math.ceil here.
             endTileX = math.ceil(maxPosition.x / self.tileMap.cellSize[0])
             endTileY = math.ceil(maxPosition.y / self.tileMap.cellSize[1])
-            endTile = (endTileX, endTileY)
+            endTile = Vector2(endTileX, endTileY)
 
             tileDimensions = endTile - startTile
 
@@ -84,18 +94,22 @@ class TileCollisionSystem(System):
         # This will eventually be refactored into its own system
         # For simplification reasons
         for key in self.tileEntityMap:
+            checkedEntities = set()
             entities = self.tileEntityMap[key]
             while len(entities) > 1:
                 currentEntity = entities.pop()
+                checkedEntities.add(currentEntity)
                 for other in entities:
                     if other not in self.entityCollisionSet[currentEntity.id] and \
                         areEntitiesColliding(currentEntity, other):
                         # Check if the two entities are actually colliding
                         self.entityCollisionSet[currentEntity.id].add(other)
+                        self.entityCollisionSet[other.id].add(currentEntity)
                         data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': entity.id }
                         event = pygame.event.Event(pygame.USEREVENT, data)
                         currentEntity.getComponent('Collidable').handle(event)
                         other.getComponent('Collidable').handle(event)
+                self.tileEntityMap[key] = checkedEntities
 
 
 def areEntitiesColliding(entity1, entity2):
