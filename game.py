@@ -96,7 +96,7 @@ def setupWorld(display):
 
 	terminal = world.createEntity()
 	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
-	terminal.addComponent(component.Position((56, 52)))
+	terminal.addComponent(component.Position((56, 12)))
 	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
 	terminal.addComponent(component.Collidable())
@@ -105,7 +105,7 @@ def setupWorld(display):
 
 	liftSprite = pygame.image.load(os.path.join('assets', 'lift.png')).convert_alpha()
 	doorEntity = world.createEntity()
-	doorEntity.addComponent(component.Position((40, 48)))
+	doorEntity.addComponent(component.Position((52, 48)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
@@ -114,7 +114,24 @@ def setupWorld(display):
 
 
 	doorEntity = world.createEntity()
-	doorEntity.addComponent(component.Position((40, 28)))
+	doorEntity.addComponent(component.Position((52, 28)))
+	doorEntity.addComponent(component.Dimension((4, 12)))
+	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity.addComponent(component.Collidable())
+	doorEntity.addComponent(component.Group('lift'))
+	world.addEntity(doorEntity)
+
+	doorEntity = world.createEntity()
+	doorEntity.addComponent(component.Position((8, 8)))
+	doorEntity.addComponent(component.Dimension((4, 12)))
+	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity.addComponent(component.Collidable())
+	doorEntity.addComponent(component.Group('lift'))
+	world.addEntity(doorEntity)
+
+
+	doorEntity = world.createEntity()
+	doorEntity.addComponent(component.Position((8, 28)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
