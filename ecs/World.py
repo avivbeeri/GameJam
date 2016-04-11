@@ -8,7 +8,7 @@ class World:
 
 
     def createEntity(self):
-        entity = Entity(self.idCounter)
+        entity = Entity(self.idCounter, self)
         self.idCounter += 1
         return entity
 
