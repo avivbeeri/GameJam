@@ -116,10 +116,9 @@ def setupWorld(display):
 
 	playerEntity = world.createEntity()
 	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
-
 	playerEntity.addComponent(component.Drawable(ghostSprite))
 	playerEntity.addComponent(component.Position((8, 48)))
-	playerEntity.addComponent(component.Dimension((4, 12)))
+	playerEntity.addComponent(component.Dimension((5, 12)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
 	collidable = playerEntity.addComponent(component.Collidable())
@@ -177,6 +176,20 @@ def setupWorld(display):
 	playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
 	world.addEntity(playerEntity)
 
+	guardEntity = world.createEntity()
+	guardSprite = pygame.image.load(os.path.join('assets', 'guard.png')).convert_alpha()
+	guardEntity.addComponent(component.Drawable(guardSprite))
+	guardEntity.addComponent(component.Position((8, 28)))
+	guardEntity.addComponent(component.Dimension((4, 12)))
+	guardEntity.addComponent(component.Velocity((0, 0)))
+	guardEntity.addComponent(component.Acceleration())
+	scriptComponent = guardEntity.addComponent(component.Script())
+	collidable = guardEntity.addComponent(component.Collidable())
+	world.addEntity(guardEntity)
+
+	def guardScript(entity, dt):
+
+
 	terminal = world.createEntity()
 	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
 	terminal.addComponent(component.Position((56, 12)))
@@ -195,7 +208,6 @@ def setupWorld(display):
 	doorEntity.addComponent(component.Group('lift'))
 	world.addEntity(doorEntity)
 
-
 	doorEntity = world.createEntity()
 	doorEntity.addComponent(component.Position((52, 28)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
@@ -205,7 +217,7 @@ def setupWorld(display):
 	world.addEntity(doorEntity)
 
 	doorEntity = world.createEntity()
-	doorEntity.addComponent(component.Position((8, 8)))
+	doorEntity.addComponent(component.Position((28, 8)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
@@ -214,7 +226,7 @@ def setupWorld(display):
 
 
 	doorEntity = world.createEntity()
-	doorEntity.addComponent(component.Position((8, 28)))
+	doorEntity.addComponent(component.Position((28, 28)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
