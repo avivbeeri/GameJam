@@ -269,6 +269,52 @@ def optionsMenu(display):
 	world.addEntity(musicOn)
 	world.addEntity(soundOn)
 
+	cursor = world.createEntity()
+	cursor.addComponent(component.Position((2,18)))
+	cursor.addComponent(component.LastPosition((2,18)))
+	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png')).convert_alpha()
+	cursor.addComponent(component.Drawable(cursorImage))
+
+	collidable = cursor.addComponent(component.Collidable())
+	def handleCollision(entity, event):
+		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
+		currentPosition.value = lastPosition.value
+	collidable.attachHandler(handleCollision)
+
+	cursorEventHandler = cursor.addComponent(component.EventHandler())
+	def move(entity, event):
+		global gamescreen, MUSIC, SOUND
+		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
+		if keys[event.key] == "Up":
+			lastPosition.value = Vector2(currentPosition.value)
+			currentPosition.value += Vector2(0, -12)
+		elif keys[event.key] == "Down":
+			lastPosition.value = Vector2(currentPosition.value)
+			currentPosition.value += Vector2(0, 12)
+		elif keys[event.key] in ("Interact", "Enter"):
+			if currentPosition.value == Vector2(2,18):
+				if MUSIC == True:
+					MUSIC = False
+					entity.getComponent("Drawable").layer = -3
+				else:
+					MUSIC == True
+					entity.getComponent("Drawable").layer = -1
+			if currentPosition.value == Vector2(2,30):
+				if SOUND == True:
+					SOUND = False
+					entity.getComponent("Drawable").layer = -3
+				else:
+					SOUND == True
+					entity.getComponent("Drawable").layer = -1
+			else:
+				print "Out of bounds D:"
+		elif keys[event.key] == "Exit":
+			quit()
+	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
+	world.addEntity(cursor)
+
 	world.addSystem(RenderSystem(display))
 	world.addSystem(inputSystem)
 	world.addSystem(TileCollisionSystem(mapData))
