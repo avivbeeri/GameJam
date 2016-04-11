@@ -40,11 +40,11 @@ def setupMenu(display):
 	world.addEntity(mapEntity)
 
 	# Add the movable component
-	#cursor = world.createEntity()
-	#cursor.addComponent(component.Position()) #TODO - Work out where we start
-	#cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert() #TODO
-	#cursor.addComponent(component.Drawable(cursorImage))
-	#world.addEntity(cursor)
+	cursor = world.createEntity()
+	cursor.addComponent(component.Position((8,28)))
+	cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert_alpha() #TODO
+	cursor.addComponent(component.Drawable(cursorImage))
+	world.addEntity(cursor)
 
 	world.addSystem(RenderSystem(display))
 	return world
