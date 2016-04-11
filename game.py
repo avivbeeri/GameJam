@@ -122,6 +122,7 @@ def setupWorld(display):
 	playerEntity.addComponent(component.Dimension((5, 12)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
+	playerEntity.addComponent(component.Group('player'))
 	collidable = playerEntity.addComponent(component.Collidable())
 
 	def handleCollision(entity, event):
@@ -184,9 +185,11 @@ def setupWorld(display):
 	guardEntity.addComponent(component.Dimension((4, 12)))
 	guardEntity.addComponent(component.Velocity((0, 0)))
 	guardEntity.addComponent(component.Acceleration())
+	guardEntity.addComponent(component.Radar('player'))
 	guardState = guardEntity.addComponent(component.State())
-
+	guardState.direction = 'right'
 	guardState.accumulator = 0
+
 	def guardScript(entity, dt):
 		state = entity.getComponent('State')
 		state.accumulator += dt
@@ -194,6 +197,7 @@ def setupWorld(display):
 			drawable = entity.getComponent('Drawable')
 			drawable.image = pygame.transform.flip(drawable.image, True, False)
 			state.accumulator = 0
+			state.direction = 'left' if state.direction == 'right' else 'right'
 
 
 	scriptComponent = guardEntity.addComponent(component.Script())

@@ -42,6 +42,9 @@ class TargetVelocity(Vector):
 class Drawable(Component):
     def __init__(self, surface, layer = 0):
         super(Drawable, self).__init__()
+        self.set(surface, layer)
+
+    def set(self, surface, layer = 0):
         self.image = surface
         self.layer = layer
 
@@ -84,3 +87,11 @@ class Script(Component):
 
     def attach(self, script):
         self.scripts.append(script)
+
+class Radar(Component):
+    def __init__(self, targets):
+        super(Radar, self).__init__()
+        self.targets = targets
+
+    def getTargets(self):
+        return self.targets
