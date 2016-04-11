@@ -3,7 +3,6 @@ A game for the gamejam [here](https://itch.io/jam/lowrezjam2016):
 People working on this:
 * Aviv - Engine, platforming lead.
 * Sanchit - Maze lead.
-* Medbh - ???
 
 Dependencies:
 * Python 2.7.+
@@ -25,6 +24,18 @@ Controls (those not yet implemented are in *italics*):
 * *Down arrow (crouch)*
 * Space (interact or quit hacking)
 * *Ctrl (thermoptic Camo)*
+
+TODO:
+* ~~Basic exploration and platforming~~
+* Levels bigger than 64x64 (camera scrolling)
+* Enemies
+* Enemy AI
+* Mazes solvable
+* Mazes *must* be solved to progress
+* Menu screen
+* Options screen?
+* Music and audio
+* Levels
 
 Design philosophy:  
 DRY, KISS, others?
