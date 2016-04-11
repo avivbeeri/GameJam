@@ -14,6 +14,32 @@ inputSystem = InputSystem()
 gamescreen = "main"
 worlds = dict()
 
+def setupMenu(display):
+	menu = World()
+
+	# Add the background image
+	background = menu.createEntity()
+	background.addComponent(component.Position())
+	menuImage = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
+	background.addComponent(component.Drawable(menuImage, -2))
+	menu.addEntity(background)
+
+	text = menu.createEntity()
+	text.addComponent(component.Position())
+	menuText = pygame.image.load(os.path.join('assets', 'menu.png')).convert_alpha() #TODO
+	text.addComponent(component.Drawable(menuText, -1))
+	menu.addEntity(text)
+
+	# Add the movable component
+	#cursor = world.createEntity()
+	#cursor.addComponent(component.Position()) #TODO - Work out where we start
+	#cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert() #TODO
+	#cursor.addComponent(component.Drawable(cursorImage))
+	#menu.addEntity(cursor)
+
+	menu.addSystem(RenderSystem(display))
+	return menu
+
 # Creates a world
 def setupWorld(display):
 	world = World()
@@ -88,7 +114,7 @@ def setupWorld(display):
 	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
-	# world.addSystem(RenderSystem(display))
+	world.addSystem(RenderSystem(display))
 	return world
 
 def setupMaze(display, time, cellSize):
@@ -214,7 +240,7 @@ def main():
 
 	# Create the world
 	# Later this could be delegated to a "State" object.
-	worlds["main"] = setupWorld(screen)
+	worlds["main"] = setupMenu(screen)
 	renderSystem = RenderSystem(screen)
 	eventQueue = []
 
