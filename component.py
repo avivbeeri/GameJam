@@ -27,6 +27,9 @@ class Acceleration(Vector):
 class Position(Vector):
     pass
 
+class LastPosition(Vector):
+    pass
+
 class Velocity(Vector):
     pass
 

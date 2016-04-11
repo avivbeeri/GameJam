@@ -139,26 +139,36 @@ def setupMaze(display, time, cellSize):
 	playerMarker.fill((255,0,0))
 	player.addComponent(component.Drawable(playerMarker, 0))
 	player.addComponent(component.Position((5,5)))
+	player.addComponent(component.LastPosition((5,5)))
 	player.addComponent(component.Velocity((0,0)))
 	playerEventHandler = player.addComponent(component.EventHandler())
 
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
-		pass
+		print "Collided!"
+		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
+		currentPosition.value = lastPosition.value
 	collidable.attachHandler(handleCollision)
 
 	playerEventHandler = player.addComponent(component.EventHandler())
 	def move(entity, event):
 		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
 		if event.type == pygame.KEYDOWN:
 			if event.key == K_UP:
+				lastPosition.value = currentPosition.value
 				currentPosition.value += Vector2(0, -cellSize)
 			elif event.key == K_DOWN:
+				lastPosition.value = currentPosition.value
 				currentPosition.value += Vector2(0, cellSize)
 			elif event.key == K_LEFT:
+				lastPosition.value = currentPosition.value
 				currentPosition.value += Vector2(-cellSize, 0)
 			elif event.key == K_RIGHT:
+				lastPosition.value = currentPosition.value
 				currentPosition.value += Vector2(cellSize, 0)
+		print "Current Position is " + str(currentPosition.value) + " and previous position is " + str(lastPosition.value)
 	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(player)
 
