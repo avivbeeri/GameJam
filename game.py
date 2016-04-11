@@ -205,8 +205,8 @@ def setupMenu(display):
 
 	# Add the movable component
 	cursor = world.createEntity()
-	cursor.addComponent(component.Position((8,28)))
-	cursor.addComponent(component.LastPosition((8,28)))
+	cursor.addComponent(component.Position((2,22)))
+	cursor.addComponent(component.LastPosition((2,22)))
 	cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert_alpha()
 	cursor.addComponent(component.Drawable(cursorImage))
 	# Which can collide with things
@@ -224,16 +224,18 @@ def setupMenu(display):
 		lastPosition = entity.getComponent("LastPosition")
 		if keys[event.key] == "Up":
 			lastPosition.value = Vector2(currentPosition.value)
-			currentPosition.value += Vector2(0, -12)
+			currentPosition.value += Vector2(0, -13)
 		elif keys[event.key] == "Down":
 			lastPosition.value = Vector2(currentPosition.value)
-			currentPosition.value += Vector2(0, 12)
+			currentPosition.value += Vector2(0, 13)
 		elif keys[event.key] in ("Interact", "Enter"):
-			if currentPosition.value == Vector2(8,28):
+			if currentPosition.value == Vector2(2,22):
 				worlds["level"] = setupWorld(display)
 				gamescreen = "level"
-			elif currentPosition.value == Vector2(8,40):
-				quit()
+			elif currentPosition.value == Vector2(2,35):
+				print "Options screen to come!"
+			elif currentPosition.value == Vector2(2,48):
+				exit()
 			else:
 				print "Out of bounds D:"
 		elif keys[event.key] == "Exit":
