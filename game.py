@@ -22,7 +22,7 @@ def setupMaze(display, time, cellSize):
 	# Creating the frame that goes around the maze.
 	frame = world.createEntity()
 	frame.addComponent(component.Position((0,0)))
-	mazeFrame = pygame.image.load(os.path.join('assets', 'puzzleframe.png'))
+	mazeFrame = pygame.image.load(os.path.join('assets', 'images', 'puzzleframe.png'))
 	mazeFrame.convert()
 	frame.addComponent(component.Drawable(mazeFrame, 1))
 	world.addEntity(frame)
@@ -103,7 +103,7 @@ def setupWorld(display):
 	world = World()
 	entity = world.createEntity()
 	entity.addComponent(component.Position())
-	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
+	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
 	entity.addComponent(component.Drawable(city, -2))
 	# world.addEntity(entity)
 
@@ -115,7 +115,7 @@ def setupWorld(display):
 	world.addEntity(mapEntity)
 
 	playerEntity = world.createEntity()
-	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
+	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png')).convert_alpha()
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
 	playerEntity.addComponent(component.Position((8, 48)))
@@ -182,7 +182,7 @@ def setupWorld(display):
 	world.addEntity(playerEntity)
 
 	terminal = world.createEntity()
-	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
+	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png')).convert_alpha()
 	terminal.addComponent(component.Position((56, 12)))
 	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
@@ -190,7 +190,7 @@ def setupWorld(display):
 	terminal.addComponent(component.Group('terminal'))
 	world.addEntity(terminal)
 
-	liftSprite = pygame.image.load(os.path.join('assets', 'lift.png')).convert_alpha()
+	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'lift.png')).convert_alpha()
 	doorEntity = world.createEntity()
 	doorEntity.addComponent(component.Position((52, 48)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
@@ -238,14 +238,14 @@ def setupMenu(display):
 	# Add the background image
 	background = world.createEntity()
 	background.addComponent(component.Position())
-	menuImage = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
 	background.addComponent(component.Drawable(menuImage, -2))
 	world.addEntity(background)
 
 	# The text that goes on top of the world is here.
 	text = world.createEntity()
 	text.addComponent(component.Position())
-	menuText = pygame.image.load(os.path.join('assets', 'menu.png')).convert_alpha()
+	menuText = pygame.image.load(os.path.join('assets', 'images', 'menu.png')).convert_alpha()
 	text.addComponent(component.Drawable(menuText, -1))
 	world.addEntity(text)
 
@@ -261,7 +261,7 @@ def setupMenu(display):
 	cursor = world.createEntity()
 	cursor.addComponent(component.Position((2,22)))
 	cursor.addComponent(component.LastPosition((2,22)))
-	cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert_alpha()
+	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png')).convert_alpha()
 	cursor.addComponent(component.Drawable(cursorImage))
 	# Which can collide with things
 	collidable = cursor.addComponent(component.Collidable())
