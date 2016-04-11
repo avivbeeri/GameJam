@@ -9,6 +9,7 @@ from pygame.math import Vector2
 from ecs import *
 from systems import RenderSystem, PhysicsSystem, InputSystem, ScriptSystem, TileCollisionSystem
 from pytmx.util_pygame import load_pygame
+from keymap import keys
 
 inputSystem = InputSystem()
 gamescreen = "menu"
@@ -75,16 +76,16 @@ def setupMaze(display, time, cellSize):
 		currentPosition = entity.getComponent("Position")
 		lastPosition = entity.getComponent("LastPosition")
 		if event.type == pygame.KEYDOWN:
-			if event.key == K_UP:
+			if keys[event.key] == "Up":
 				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(0, -cellSize)
-			elif event.key == K_DOWN:
+			elif keys[event.key] == "Down":
 				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(0, cellSize)
-			elif event.key == K_LEFT:
+			elif keys[event.key] == "Left":
 				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(-cellSize, 0)
-			elif event.key == K_RIGHT:
+			elif keys[event.key] == "Right":
 				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(cellSize, 0)
 	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
@@ -135,11 +136,11 @@ def setupWorld(display):
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
 		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_LEFT:
+			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(-0.5, 0)
-			elif event.key == pygame.K_RIGHT:
+			elif keys[event.key] == "Right":
 				targetVelocityComponent.value += Vector2(0.5, 0)
-			elif event.key == pygame.K_SPACE:
+			elif keys[event.key] == "Interact":
 				collisionSystem = world.getSystem('TileCollisionSystem')
 				collisions = collisionSystem.getEntityCollisions(entity.id)
 				for other in collisions:
@@ -150,9 +151,9 @@ def setupWorld(display):
 							worlds["maze"] = setupMaze(display, time, size)
 							gamescreen = "maze"
 		elif event.type == pygame.KEYUP:
-			if event.key == pygame.K_LEFT:
+			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(+0.5, 0)
-			elif event.key == pygame.K_RIGHT:
+			elif keys[event.key] == "Right":
 				targetVelocityComponent.value += Vector2(-0.5, 0)
 
 		velocityComponent.value = targetVelocityComponent.value
@@ -221,13 +222,13 @@ def setupMenu(display):
 		global gamescreen
 		currentPosition = entity.getComponent("Position")
 		lastPosition = entity.getComponent("LastPosition")
-		if event.key == K_UP:
+		if keys[event.key] == "Up":
 			lastPosition.value = Vector2(currentPosition.value)
 			currentPosition.value += Vector2(0, -12)
-		elif event.key == K_DOWN:
+		elif keys[event.key] == "Down":
 			lastPosition.value = Vector2(currentPosition.value)
 			currentPosition.value += Vector2(0, 12)
-		elif event.key in (K_SPACE, K_RETURN):
+		elif keys[event.key] in ("Interact", "Enter"):
 			if currentPosition.value == Vector2(8,28):
 				worlds["level"] = setupWorld(display)
 				gamescreen = "level"
@@ -235,7 +236,7 @@ def setupMenu(display):
 				quit()
 			else:
 				print "Out of bounds D:"
-		elif event.key == K_ESCAPE:
+		elif keys[event.key] == "Exit":
 			quit()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)	
 	world.addEntity(cursor)
@@ -253,7 +254,7 @@ def quitcheck(eventQueue):
 		if event.type == QUIT:
 			retval = 1
 		elif event.type == KEYDOWN:
-			if event.key == K_ESCAPE:
+			if keys[event.key] == "Exit":
 				if gamescreen == "level":
 					worlds.pop(gamescreen)
 					gamescreen = "menu"
