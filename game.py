@@ -10,7 +10,7 @@ from pygame.math import Vector2
 from ecs import *
 from systems import RenderSystem, PhysicsSystem, InputSystem, ScriptSystem, TileCollisionSystem
 from pytmx.util_pygame import load_pygame
-from keymap import keys
+from options import *
 
 inputSystem = InputSystem()
 gamescreen = "menu"
@@ -148,7 +148,7 @@ def setupWorld(display):
 					if other.hasComponent('Group'):
 						group = other.getComponent('Group')
 						if group.value == "terminal":
-							time, size = 10, 8 #Get these from the terminal?
+							time, size = 10, 4 #Get these from the terminal?
 							worlds["maze"] = setupMaze(display, time, size)
 							gamescreen = "maze"
 						elif group.value == 'lift':
@@ -232,6 +232,48 @@ def setupWorld(display):
 	world.addSystem(RenderSystem(display))
 	return world
 
+def optionsMenu(display):
+	world = World()
+
+	# See setupMenu for the comments on this :)
+	background = world.createEntity()
+	background.addComponent(component.Position())
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
+	background.addComponent(component.Drawable(menuImage, -2))
+	world.addEntity(background)
+
+	text = world.createEntity()
+	text.addComponent(component.Position())
+	menuText = pygame.image.load(os.path.join('assets', 'images', 'options.png')).convert_alpha()
+	text.addComponent(component.Drawable(menuText, -1))
+	world.addEntity(text)
+
+	mapEntity = world.createEntity()
+	mapEntity.addComponent(component.Position())
+	mapData = tileMap.TileMap('menu.tmx')
+	tileSurface = mapData.getLayerSurface(0)
+	mapEntity.addComponent(component.Drawable(tileSurface, -3))
+	world.addEntity(mapEntity)
+
+	musicOn = world.createEntity()
+	soundOn = world.createEntity()
+	musicOn.addComponent(component.Position((53,22)))
+	soundOn.addComponent(component.Position((53,34)))
+	onImage = pygame.image.load(os.path.join("assets", "images", "on.png"))
+	musicOn.addComponent(component.Drawable(onImage, -1))
+	soundOn.addComponent(component.Drawable(onImage, -1))
+	if MUSIC == False:
+		musicOn.getComponent("Drawable").layer = -3
+	if SOUND == False:
+		soundOn.getComponent("Drawable").layer = -3
+	world.addEntity(musicOn)
+	world.addEntity(soundOn)
+
+	world.addSystem(RenderSystem(display))
+	world.addSystem(inputSystem)
+	world.addSystem(TileCollisionSystem(mapData))
+	return world
+
 def setupMenu(display):
 	world = World()
 
@@ -287,7 +329,8 @@ def setupMenu(display):
 				worlds["level"] = setupWorld(display)
 				gamescreen = "level"
 			elif currentPosition.value == Vector2(2,35):
-				print "Options screen to come!"
+				worlds["options"] = optionsMenu(display)
+				gamescreen = "options"
 			elif currentPosition.value == Vector2(2,48):
 				exit()
 			else:
@@ -317,6 +360,9 @@ def quitcheck(eventQueue):
 				elif gamescreen == "maze":
 					worlds.pop(gamescreen)
 					gamescreen = "level"
+				elif gamescreen == "options":
+					worlds.pop(gamescreen)
+					gamescreen = "menu"
 		elif (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
 			gamescreen = "level"
 	eventQueue = []
