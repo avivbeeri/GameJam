@@ -14,3 +14,6 @@ keys = {
 	pygame.K_RCTRL:"Camo",
 	pygame.K_RETURN:"Enter",
 }
+
+MUSIC = True
+SOUND = True
