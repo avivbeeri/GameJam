@@ -10,7 +10,7 @@ from pygame.math import Vector2
 from ecs import *
 from systems import RenderSystem, PhysicsSystem, InputSystem, ScriptSystem, TileCollisionSystem
 from pytmx.util_pygame import load_pygame
-from keymap import keys
+from options import *
 
 inputSystem = InputSystem()
 gamescreen = "menu"
@@ -22,7 +22,7 @@ def setupMaze(display, time, cellSize):
 	# Creating the frame that goes around the maze.
 	frame = world.createEntity()
 	frame.addComponent(component.Position((0,0)))
-	mazeFrame = pygame.image.load(os.path.join('assets', 'puzzleframe.png'))
+	mazeFrame = pygame.image.load(os.path.join('assets', 'images', 'puzzleframe.png'))
 	mazeFrame.convert()
 	frame.addComponent(component.Drawable(mazeFrame, 1))
 	world.addEntity(frame)
@@ -103,7 +103,7 @@ def setupWorld(display):
 	world = World()
 	entity = world.createEntity()
 	entity.addComponent(component.Position())
-	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
+	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
 	entity.addComponent(component.Drawable(city, -2))
 	# world.addEntity(entity)
 
@@ -115,7 +115,7 @@ def setupWorld(display):
 	world.addEntity(mapEntity)
 
 	playerEntity = world.createEntity()
-	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
+	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png')).convert_alpha()
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
 	playerEntity.addComponent(component.Position((8, 48)))
@@ -148,7 +148,7 @@ def setupWorld(display):
 					if other.hasComponent('Group'):
 						group = other.getComponent('Group')
 						if group.value == "terminal":
-							time, size = 10, 8 #Get these from the terminal?
+							time, size = 10, 4 #Get these from the terminal?
 							worlds["maze"] = setupMaze(display, time, size)
 							gamescreen = "maze"
 						elif group.value == 'lift':
@@ -178,7 +178,7 @@ def setupWorld(display):
 	world.addEntity(playerEntity)
 
 	terminal = world.createEntity()
-	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
+	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png')).convert_alpha()
 	terminal.addComponent(component.Position((56, 12)))
 	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
@@ -186,7 +186,7 @@ def setupWorld(display):
 	terminal.addComponent(component.Group('terminal'))
 	world.addEntity(terminal)
 
-	liftSprite = pygame.image.load(os.path.join('assets', 'lift.png')).convert_alpha()
+	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'lift.png')).convert_alpha()
 	doorEntity = world.createEntity()
 	doorEntity.addComponent(component.Position((52, 48)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
@@ -228,20 +228,108 @@ def setupWorld(display):
 	world.addSystem(RenderSystem(display))
 	return world
 
+def optionsMenu(display):
+	world = World()
+
+	# See setupMenu for the comments on this :)
+	background = world.createEntity()
+	background.addComponent(component.Position())
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
+	background.addComponent(component.Drawable(menuImage, -2))
+	world.addEntity(background)
+
+	text = world.createEntity()
+	text.addComponent(component.Position())
+	menuText = pygame.image.load(os.path.join('assets', 'images', 'options.png')).convert_alpha()
+	text.addComponent(component.Drawable(menuText, -1))
+	world.addEntity(text)
+
+	mapEntity = world.createEntity()
+	mapEntity.addComponent(component.Position())
+	mapData = tileMap.TileMap('menu.tmx')
+	tileSurface = mapData.getLayerSurface(0)
+	mapEntity.addComponent(component.Drawable(tileSurface, -3))
+	world.addEntity(mapEntity)
+
+	musicOn = world.createEntity()
+	soundOn = world.createEntity()
+	musicOn.addComponent(component.Position((53,22)))
+	soundOn.addComponent(component.Position((53,34)))
+	onImage = pygame.image.load(os.path.join("assets", "images", "on.png"))
+	musicOn.addComponent(component.Drawable(onImage, -1))
+	soundOn.addComponent(component.Drawable(onImage, -1))
+	if MUSIC == False:
+		musicOn.getComponent("Drawable").layer = -3
+	if SOUND == False:
+		soundOn.getComponent("Drawable").layer = -3
+	world.addEntity(musicOn)
+	world.addEntity(soundOn)
+
+	cursor = world.createEntity()
+	cursor.addComponent(component.Position((2,18)))
+	cursor.addComponent(component.LastPosition((2,18)))
+	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png')).convert_alpha()
+	cursor.addComponent(component.Drawable(cursorImage))
+
+	collidable = cursor.addComponent(component.Collidable())
+	def handleCollision(entity, event):
+		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
+		currentPosition.value = lastPosition.value
+	collidable.attachHandler(handleCollision)
+
+	cursorEventHandler = cursor.addComponent(component.EventHandler())
+	def move(entity, event):
+		global gamescreen, MUSIC, SOUND
+		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
+		if keys[event.key] == "Up":
+			lastPosition.value = Vector2(currentPosition.value)
+			currentPosition.value += Vector2(0, -12)
+		elif keys[event.key] == "Down":
+			lastPosition.value = Vector2(currentPosition.value)
+			currentPosition.value += Vector2(0, 12)
+		elif keys[event.key] in ("Interact", "Enter"):
+			if currentPosition.value == Vector2(2,18):
+				if MUSIC == True:
+					MUSIC = False
+					entity.getComponent("Drawable").layer = -3
+				else:
+					MUSIC == True
+					entity.getComponent("Drawable").layer = -1
+			if currentPosition.value == Vector2(2,30):
+				if SOUND == True:
+					SOUND = False
+					entity.getComponent("Drawable").layer = -3
+				else:
+					SOUND == True
+					entity.getComponent("Drawable").layer = -1
+			else:
+				print "Out of bounds D:"
+		elif keys[event.key] == "Exit":
+			quit()
+	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
+	world.addEntity(cursor)
+
+	world.addSystem(RenderSystem(display))
+	world.addSystem(inputSystem)
+	world.addSystem(TileCollisionSystem(mapData))
+	return world
+
 def setupMenu(display):
 	world = World()
 
 	# Add the background image
 	background = world.createEntity()
 	background.addComponent(component.Position())
-	menuImage = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
 	background.addComponent(component.Drawable(menuImage, -2))
 	world.addEntity(background)
 
 	# The text that goes on top of the world is here.
 	text = world.createEntity()
 	text.addComponent(component.Position())
-	menuText = pygame.image.load(os.path.join('assets', 'menu.png')).convert_alpha()
+	menuText = pygame.image.load(os.path.join('assets', 'images', 'menu.png')).convert_alpha()
 	text.addComponent(component.Drawable(menuText, -1))
 	world.addEntity(text)
 
@@ -257,7 +345,7 @@ def setupMenu(display):
 	cursor = world.createEntity()
 	cursor.addComponent(component.Position((2,22)))
 	cursor.addComponent(component.LastPosition((2,22)))
-	cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert_alpha()
+	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png')).convert_alpha()
 	cursor.addComponent(component.Drawable(cursorImage))
 	# Which can collide with things
 	collidable = cursor.addComponent(component.Collidable())
@@ -283,7 +371,8 @@ def setupMenu(display):
 				worlds["level"] = setupWorld(display)
 				gamescreen = "level"
 			elif currentPosition.value == Vector2(2,35):
-				print "Options screen to come!"
+				worlds["options"] = optionsMenu(display)
+				gamescreen = "options"
 			elif currentPosition.value == Vector2(2,48):
 				exit()
 			else:
@@ -313,6 +402,9 @@ def quitcheck(eventQueue):
 				elif gamescreen == "maze":
 					worlds.pop(gamescreen)
 					gamescreen = "level"
+				elif gamescreen == "options":
+					worlds.pop(gamescreen)
+					gamescreen = "menu"
 		elif (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
 			gamescreen = "level"
 	eventQueue = []
