@@ -17,7 +17,7 @@ class World:
         self.entities[entity.id] = entity
 
 
-    def getEntityById(self, id):
+    def getEntity(self, id):
         return self.entities[id]
 
 

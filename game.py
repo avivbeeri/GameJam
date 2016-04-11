@@ -295,21 +295,25 @@ def optionsMenu(display):
 			currentPosition.value += Vector2(0, 12)
 		elif keys[event.key] in ("Interact", "Enter"):
 			if currentPosition.value == Vector2(2,18):
+				print currentPosition.value
+				print lastPosition.value
 				if MUSIC == True:
 					MUSIC = False
-					entity.getComponent("Drawable").layer = -3
+					worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = -3
 				else:
 					MUSIC == True
-					entity.getComponent("Drawable").layer = -1
+					worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = -1
 			if currentPosition.value == Vector2(2,30):
 				if SOUND == True:
 					SOUND = False
-					entity.getComponent("Drawable").layer = -3
+					worlds[gamescreen].getEntity(4).getComponent("Drawable").layer = -3
 				else:
 					SOUND == True
-					entity.getComponent("Drawable").layer = -1
+					worlds[gamescreen].getEntity(4).getComponent("Drawable").layer = -1
 			else:
 				print "Out of bounds D:"
+			print currentPosition.value
+			print lastPosition.value
 		elif keys[event.key] == "Exit":
 			quit()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
