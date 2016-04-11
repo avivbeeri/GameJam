@@ -11,120 +11,8 @@ from systems import RenderSystem, PhysicsSystem, InputSystem, ScriptSystem, Tile
 from pytmx.util_pygame import load_pygame
 
 inputSystem = InputSystem()
-gamescreen = "main"
+gamescreen = "menu"
 worlds = dict()
-
-def setupMenu(display):
-	world = World()
-
-	# Add the background image
-	background = world.createEntity()
-	background.addComponent(component.Position())
-	menuImage = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
-	background.addComponent(component.Drawable(menuImage, -2))
-	world.addEntity(background)
-
-	# The text that goes on top of the world is here.
-	text = world.createEntity()
-	text.addComponent(component.Position())
-	menuText = pygame.image.load(os.path.join('assets', 'menu.png')).convert_alpha()
-	text.addComponent(component.Drawable(menuText, -1))
-	world.addEntity(text)
-
-	# We use this tmx because I (Sanchit) am too lazy to make custom collision handling :p
-	mapEntity = world.createEntity()
-	mapEntity.addComponent(component.Position())
-	mapData = tileMap.TileMap('menu.tmx')
-	tileSurface = mapData.getLayerSurface(0)
-	mapEntity.addComponent(component.Drawable(tileSurface, -3))
-	world.addEntity(mapEntity)
-
-	# Add the movable component
-	cursor = world.createEntity()
-	cursor.addComponent(component.Position((8,28)))
-	cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert_alpha() #TODO
-	cursor.addComponent(component.Drawable(cursorImage))
-	world.addEntity(cursor)
-
-	world.addSystem(RenderSystem(display))
-	return world
-
-# Creates a world
-def setupWorld(display):
-	world = World()
-	entity = world.createEntity()
-	entity.addComponent(component.Position())
-	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
-	entity.addComponent(component.Drawable(city, -2))
-	world.addEntity(entity)
-
-	mapEntity = world.createEntity()
-	mapEntity.addComponent(component.Position())
-	mapData = tileMap.TileMap('test.tmx')
-	tileSurface = mapData.getLayerSurface(0)
-	mapEntity.addComponent(component.Drawable(tileSurface, -1))
-	world.addEntity(mapEntity)
-
-	playerEntity = world.createEntity()
-	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
-
-	playerEntity.addComponent(component.Drawable(ghostSprite))
-	playerEntity.addComponent(component.Position((8, 48)))
-	playerEntity.addComponent(component.Dimension((4, 12)))
-	playerEntity.addComponent(component.Velocity((0, 0)))
-	playerEntity.addComponent(component.Acceleration())
-	collidable = playerEntity.addComponent(component.Collidable())
-
-	def handleCollision(entity, event):
-		pass
-
-	collidable.attachHandler(handleCollision)
-	playerEntity.addComponent(component.TargetVelocity())
-
-	# Demonstration of how to handle input.
-	# We should push entity creation into its own file/function
-	def handleInput(entity, event):
-		targetVelocityComponent = entity.getComponent('TargetVelocity')
-		velocityComponent = entity.getComponent('Velocity')
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_LEFT:
-				targetVelocityComponent.value += Vector2(-0.5, 0)
-			elif event.key == pygame.K_RIGHT:
-				targetVelocityComponent.value += Vector2(0.5, 0)
-			elif event.key == pygame.K_LSHIFT:
-				collisionSystem = world.getSystem('TileCollisionSystem')
-				collisions = collisionSystem.getEntityCollisions(entity.id)
-				for other in collisions:
-					if other.hasComponent('Group'):
-						group = other.getComponent('Group')
-						print group.value
-		elif event.type == pygame.KEYUP:
-			if event.key == pygame.K_LEFT:
-				targetVelocityComponent.value += Vector2(+0.5, 0)
-			elif event.key == pygame.K_RIGHT:
-				targetVelocityComponent.value += Vector2(-0.5, 0)
-
-		velocityComponent.value = targetVelocityComponent.value
-
-	playerInputHandler = playerEntity.addComponent(component.EventHandler())
-	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
-	playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
-	world.addEntity(playerEntity)
-
-	terminal = world.createEntity()
-	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
-	terminal.addComponent(component.Position((56, 52)))
-	terminal.addComponent(component.Dimension((4, 8)))
-	terminal.addComponent(component.Drawable(termSprite, -1))
-	terminal.addComponent(component.Collidable())
-	terminal.addComponent(component.Group('terminal'))
-	world.addEntity(terminal)
-
-	world.addSystem(inputSystem)
-	world.addSystem(PhysicsSystem())
-	world.addSystem(TileCollisionSystem(mapData))
-	world.addSystem(RenderSystem(display))
-	return world
 
 def setupMaze(display, time, cellSize):
 	world = World()
@@ -135,7 +23,6 @@ def setupMaze(display, time, cellSize):
 	mazeFrame = pygame.image.load(os.path.join('assets', 'puzzleframe.png'))
 	mazeFrame.convert()
 	frame.addComponent(component.Drawable(mazeFrame, 1))
-	frame.addComponent(component.Collidable())
 	world.addEntity(frame)
 
 	# Creating the object for the timer.
@@ -175,8 +62,6 @@ def setupMaze(display, time, cellSize):
 	player.addComponent(component.Drawable(playerMarker, 0))
 	player.addComponent(component.Position((5,5)))
 	player.addComponent(component.LastPosition((5,5)))
-	player.addComponent(component.Velocity((0,0)))
-	playerEventHandler = player.addComponent(component.EventHandler())
 
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
@@ -211,20 +96,170 @@ def setupMaze(display, time, cellSize):
 	world.addSystem(TileCollisionSystem(mapData))
 	return world
 
+# Creates a world
+def setupWorld(display):
+	world = World()
+	entity = world.createEntity()
+	entity.addComponent(component.Position())
+	city = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
+	entity.addComponent(component.Drawable(city, -2))
+	world.addEntity(entity)
 
-def quitcheck(eventQueue, quit=True):
+	mapEntity = world.createEntity()
+	mapEntity.addComponent(component.Position())
+	mapData = tileMap.TileMap('test.tmx')
+	tileSurface = mapData.getLayerSurface(0)
+	mapEntity.addComponent(component.Drawable(tileSurface, -1))
+	world.addEntity(mapEntity)
+
+	playerEntity = world.createEntity()
+	ghostSprite = pygame.image.load(os.path.join('assets', 'ghost.png')).convert_alpha()
+
+	playerEntity.addComponent(component.Drawable(ghostSprite))
+	playerEntity.addComponent(component.Position((8, 48)))
+	playerEntity.addComponent(component.Dimension((4, 12)))
+	playerEntity.addComponent(component.Velocity((0, 0)))
+	playerEntity.addComponent(component.Acceleration())
+	collidable = playerEntity.addComponent(component.Collidable())
+
+	def handleCollision(entity, event):
+		pass
+
+	collidable.attachHandler(handleCollision)
+	playerEntity.addComponent(component.TargetVelocity())
+
+	# Demonstration of how to handle input.
+	# We should push entity creation into its own file/function
+	def handleInput(entity, event):
+		global gamescreen
+		targetVelocityComponent = entity.getComponent('TargetVelocity')
+		velocityComponent = entity.getComponent('Velocity')
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_LEFT:
+				targetVelocityComponent.value += Vector2(-0.5, 0)
+			elif event.key == pygame.K_RIGHT:
+				targetVelocityComponent.value += Vector2(0.5, 0)
+			elif event.key == pygame.K_SPACE:
+				collisionSystem = world.getSystem('TileCollisionSystem')
+				collisions = collisionSystem.getEntityCollisions(entity.id)
+				for other in collisions:
+					if other.hasComponent('Group'):
+						group = other.getComponent('Group')
+						if group.value == "terminal":
+							time, size = 10, 8 #Get these from the terminal?
+							worlds["maze"] = setupMaze(display, time, size)
+							gamescreen = "maze"
+		elif event.type == pygame.KEYUP:
+			if event.key == pygame.K_LEFT:
+				targetVelocityComponent.value += Vector2(+0.5, 0)
+			elif event.key == pygame.K_RIGHT:
+				targetVelocityComponent.value += Vector2(-0.5, 0)
+
+		velocityComponent.value = targetVelocityComponent.value
+
+	playerInputHandler = playerEntity.addComponent(component.EventHandler())
+	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
+	playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
+	world.addEntity(playerEntity)
+
+	terminal = world.createEntity()
+	termSprite = pygame.image.load(os.path.join('assets', 'terminal.png')).convert_alpha()
+	terminal.addComponent(component.Position((56, 52)))
+	terminal.addComponent(component.Dimension((4, 8)))
+	terminal.addComponent(component.Drawable(termSprite, -1))
+	terminal.addComponent(component.Collidable())
+	terminal.addComponent(component.Group('terminal'))
+	world.addEntity(terminal)
+
+	world.addSystem(inputSystem)
+	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
+	world.addSystem(RenderSystem(display))
+	return world
+
+def setupMenu(display):
+	world = World()
+
+	# Add the background image
+	background = world.createEntity()
+	background.addComponent(component.Position())
+	menuImage = pygame.image.load(os.path.join('assets', 'cityscape.png')).convert()
+	background.addComponent(component.Drawable(menuImage, -2))
+	world.addEntity(background)
+
+	# The text that goes on top of the world is here.
+	text = world.createEntity()
+	text.addComponent(component.Position())
+	menuText = pygame.image.load(os.path.join('assets', 'menu.png')).convert_alpha()
+	text.addComponent(component.Drawable(menuText, -1))
+	world.addEntity(text)
+
+	# We use this tmx because I (Sanchit) am too lazy to make custom collision handling :p
+	mapEntity = world.createEntity()
+	mapEntity.addComponent(component.Position())
+	mapData = tileMap.TileMap('menu.tmx')
+	tileSurface = mapData.getLayerSurface(0)
+	mapEntity.addComponent(component.Drawable(tileSurface, -3))
+	world.addEntity(mapEntity)
+
+	# Add the movable component
+	cursor = world.createEntity()
+	cursor.addComponent(component.Position((8,28)))
+	cursor.addComponent(component.LastPosition((8,28)))
+	cursorImage = pygame.image.load(os.path.join('assets', 'cursor.png')).convert_alpha()
+	cursor.addComponent(component.Drawable(cursorImage))
+	# Which can collide with things
+	collidable = cursor.addComponent(component.Collidable())
+	def handleCollision(entity, event):
+		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
+		currentPosition.value = lastPosition.value
+	collidable.attachHandler(handleCollision)
+	# And move (a bit).
+	cursorEventHandler = cursor.addComponent(component.EventHandler())
+	def move(entity, event):
+		global gamescreen
+		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
+		if event.key == K_UP:
+			lastPosition.value = Vector2(currentPosition.value)
+			currentPosition.value += Vector2(0, -12)
+		elif event.key == K_DOWN:
+			lastPosition.value = Vector2(currentPosition.value)
+			currentPosition.value += Vector2(0, 12)
+		elif event.key in (K_SPACE, K_RETURN):
+			if currentPosition.value == Vector2(8,28):
+				worlds["level"] = setupWorld(display)
+				gamescreen = "level"
+			elif currentPosition.value == Vector2(8,40):
+				quit()
+			else:
+				print "Out of bounds D:"
+		elif event.key == K_ESCAPE:
+			quit()
+	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)	
+	world.addEntity(cursor)
+
+	world.addSystem(RenderSystem(display))
+	world.addSystem(inputSystem)
+	world.addSystem(TileCollisionSystem(mapData))
+	return world
+
+def quitcheck(eventQueue):
 	retval = 0
+	global gamescreen, worlds
 	for event in eventQueue:
-	#Check if the user has quit, and if so quit.
-
+	# Check if the user has quit, and if so quit.
 		if event.type == QUIT:
 			retval = 1
 		elif event.type == KEYDOWN:
 			if event.key == K_ESCAPE:
-				if quit == True:
-					retval = 1
-				else:
-					pass # In future we'll use this to return to the main menu
+				if gamescreen == "level":
+					worlds.pop(gamescreen)
+					gamescreen = "menu"
+				elif gamescreen == "maze":
+					worlds.pop(gamescreen)
+					gamescreen = "level"
 	eventQueue = []
 	return retval
 
@@ -249,7 +284,7 @@ def main():
 
 	# Create the world
 	# Later this could be delegated to a "State" object.
-	worlds["main"] = setupMenu(screen)
+	worlds["menu"] = setupMenu(screen)
 	renderSystem = RenderSystem(screen)
 	eventQueue = []
 
@@ -266,17 +301,7 @@ def main():
 		# Retrieve input events for processing
 		eventQueue = pygame.event.get()
 		inputSystem.eventQueue += eventQueue
-		for event in eventQueue:
-			if (event.type == KEYDOWN) and (event.key == K_SPACE):
-				if gamescreen == "main":
-					worlds["maze"] = setupMaze(screen, 15, 8)
-					gamescreen = "maze"
-				elif gamescreen == "maze":
-					worlds.pop("maze", None)
-					gamescreen = "main"
-			if (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
-				worlds.pop("maze", None)
-				gamescreen = "main"
+#			if (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
 		while (accumulator >= dt):
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt
