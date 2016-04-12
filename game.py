@@ -101,6 +101,8 @@ def setupMaze(display, time, cellSize):
 # Creates a world
 def setupWorld(display):
 	world = World()
+	groupManager = world.getManager('Group')
+
 	entity = world.createEntity()
 	entity.addComponent(component.Position())
 	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
@@ -115,6 +117,7 @@ def setupWorld(display):
 	world.addEntity(mapEntity)
 
 	playerEntity = world.createEntity()
+	groupManager.add('player', playerEntity)
 	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png')).convert_alpha()
 
 	playerEntity.addComponent(component.Drawable(ghostSprite))
@@ -122,7 +125,6 @@ def setupWorld(display):
 	playerEntity.addComponent(component.Dimension((5, 12)))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
-	playerEntity.addComponent(component.Group('player'))
 	collidable = playerEntity.addComponent(component.Collidable())
 
 	def handleCollision(entity, event):
@@ -146,25 +148,23 @@ def setupWorld(display):
 				collisionSystem = world.getSystem('TileCollisionSystem')
 				collisions = collisionSystem.getEntityCollisions(entity.id)
 				for other in collisions:
-					if other.hasComponent('Group'):
-						group = other.getComponent('Group')
-						if group.value == "terminal":
-							time, size = 10, 4 #Get these from the terminal?
-							worlds["maze"] = setupMaze(display, time, size)
-							gamescreen = "maze"
-						elif group.value == 'lift':
-							originalLiftId = other.id
-							liftPosition = other.getComponent('Position').value
-							liftTilePosition = collisionSystem.getTilePosition(liftPosition)
-							for height in range(collisionSystem.tileMap.mapSize[1]):
-								entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
-								for other in entities:
-									if other.hasComponent('Group') and other.getComponent('Group').value == 'lift' \
-											and other.id != originalLiftId:
-										newPosition = entity.getComponent('Position').value
-										liftPosition = other.getComponent('Position').value
-										newPosition.y = liftPosition.y
-										return
+					if groupManager.check(other, 'terminal'):
+						time, size = 10, 4 #Get these from the terminal?
+						worlds["maze"] = setupMaze(display, time, size)
+						gamescreen = "maze"
+					elif groupManager.check(other, 'lift'):
+						originalLiftId = other.id
+						liftPosition = other.getComponent('Position').value
+						liftTilePosition = collisionSystem.getTilePosition(liftPosition)
+						for height in range(collisionSystem.tileMap.mapSize[1]):
+							entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
+							for other in entities:
+								if groupManager.check(other, 'lift') and \
+										other.id != originalLiftId:
+									newPosition = entity.getComponent('Position').value
+									liftPosition = other.getComponent('Position').value
+									newPosition.y = liftPosition.y
+									return
 		elif event.type == pygame.KEYUP:
 			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(+0.5, 0)
@@ -206,46 +206,46 @@ def setupWorld(display):
 	world.addEntity(guardEntity)
 
 	terminal = world.createEntity()
+	groupManager.add('terminal', terminal)
 	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png')).convert_alpha()
 	terminal.addComponent(component.Position((56, 12)))
 	terminal.addComponent(component.Dimension((4, 8)))
 	terminal.addComponent(component.Drawable(termSprite, -1))
 	terminal.addComponent(component.Collidable())
-	terminal.addComponent(component.Group('terminal'))
 	world.addEntity(terminal)
 
 	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'lift.png')).convert_alpha()
 	doorEntity = world.createEntity()
+	groupManager.add('lift', doorEntity)
 	doorEntity.addComponent(component.Position((52, 48)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
-	doorEntity.addComponent(component.Group('lift'))
 	world.addEntity(doorEntity)
 
 	doorEntity = world.createEntity()
+	groupManager.add('lift', doorEntity)
 	doorEntity.addComponent(component.Position((52, 28)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
-	doorEntity.addComponent(component.Group('lift'))
 	world.addEntity(doorEntity)
 
 	doorEntity = world.createEntity()
+	groupManager.add('lift', doorEntity)
 	doorEntity.addComponent(component.Position((28, 8)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
-	doorEntity.addComponent(component.Group('lift'))
 	world.addEntity(doorEntity)
 
 
 	doorEntity = world.createEntity()
+	groupManager.add('lift', doorEntity)
 	doorEntity.addComponent(component.Position((28, 28)))
 	doorEntity.addComponent(component.Dimension((4, 12)))
 	doorEntity.addComponent(component.Drawable(liftSprite, -1))
 	doorEntity.addComponent(component.Collidable())
-	doorEntity.addComponent(component.Group('lift'))
 	world.addEntity(doorEntity)
 
 

@@ -1,10 +1,12 @@
 from .Entity import Entity
+from .GroupManager import GroupManager
 
 class World:
     def __init__(self):
         self.idCounter = 0
         self.entities = {}
         self.systems = []
+        self.managers = { 'Group': GroupManager(self) }
 
 
     def createEntity(self):
@@ -36,6 +38,8 @@ class World:
                 return system
         return None
 
+    def getManager(self, managerType):
+        return self.managers[managerType]
 
     def update(self, dt):
         for system in self.systems:
