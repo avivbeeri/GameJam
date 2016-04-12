@@ -8,7 +8,12 @@ import tileMap
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
-from systems import RenderSystem, PhysicsSystem, InputSystem, ScriptSystem, TileCollisionSystem
+from systems import RenderSystem, \
+					PhysicsSystem, \
+					InputSystem, \
+					RadarSystem, \
+					ScriptSystem, \
+					TileCollisionSystem
 from pytmx.util_pygame import load_pygame
 from options import *
 
@@ -250,6 +255,7 @@ def setupWorld(display):
 
 
 	world.addSystem(inputSystem)
+	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))

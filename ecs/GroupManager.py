@@ -11,11 +11,21 @@ class GroupManager:
             self.groups[group] = set()
         self.groups[group].add(entity)
 
+    def getAll(self, groups):
+        if not hasattr(groups, '__iter__'):
+            groups = (groups,)
+
+        resultGroups = {}
+        for group in groups:
+            resultGroups[group] = self.get(group)
+
+        return resultGroups
+
     def get(self, group):
         if group in self.groups:
-            return self.groups[group]
+            return frozenset(self.groups[group])
         else:
-            return set()
+            return frozenset()
 
     def check(self, entity, group):
         if group in self.groups:
