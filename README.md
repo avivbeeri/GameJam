@@ -33,8 +33,8 @@ TODO:
 * Enemy AI
 * Mazes solvable
 * Mazes *must* be solved to progress
-* Menu screen
-* Options screen?
+* ~~Menu screen~~
+* ~~Options screen~~
 * Music and audio
 * Levels
 
