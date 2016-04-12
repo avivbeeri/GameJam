@@ -86,9 +86,10 @@ class Script(Component):
         self.scripts.append(script)
 
 class Radar(Component):
-    def __init__(self, targets):
+    def __init__(self, targetGroups):
         super(Radar, self).__init__()
-        self.targets = targets
+        self.targetGroups = targetGroups
+        self.targets = {}
 
-    def getTargets(self):
-        return self.targets
+    def getTargetGroups(self):
+        return self.targetGroups

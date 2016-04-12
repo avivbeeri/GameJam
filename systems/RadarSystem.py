@@ -10,10 +10,22 @@ class RadarSystem(System):
 		groupManager = self.world.getManager('Group')
 		for entity in entities:
 			radar = entity.getComponent("Radar")
-			targets = groupManager.getAll(radar.getTargets())
-
+			radar.targets.clear()
+			targetGroups = groupManager.getAll(radar.getTargetGroups())
+			entityPosition = entity.getComponent('Position').value
 			# TODO: Use the Radar config to decide if we need to fire an event
+			for key, group in targetGroups.iteritems():
+				radar.targets[key] = set()
+				for target in group:
+					ping = self.RadarPing()
+					ping.group = key
+					ping.entity = target
+					targetPosition = target.getComponent('Position').value
+					ping.position = targetPosition
+					ping.distance = targetPosition - entityPosition
+					radar.targets[key].add(ping)
 
+			'''
 			player = next(iter(targets['player']))
 			entityPosition = entity.getComponent('Position').value
 			entityDirection = entity.getComponent('State').direction
@@ -22,3 +34,7 @@ class RadarSystem(System):
 					entityPosition.x < playerPosition.x and \
 					entityDirection == 'right':
 				print 'ALERT'
+			'''
+
+	class RadarPing(object):
+		pass

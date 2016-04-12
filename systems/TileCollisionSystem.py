@@ -31,6 +31,47 @@ class TileCollisionSystem(System):
         tileY = math.floor(vector.y / self.tileMap.cellSize[1])
         return Vector2(tileX, tileY)
 
+    def isRaycastClear(self, start, end):
+        # Bresenham Algorithm
+        # http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm#Python
+        solid = False
+        tiles = []
+        startTile = self.getTilePosition(start)
+        endTile = self.getTilePosition(end)
+        delta = endTile - startTile
+
+
+        isSteep = abs(delta.y) > abs(delta.x)
+        if isSteep:
+            startTile.x, startTile.y = startTile.y, startTile.x
+            endTile.x, endTile.y = endTile.y, endTile.x
+
+
+        swapped = False
+        if (startTile.x > endTile.x):
+            startTile.x, endTile.x = endTile.x, startTile.x
+            startTile.y, endTile.y = endTile.y, startTile.y
+
+        delta = endTile - startTile
+        error = int(delta.x / 2.0)
+        y = startTile.y
+        ystep = 1 if startTile.y < endTile.y else -1
+
+        for x in range(int(startTile.x), int(endTile.x + 1)):
+            coord = (y, x) if isSteep else (x, y)
+            tiles.append(coord)
+            error -= abs(delta.y)
+            while error < 0:
+                y = y + ystep
+                error += delta.x
+
+        for tileX, tileY in tiles:
+            tile = self.tileMap.getTileData(tileX, tileY, 0)
+            if tile == 'SOLID':
+                return False
+        return True
+
+
     def process(self, entities, dt):
         # Dictionary to store items who we need to correct the physics of
         tileCollidedEntities = set()
