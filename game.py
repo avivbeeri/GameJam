@@ -313,7 +313,7 @@ def setupMenu(display):
 	world = World()
 
 	# Add the music
-	pygame.mixer.music.load(os.path.join('assets','music','BlueBeat.ogg'))
+	pygame.mixer.music.load(os.path.join('assets','music','BlueBeat.wav'))
 	pygame.mixer.music.play(loops=-1)
 
 	# Add the background image
