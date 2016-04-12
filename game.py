@@ -312,6 +312,10 @@ def optionsMenu(display):
 def setupMenu(display):
 	world = World()
 
+	# Add the music
+	pygame.mixer.music.load(os.path.join('assets','music','BlueBeat.ogg'))
+	pygame.mixer.music.play(loops=-1)
+
 	# Add the background image
 	background = world.createEntity()
 	background.addComponent(component.Position())

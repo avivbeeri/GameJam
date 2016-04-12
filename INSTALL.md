@@ -4,7 +4,9 @@ When the jam is completed and at regular intervals afterwards, we will aim to pr
 ## OSX and Linux
 * Clone the git repository.
 * Install python 2.7.x and [pip](https://pip.pypa.io/en/stable/installing/), if you haven't already, and upgrade pip to the latest version.
-* Download and install [pygame](http://www.pygame.org/download.shtml "pygame").
+* Download and install [pygame](http://www.pygame.org/download.shtml).
+* If you don't already have it, make sure you grab libvorbis from your package manager.
+* If you're on a mac, you may need to downgrade SDL to 1.2.10 - see [here](https://bitbucket.org/pygame/pygame/issues/284/max-osx-el-capitan-using-the-deprecated)
 * Run (in any terminal): 
 ```shell
 pip install pytmx
