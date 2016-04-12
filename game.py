@@ -5,6 +5,7 @@ import math, os, pygame, random
 import component
 import maze
 import tileMap
+from collections import OrderedDict
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
@@ -14,7 +15,7 @@ from options import *
 
 inputSystem = InputSystem()
 gamescreen = "menu"
-worlds = dict()
+worlds = OrderedDict()
 
 def setupMaze(display, time, cellSize):
 	world = World()
@@ -256,8 +257,8 @@ def optionsMenu(display):
 	musicOn.addComponent(component.Position((53,22)))
 	soundOn.addComponent(component.Position((53,34)))
 	onImage = pygame.image.load(os.path.join("assets", "images", "on.png"))
-	musicOn.addComponent(component.Drawable(onImage, -1))
-	soundOn.addComponent(component.Drawable(onImage, -1))
+	musicOn.addComponent(component.Drawable(onImage, 3))
+	soundOn.addComponent(component.Drawable(onImage, 3))
 	if MUSIC == False:
 		musicOn.getComponent("Drawable").layer = -3
 	if SOUND == False:
@@ -291,27 +292,14 @@ def optionsMenu(display):
 			currentPosition.value += Vector2(0, 12)
 		elif keys[event.key] in ("Interact", "Enter"):
 			if currentPosition.value == Vector2(2,18):
-				print currentPosition.value
-				print lastPosition.value
-				if MUSIC == True:
-					MUSIC = False
-					worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = -3
-				else:
-					MUSIC == True
-					worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = -1
+				MUSIC = not MUSIC
+				worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
+				# This swaps the value between 3 and -3 - IE visible or not.
 			if currentPosition.value == Vector2(2,30):
-				if SOUND == True:
-					SOUND = False
-					worlds[gamescreen].getEntity(4).getComponent("Drawable").layer = -3
-				else:
-					SOUND == True
-					worlds[gamescreen].getEntity(4).getComponent("Drawable").layer = -1
+				SOUND = not SOUND
+				worlds[gamescreen].getEntity(4).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(4).getComponent("Drawable").layer
 			else:
 				print "Out of bounds D:"
-			print currentPosition.value
-			print lastPosition.value
-		elif keys[event.key] == "Exit":
-			quit()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
@@ -400,15 +388,8 @@ def quitcheck(eventQueue):
 			retval = 1
 		elif event.type == KEYDOWN:
 			if keys[event.key] == "Exit":
-				if gamescreen == "level":
-					worlds.pop(gamescreen)
-					gamescreen = "menu"
-				elif gamescreen == "maze":
-					worlds.pop(gamescreen)
-					gamescreen = "level"
-				elif gamescreen == "options":
-					worlds.pop(gamescreen)
-					gamescreen = "menu"
+				worlds.popitem()
+				gamescreen = worlds.keys()[-1]
 		elif (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
 			gamescreen = "level"
 	eventQueue = []
