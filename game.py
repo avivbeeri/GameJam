@@ -17,7 +17,7 @@ inputSystem = InputSystem()
 gamescreen = "menu"
 worlds = OrderedDict()
 
-def setupMaze(display, time, cellSize):
+def setupMaze(display, (time, cellSize)):
 	world = World()
 
 	# Creating the frame that goes around the maze.
@@ -149,8 +149,8 @@ def setupWorld(display):
 					if other.hasComponent('Group'):
 						group = other.getComponent('Group')
 						if group.value == "terminal":
-							time, size = 10, 4 #Get these from the terminal?
-							worlds["maze"] = setupMaze(display, time, size)
+							terminalDifficulty = DIFFICULTY[0] #Ideally the terminal itself should store the difficulty number.
+							worlds["maze"] = setupMaze(display, terminalDifficulty)
 							gamescreen = "maze"
 						elif group.value == 'lift':
 							originalLiftId = other.id
@@ -231,7 +231,7 @@ def setupWorld(display):
 
 def optionsMenu(display):
 	world = World()
-
+	### NOTE: DON'T ADD ENTITES YET! ###
 	# See setupMenu for the comments on this :)
 	background = world.createEntity()
 	background.addComponent(component.Position())
@@ -265,6 +265,7 @@ def optionsMenu(display):
 		soundOn.getComponent("Drawable").layer = -3
 	world.addEntity(musicOn)
 	world.addEntity(soundOn)
+	### FEEL FREE TO ADD ENTITIES AGAIN ###
 
 	cursor = world.createEntity()
 	cursor.addComponent(component.Position((2,18)))

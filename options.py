@@ -17,3 +17,9 @@ keys = {
 
 MUSIC = True
 SOUND = True
+DIFFICULTY = [
+	(30, 8),
+	(10, 8),
+	(30, 4),
+	(10, 4)
+]
