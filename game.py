@@ -177,6 +177,7 @@ def setupWorld(display):
 	guardState.modeTime = 0
 
 	def guardScript(entity, dt):
+		global worlds
 		def isVisible(entity, player):
 			entityPosition  = entity.getComponent('Position').value
 			entityDirection = entity.getComponent('State').direction
@@ -220,7 +221,7 @@ def setupWorld(display):
 		elif state.mode == 'alert':
 			if isVisible(entity, player):
 				if state.modeTime > 0.4:
-					quit()
+					worlds['level'] = setupWorld(display)
 				else:
 					state.modeTime += dt
 			else:
