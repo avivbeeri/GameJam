@@ -60,15 +60,15 @@ class TileCollisionSystem(System):
         for x in range(int(startTile.x), int(endTile.x + 1)):
             coord = (y, x) if isSteep else (x, y)
             tiles.append(coord)
+            tileX, tileY = coord
+            tile = self.tileMap.getTileData(tileX, tileY, 0)
+            if tile == 'SOLID':
+                return False
             error -= abs(delta.y)
             while error < 0:
                 y = y + ystep
                 error += delta.x
 
-        for tileX, tileY in tiles:
-            tile = self.tileMap.getTileData(tileX, tileY, 0)
-            if tile == 'SOLID':
-                return False
         return True
 
 

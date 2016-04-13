@@ -198,23 +198,20 @@ def setupWorld(display):
 	def guardScript(entity, dt):
 
 		radar = entity.getComponent('Radar')
+		state = entity.getComponent('State')
 		playerPing = next(iter(radar.targets['player']))
 
 		player = playerPing.entity
 		entityPosition = entity.getComponent('Position').value
-		entityDirection = entity.getComponent('State').direction
+		entityDirection = state.direction
 		playerPosition = player.getComponent('Position').value
-		isVisible = world.getSystem('TileCollisionSystem').isRaycastClear(entityPosition, playerPosition)
+		print entityDirection
+		if (entityDirection == 'right' and entityPosition.x <= playerPosition.x) or \
+				(entityDirection == 'left' and entityPosition.x > playerPosition.x) :
+			collisionSystem = world.getSystem('TileCollisionSystem')
+			isVisible = collisionSystem.isRaycastClear(entityPosition, playerPosition)
 
-		'''
 
-		if entityPosition.y == playerPosition.y and \
-				entityPosition.x < playerPosition.x and \
-				entityDirection == 'right':
-			print 'ALERT'
-		'''
-
-		state = entity.getComponent('State')
 		state.accumulator += dt
 		if state.accumulator > 5:
 			drawable = entity.getComponent('Drawable')
