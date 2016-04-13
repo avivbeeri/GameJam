@@ -193,6 +193,7 @@ def setupWorld(display):
 	guardEntity.addComponent(component.Radar('player'))
 	guardState = guardEntity.addComponent(component.State())
 	guardState.direction = 'right'
+	guardState.mode = 'patrol'
 	guardState.accumulator = 0
 
 	def guardScript(entity, dt):
@@ -200,24 +201,34 @@ def setupWorld(display):
 		radar = entity.getComponent('Radar')
 		state = entity.getComponent('State')
 		playerPing = next(iter(radar.targets['player']))
-
 		player = playerPing.entity
 		entityPosition = entity.getComponent('Position').value
 		entityDirection = state.direction
 		playerPosition = player.getComponent('Position').value
-		print entityDirection
-		if (entityDirection == 'right' and entityPosition.x <= playerPosition.x) or \
-				(entityDirection == 'left' and entityPosition.x > playerPosition.x) :
-			collisionSystem = world.getSystem('TileCollisionSystem')
+		collisionSystem = world.getSystem('TileCollisionSystem')
+
+		if state.mode == 'patrol':
+			state.accumulator += dt
+			if state.accumulator > 5:
+				drawable = entity.getComponent('Drawable')
+				drawable.image = pygame.transform.flip(drawable.image, True, False)
+				state.accumulator = 0
+				state.direction = 'left' if state.direction == 'right' else 'right'
+
+			if (entityDirection == 'right' and entityPosition.x <= playerPosition.x) or \
+					(entityDirection == 'left' and entityPosition.x > playerPosition.x) :
+				isVisible = collisionSystem.isRaycastClear(entityPosition, playerPosition)
+				state.mode = 'attack' if isVisible else 'patrol'
+		else:
+			velocity = entity.getComponent('Velocity')
 			isVisible = collisionSystem.isRaycastClear(entityPosition, playerPosition)
+			if isVisible:
+				velocity.value = playerPing.distance.normalize() * 0.3
+			else:
+				velocity.value = Vector2()
+				state.mode = 'patrol'
 
 
-		state.accumulator += dt
-		if state.accumulator > 5:
-			drawable = entity.getComponent('Drawable')
-			drawable.image = pygame.transform.flip(drawable.image, True, False)
-			state.accumulator = 0
-			state.direction = 'left' if state.direction == 'right' else 'right'
 
 
 	scriptComponent = guardEntity.addComponent(component.Script())
