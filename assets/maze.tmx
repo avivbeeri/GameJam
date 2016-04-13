@@ -3,7 +3,7 @@
  <tileset firstgid="1" name="experiment-tiles" tilewidth="4" tileheight="4" tilecount="3" columns="3">
   <image source="experiment-tiles.png" width="12" height="4"/>
  </tileset>
- <layer name="frame" width="16" height="17">
+ <layer name="frame" width="16" height="16">
   <data encoding="csv">
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
