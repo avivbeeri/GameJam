@@ -23,7 +23,6 @@ def setupMaze(display, (time, cellSize)):
 	# Creating the frame that goes around the maze.
 	mazeFrame = pygame.image.load(os.path.join('assets', 'images', 'puzzleframe.png'))
 	frame = auxFunctions.create(world, position=(0,0), drawable=mazeFrame, layer=1)
-	frame.addComponent(component.Collidable())
 	world.addEntity(frame)
 
 	# Creating the object for the timer.

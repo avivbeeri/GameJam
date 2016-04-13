@@ -75,7 +75,7 @@ class TileCollisionSystem(System):
                     if (tileX, tileY) not in self.tileEntityMap:
                         self.tileEntityMap[tileX, tileY] = set()
                     self.tileEntityMap[tileX, tileY].add(entity)
-                    if tile == 'SOLID' and entity.hasComponent('Velocity'):
+                    if tile == 'SOLID':
                         tileCollidedEntities.add(entity)
 
         # Dispatch events and correct the physics
@@ -87,11 +87,15 @@ class TileCollisionSystem(System):
             data = {'code': 'COLLISION', 'collisionType': 'tile' }
             event = pygame.event.Event(pygame.USEREVENT, data)
             entity.getComponent('Collidable').handle(event)
-            # Correct entity position
-            position = entity.getComponent('Position').value
-            velocityComponent = entity.getComponent('Velocity')
-            position -= velocityComponent.value
-            velocityComponent.value = Vector2()
+            if entity.hasComponent('Velocity'):
+                # Correct entity position
+                positionComponent = entity.getComponent('Position')
+                position = positionComponent.value
+                velocityComponent = entity.getComponent('Velocity')
+                position -= velocityComponent.value
+                velocityComponent.value = Vector2()
+            elif entity.hasComponent('LastPosition'):
+                positionComponent.value = Vector2(entity.getComponent('LastPosition').value)
 
         # Process E-E collisions
         # This will eventually be refactored into its own system
