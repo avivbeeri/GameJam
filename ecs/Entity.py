@@ -1,8 +1,9 @@
 class Entity:
     # Represents a game entity, which can be given components.
 
-    def __init__(self, id):
+    def __init__(self, id, world):
         self.id = id
+        self._world = world
         self.components = {}
 
     def addComponent(self, component):

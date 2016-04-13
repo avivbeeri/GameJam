@@ -28,14 +28,14 @@ Controls (those not yet implemented are in *italics*):
 
 TODO:
 * ~~Basic exploration and platforming~~
-* Levels bigger than 64x64 (camera scrolling)
-* Enemies
+* Levels bigger than 64x64? (camera scrolling)
+* ~~Enemies~~
 * Enemy AI
 * Mazes solvable
 * Mazes *must* be solved to progress
-* Menu screen
-* Options screen?
-* Music and audio
+* ~~Menu screen~~
+* ~~Options screen~~
+* ~~Music~~ and audio
 * Levels
 
 Design philosophy:  

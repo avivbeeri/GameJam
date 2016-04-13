@@ -1,7 +1,39 @@
+# System-wide imports
+import pygame, os
 from pytmx.util_pygame import load_pygame
 
-import pygame
-import os
+# Our other files
+import maze, component
+
+def create(world, **kwargs):
+    '''
+    A function to create an entity, designed to make game.py smaller and easier to read.
+    Accepted kwargs are: position, sprite, layer, script, attachClass, classArgs, dimension
+    '''
+    entity = world.createEntity()
+    if 'position' in kwargs:
+        entity.addComponent(component.Position(kwargs['position']))
+    if 'lastPosition' in kwargs:
+        entity.addComponent(component.LastPosition(kwargs['lastPosition']))
+
+    if 'sprite' in kwargs:
+        if 'layer' not in kwargs:
+            kwargs['layer'] = 0
+        kwargs['sprite'].convert_alpha()
+        entity.addComponent(component.Drawable(kwargs['sprite'], kwargs['layer']))
+
+    if 'attachClass' in kwargs:
+        if 'classArgs' not in kwargs:
+            kwargs['classargs'] = ''
+        entity.addComponent(kwargs['attachClass'](item for item in kwargs['classArgs']))
+    if 'script' in kwargs:
+        entity.addComponent(component.Script())
+        entity.getComponent("Script").attach(kwargs['script'])
+
+    if 'dimension' in kwargs:
+        entity.addComponent(component.Dimension(kwargs['dimension']))
+
+    return entity
 
 class TileMap:
 

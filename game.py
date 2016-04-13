@@ -4,7 +4,8 @@
 import math, os, pygame, random
 import component
 import maze
-import tileMap
+import auxFunctions
+from collections import OrderedDict
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
@@ -19,62 +20,49 @@ from options import *
 
 inputSystem = InputSystem()
 gamescreen = "menu"
-worlds = dict()
+worlds = OrderedDict()
 
-def setupMaze(display, time, cellSize):
+def setupMaze(display, (time, cellSize)):
 	world = World()
 
 	# Creating the frame that goes around the maze.
-	frame = world.createEntity()
-	frame.addComponent(component.Position((0,0)))
 	mazeFrame = pygame.image.load(os.path.join('assets', 'images', 'puzzleframe.png'))
-	mazeFrame.convert()
-	frame.addComponent(component.Drawable(mazeFrame, 1))
+	frame = auxFunctions.create(world, position=(0,0), drawable=mazeFrame, layer=1)
 	world.addEntity(frame)
 
 	# Creating the object for the timer.
-	timer = world.createEntity()
-	timer.addComponent(component.Position((4,display.get_height()-3)))
 	timeLayer = pygame.Surface((display.get_width()-8, 2))
-	timeLayer.convert()
+	timer = auxFunctions.create(world, position=(4,display.get_height()-3), sprite=timeLayer, layer=2)
 	timer.addComponent(maze.Timer(timeLayer, time))
-	timer.addComponent(component.Drawable(timer.getComponent("MazeTimer").timeLayer, 2))
 	timer.addComponent(component.Script())
-	timer.getComponent("Script").attach(timer.getComponent("MazeTimer").update)
+	timer.getComponent("Script").attach(timer.getComponent('MazeTimer').update)
 	world.addEntity(timer)
 
 	# Creating the object for the maze.
-	mazeContent = world.createEntity()
-	mazeContent.addComponent(component.Position((4,4)))
 	mazeLayer = pygame.Surface((display.get_width()-8,display.get_height()-8))
-	mazeLayer.convert()
+	mazeContent = auxFunctions.create(world, position=(4,4), sprite=mazeLayer, layer=-1)
 	mazeContent.addComponent(maze.Maze(mazeLayer, cellSize))
-	mazeContent.addComponent(component.Drawable(mazeContent.getComponent("Maze").mLayer, -1))
-	scriptComponent = mazeContent.addComponent(component.Script())
-	scriptComponent.attach(mazeContent.getComponent("Maze").update)
+	mazeContent.addComponent(component.Script())
+	mazeContent.getComponent("Script").attach(mazeContent.getComponent("Maze").update)
 	world.addEntity(mazeContent)
 
 	# Setting the walls
-	mapEntity = world.createEntity()
-	mapEntity.addComponent(component.Position())
-	mapData = tileMap.TileMap('maze.tmx')
+	mapData = auxFunctions.TileMap('maze.tmx')
 	tileSurface = mapData.getLayerSurface(0)
-	mapEntity.addComponent(component.Drawable(tileSurface, -1))
+	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-1)
 	world.addEntity(mapEntity)
 
 	# Creating the player
-	player = world.createEntity()
 	playerMarker = pygame.Surface((cellSize-1,cellSize-1)).convert()
 	playerMarker.fill((255,0,0))
-	player.addComponent(component.Drawable(playerMarker, 0))
-	player.addComponent(component.Position((5,5)))
-	player.addComponent(component.LastPosition((5,5)))
-
+	player = auxFunctions.create(world, sprite=playerMarker, layer=0, position=(5,5), lastPosition=(5,5))
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
 		currentPosition = entity.getComponent("Position")
+		print currentPosition.value
 		lastPosition = entity.getComponent("LastPosition")
-		currentPosition.value = lastPosition.value
+		print lastPosition.value
+		currentPosition.value = Vector2(lastPosition.value)
 	collidable.attachHandler(handleCollision)
 
 	playerEventHandler = player.addComponent(component.EventHandler())
@@ -108,26 +96,17 @@ def setupWorld(display):
 	world = World()
 	groupManager = world.getManager('Group')
 
-	entity = world.createEntity()
-	entity.addComponent(component.Position())
-	city = pygame.image.load(os.path.join('assets', 'images', 'building_glass.png')).convert()
-	entity.addComponent(component.Drawable(city, -2))
-	world.addEntity(entity)
+	city = pygame.image.load(os.path.join('assets', 'images', 'building_glass.png'))
+	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-2)
+	# world.addEntity(background)
 
-	mapEntity = world.createEntity()
-	mapEntity.addComponent(component.Position())
-	mapData = tileMap.TileMap('test.tmx')
+	mapData = auxFunctions.TileMap('test.tmx')
 	tileSurface = mapData.getLayerSurface(0)
-	mapEntity.addComponent(component.Drawable(tileSurface, -1))
+	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-1)
 	world.addEntity(mapEntity)
 
-	playerEntity = world.createEntity()
-	groupManager.add('player', playerEntity)
-	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png')).convert_alpha()
-
-	playerEntity.addComponent(component.Drawable(ghostSprite))
-	playerEntity.addComponent(component.Position((8, 48)))
-	playerEntity.addComponent(component.Dimension((5, 12)))
+	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
+	playerEntity = auxFunctions.create(world, position=(8,48), sprite=ghostSprite, layer=0, dimension=(4,12))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
 	collidable = playerEntity.addComponent(component.Collidable())
@@ -139,7 +118,6 @@ def setupWorld(display):
 	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
-	# We should push entity creation into its own file/function
 	def handleInput(entity, event):
 		global gamescreen
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
@@ -154,8 +132,8 @@ def setupWorld(display):
 				collisions = collisionSystem.getEntityCollisions(entity.id)
 				for other in collisions:
 					if groupManager.check(other, 'terminal'):
-						time, size = 10, 4 #Get these from the terminal?
-						worlds["maze"] = setupMaze(display, time, size)
+						terminalDifficulty = DIFFICULTY[0] #Ideally the terminal itself should store the difficulty number.
+						worlds["maze"] = setupMaze(display, terminalDifficulty)
 						gamescreen = "maze"
 					elif groupManager.check(other, 'lift'):
 						originalLiftId = other.id
@@ -181,13 +159,11 @@ def setupWorld(display):
 	playerInputHandler = playerEntity.addComponent(component.EventHandler())
 	playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
 	playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
+	groupManager.add('player', playerEntity)
 	world.addEntity(playerEntity)
 
-	guardEntity = world.createEntity()
-	guardSprite = pygame.image.load(os.path.join('assets', 'images', 'guard.png')).convert_alpha()
-	guardEntity.addComponent(component.Drawable(guardSprite))
-	guardEntity.addComponent(component.Position((8, 28)))
-	guardEntity.addComponent(component.Dimension((4, 12)))
+	guardSprite = pygame.image.load(os.path.join('assets', 'images', 'guard.png'))
+	guardEntity = auxFunctions.create(world, position=(8,28), dimension=(4,12), sprite=guardSprite, layer=0)
 	guardEntity.addComponent(component.Velocity((0, 0)))
 	guardEntity.addComponent(component.Acceleration())
 	guardEntity.addComponent(component.Radar('player'))
@@ -229,56 +205,37 @@ def setupWorld(display):
 				state.mode = 'patrol'
 
 
-
-
 	scriptComponent = guardEntity.addComponent(component.Script())
 	scriptComponent.attach(guardScript)
 	collidable = guardEntity.addComponent(component.Collidable())
 	world.addEntity(guardEntity)
 
-	terminal = world.createEntity()
-	groupManager.add('terminal', terminal)
-	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png')).convert_alpha()
-	terminal.addComponent(component.Position((56, 12)))
-	terminal.addComponent(component.Dimension((4, 8)))
-	terminal.addComponent(component.Drawable(termSprite, -1))
+	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
+	terminal = auxFunctions.create(world, position=(16,52), dimension=(4,8), sprite=termSprite, layer=-1)
 	terminal.addComponent(component.Collidable())
+	groupManager.add('terminal', terminal)
 	world.addEntity(terminal)
 
-	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'lift.png')).convert_alpha()
-	doorEntity = world.createEntity()
-	groupManager.add('lift', doorEntity)
-	doorEntity.addComponent(component.Position((52, 48)))
-	doorEntity.addComponent(component.Dimension((4, 12)))
-	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'lift.png'))
+	doorEntity = auxFunctions.create(world, position=(52,48), dimension=(4,12), sprite=liftSprite, layer=-1)
 	doorEntity.addComponent(component.Collidable())
+	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
 
-	doorEntity = world.createEntity()
-	groupManager.add('lift', doorEntity)
-	doorEntity.addComponent(component.Position((52, 28)))
-	doorEntity.addComponent(component.Dimension((4, 12)))
-	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity = auxFunctions.create(world, position=(52,28), dimension=(4,12), sprite=liftSprite, layer=-1)
 	doorEntity.addComponent(component.Collidable())
+	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
 
-	doorEntity = world.createEntity()
-	groupManager.add('lift', doorEntity)
-	doorEntity.addComponent(component.Position((28, 8)))
-	doorEntity.addComponent(component.Dimension((4, 12)))
-	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity = auxFunctions.create(world, position=(28,8), dimension=(4,12), sprite=liftSprite, layer=-1)
 	doorEntity.addComponent(component.Collidable())
+	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
 
-
-	doorEntity = world.createEntity()
-	groupManager.add('lift', doorEntity)
-	doorEntity.addComponent(component.Position((28, 28)))
-	doorEntity.addComponent(component.Dimension((4, 12)))
-	doorEntity.addComponent(component.Drawable(liftSprite, -1))
+	doorEntity = auxFunctions.create(world, position=(28,28), dimension=(4,12), sprite=liftSprite, layer=-1)
 	doorEntity.addComponent(component.Collidable())
+	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
-
 
 	world.addSystem(inputSystem)
 	world.addSystem(RadarSystem())
@@ -290,47 +247,34 @@ def setupWorld(display):
 
 def optionsMenu(display):
 	world = World()
-
+	### NOTE: DON'T ADD ENTITES YET! ###
 	# See setupMenu for the comments on this :)
-	background = world.createEntity()
-	background.addComponent(component.Position())
-	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
-	background.addComponent(component.Drawable(menuImage, -2))
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-2)
 	world.addEntity(background)
 
-	text = world.createEntity()
-	text.addComponent(component.Position())
-	menuText = pygame.image.load(os.path.join('assets', 'images', 'options.png')).convert_alpha()
-	text.addComponent(component.Drawable(menuText, -1))
+	menuText = pygame.image.load(os.path.join('assets', 'images', 'options.png'))
+	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
 	world.addEntity(text)
 
-	mapEntity = world.createEntity()
-	mapEntity.addComponent(component.Position())
-	mapData = tileMap.TileMap('menu.tmx')
+	mapData = auxFunctions.TileMap('menu.tmx')
 	tileSurface = mapData.getLayerSurface(0)
-	mapEntity.addComponent(component.Drawable(tileSurface, -3))
+	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-3)
 	world.addEntity(mapEntity)
 
-	musicOn = world.createEntity()
-	soundOn = world.createEntity()
-	musicOn.addComponent(component.Position((53,22)))
-	soundOn.addComponent(component.Position((53,34)))
 	onImage = pygame.image.load(os.path.join("assets", "images", "on.png"))
-	musicOn.addComponent(component.Drawable(onImage, -1))
-	soundOn.addComponent(component.Drawable(onImage, -1))
+	musicOn = auxFunctions.create(world, position=(53,22), sprite=onImage, layer=3)
+	soundOn = auxFunctions.create(world, position=(53,34), sprite=onImage, layer=3)
 	if MUSIC == False:
 		musicOn.getComponent("Drawable").layer = -3
 	if SOUND == False:
 		soundOn.getComponent("Drawable").layer = -3
 	world.addEntity(musicOn)
 	world.addEntity(soundOn)
+	### FEEL FREE TO ADD ENTITIES AGAIN ###
 
-	cursor = world.createEntity()
-	cursor.addComponent(component.Position((2,18)))
-	cursor.addComponent(component.LastPosition((2,18)))
-	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png')).convert_alpha()
-	cursor.addComponent(component.Drawable(cursorImage))
-
+	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
+	cursor = auxFunctions.create(world, position=(2,18), lastPosition=(2,18), sprite=cursorImage, layer=3)
 	collidable = cursor.addComponent(component.Collidable())
 	def handleCollision(entity, event):
 		currentPosition = entity.getComponent("Position")
@@ -351,23 +295,18 @@ def optionsMenu(display):
 			currentPosition.value += Vector2(0, 12)
 		elif keys[event.key] in ("Interact", "Enter"):
 			if currentPosition.value == Vector2(2,18):
+				MUSIC = not MUSIC
+				worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
+				# This swaps the value between 3 and -3 - IE visible or not.
 				if MUSIC == True:
-					MUSIC = False
-					entity.getComponent("Drawable").layer = -3
+					pygame.mixer.music.play(loops=-1)
 				else:
-					MUSIC == True
-					entity.getComponent("Drawable").layer = -1
-			if currentPosition.value == Vector2(2,30):
-				if SOUND == True:
-					SOUND = False
-					entity.getComponent("Drawable").layer = -3
-				else:
-					SOUND == True
-					entity.getComponent("Drawable").layer = -1
+					pygame.mixer.music.stop()
+			elif currentPosition.value == Vector2(2,30):
+				SOUND = not SOUND
+				worlds[gamescreen].getEntity(4).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(4).getComponent("Drawable").layer
 			else:
 				print "Out of bounds D:"
-		elif keys[event.key] == "Exit":
-			quit()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
@@ -379,34 +318,30 @@ def optionsMenu(display):
 def setupMenu(display):
 	world = World()
 
+	# Add the music
+	pygame.mixer.music.load(os.path.join('assets','music','BlueBeat.wav'))
+	if MUSIC == True:
+		pygame.mixer.music.play(loops=-1)
+
 	# Add the background image
-	background = world.createEntity()
-	background.addComponent(component.Position())
-	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
-	background.addComponent(component.Drawable(menuImage, -2))
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-2)
 	world.addEntity(background)
 
 	# The text that goes on top of the world is here.
-	text = world.createEntity()
-	text.addComponent(component.Position())
-	menuText = pygame.image.load(os.path.join('assets', 'images', 'menu.png')).convert_alpha()
-	text.addComponent(component.Drawable(menuText, -1))
+	menuText = pygame.image.load(os.path.join('assets', 'images', 'menu.png'))
+	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
 	world.addEntity(text)
 
 	# We use this tmx because I (Sanchit) am too lazy to make custom collision handling :p
-	mapEntity = world.createEntity()
-	mapEntity.addComponent(component.Position())
-	mapData = tileMap.TileMap('menu.tmx')
+	mapData = auxFunctions.TileMap('menu.tmx')
 	tileSurface = mapData.getLayerSurface(0)
-	mapEntity.addComponent(component.Drawable(tileSurface, -3))
+	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-3)
 	world.addEntity(mapEntity)
 
 	# Add the movable component
-	cursor = world.createEntity()
-	cursor.addComponent(component.Position((2,22)))
-	cursor.addComponent(component.LastPosition((2,22)))
-	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png')).convert_alpha()
-	cursor.addComponent(component.Drawable(cursorImage))
+	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
+	cursor = auxFunctions.create(world, position=(2,22), lastPosition=(2,22), sprite=cursorImage, layer=0)
 	# Which can collide with things
 	collidable = cursor.addComponent(component.Collidable())
 	def handleCollision(entity, event):
@@ -434,7 +369,7 @@ def setupMenu(display):
 				worlds["options"] = optionsMenu(display)
 				gamescreen = "options"
 			elif currentPosition.value == Vector2(2,48):
-				exit()
+				quit()
 			else:
 				print "Out of bounds D:"
 		elif keys[event.key] == "Exit":
@@ -456,15 +391,8 @@ def quitcheck(eventQueue):
 			retval = 1
 		elif event.type == KEYDOWN:
 			if keys[event.key] == "Exit":
-				if gamescreen == "level":
-					worlds.pop(gamescreen)
-					gamescreen = "menu"
-				elif gamescreen == "maze":
-					worlds.pop(gamescreen)
-					gamescreen = "level"
-				elif gamescreen == "options":
-					worlds.pop(gamescreen)
-					gamescreen = "menu"
+				worlds.popitem()
+				gamescreen = worlds.keys()[-1]
 		elif (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
 			gamescreen = "level"
 	eventQueue = []

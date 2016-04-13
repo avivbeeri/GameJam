@@ -10,7 +10,7 @@ class World:
 
 
     def createEntity(self):
-        entity = Entity(self.idCounter)
+        entity = Entity(self.idCounter, self)
         self.idCounter += 1
         return entity
 
@@ -19,7 +19,7 @@ class World:
         self.entities[entity.id] = entity
 
 
-    def getEntityById(self, id):
+    def getEntity(self, id):
         return self.entities[id]
 
 
