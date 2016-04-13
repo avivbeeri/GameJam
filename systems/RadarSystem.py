@@ -17,6 +17,8 @@ class RadarSystem(System):
 			for key, group in targetGroups.iteritems():
 				radar.targets[key] = set()
 				for target in group:
+					if not target.hasComponent('Visible'):
+						continue
 					ping = self.RadarPing()
 					ping.group = key
 					ping.entity = target

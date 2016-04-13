@@ -108,6 +108,7 @@ def setupWorld(display):
 	playerEntity = auxFunctions.create(world, position=(8,48), sprite=ghostSprite, layer=0, dimension=(4,12))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
+	playerEntity.addComponent(component.Visible())
 	playerState = playerEntity.addComponent(component.State())
 	playerState.flipped = False
 	collidable = playerEntity.addComponent(component.Collidable())
@@ -194,6 +195,9 @@ def setupWorld(display):
 		radar = entity.getComponent('Radar')
 		state = entity.getComponent('State')
 		imageFlip = state.direction == 'left'
+
+		if 'player' not in radar.targets or len(radar.targets['player']) == 0:
+			return
 		playerPing = next(iter(radar.targets['player']))
 		player = playerPing.entity
 		drawable = entity.getComponent('Drawable')

@@ -3,6 +3,9 @@ import pygame
 from pygame.math import Vector2
 from ecs import Component
 
+class Visible(Component):
+    pass
+
 class Constant(Component):
     def __init__(self, value=0):
         super(Constant, self).__init__()
