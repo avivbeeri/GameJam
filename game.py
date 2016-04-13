@@ -55,7 +55,9 @@ def setupMaze(display, (time, cellSize)):
 	# Creating the player
 	playerMarker = pygame.Surface((cellSize-1,cellSize-1)).convert()
 	playerMarker.fill((255,0,0))
-	player = auxFunctions.create(world, sprite=playerMarker, layer=0, position=(5,5), lastPosition=(5,5))
+	player = auxFunctions.create(world, sprite=playerMarker, layer=0, position=(5,5),\
+								lastPosition=(5,5), dimension=(cellSize-1, cellSize-1))
+
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
 		currentPosition = entity.getComponent("Position")
@@ -257,11 +259,6 @@ def optionsMenu(display):
 	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
 	world.addEntity(text)
 
-	mapData = auxFunctions.TileMap('menu.tmx')
-	tileSurface = mapData.getLayerSurface(0)
-	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-3)
-	world.addEntity(mapEntity)
-
 	onImage = pygame.image.load(os.path.join("assets", "images", "on.png"))
 	musicOn = auxFunctions.create(world, position=(53,22), sprite=onImage, layer=3)
 	soundOn = auxFunctions.create(world, position=(53,34), sprite=onImage, layer=3)
@@ -274,45 +271,38 @@ def optionsMenu(display):
 	### FEEL FREE TO ADD ENTITIES AGAIN ###
 
 	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
-	cursor = auxFunctions.create(world, position=(2,18), lastPosition=(2,18), sprite=cursorImage, layer=3)
-	collidable = cursor.addComponent(component.Collidable())
-	def handleCollision(entity, event):
-		currentPosition = entity.getComponent("Position")
-		lastPosition = entity.getComponent("LastPosition")
-		currentPosition.value = lastPosition.value
-	collidable.attachHandler(handleCollision)
+	cursor = auxFunctions.create(world, position=(2,18), sprite=cursorImage, layer=3)
 
 	cursorEventHandler = cursor.addComponent(component.EventHandler())
 	def move(entity, event):
 		global gamescreen, MUSIC, SOUND
 		currentPosition = entity.getComponent("Position")
-		lastPosition = entity.getComponent("LastPosition")
 		if keys[event.key] == "Up":
-			lastPosition.value = Vector2(currentPosition.value)
-			currentPosition.value += Vector2(0, -12)
+			if currentPosition.value[1] > 18:
+				currentPosition.value += Vector2(0, -12)
 		elif keys[event.key] == "Down":
-			lastPosition.value = Vector2(currentPosition.value)
-			currentPosition.value += Vector2(0, 12)
+			if currentPosition.value[1] < 30:
+				currentPosition.value += Vector2(0, 12)
 		elif keys[event.key] in ("Interact", "Enter"):
-			if currentPosition.value == Vector2(2,18):
+			if currentPosition.value[1] == 18:
 				MUSIC = not MUSIC
-				worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
+				worlds[gamescreen].getEntity(2).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
+				print worlds[gamescreen].getEntity(2).getComponent("Drawable").layer
 				# This swaps the value between 3 and -3 - IE visible or not.
 				if MUSIC == True:
 					pygame.mixer.music.play(loops=-1)
 				else:
 					pygame.mixer.music.stop()
-			elif currentPosition.value == Vector2(2,30):
+			elif currentPosition.value[1] == 30:
 				SOUND = not SOUND
-				worlds[gamescreen].getEntity(4).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(4).getComponent("Drawable").layer
+				worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(4).getComponent("Drawable").layer
 			else:
-				print "Out of bounds D:"
+				pass
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
 	world.addSystem(RenderSystem(display))
 	world.addSystem(inputSystem)
-	world.addSystem(TileCollisionSystem(mapData))
 	return world
 
 def setupMenu(display):
@@ -333,34 +323,20 @@ def setupMenu(display):
 	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
 	world.addEntity(text)
 
-	# We use this tmx because I (Sanchit) am too lazy to make custom collision handling :p
-	mapData = auxFunctions.TileMap('menu.tmx')
-	tileSurface = mapData.getLayerSurface(0)
-	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-3)
-	world.addEntity(mapEntity)
-
 	# Add the movable component
 	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
 	cursor = auxFunctions.create(world, position=(2,22), lastPosition=(2,22), sprite=cursorImage, layer=0)
-	# Which can collide with things
-	collidable = cursor.addComponent(component.Collidable())
-	def handleCollision(entity, event):
-		currentPosition = entity.getComponent("Position")
-		lastPosition = entity.getComponent("LastPosition")
-		currentPosition.value = lastPosition.value
-	collidable.attachHandler(handleCollision)
-	# And move (a bit).
+	# Which can move (a bit).
 	cursorEventHandler = cursor.addComponent(component.EventHandler())
 	def move(entity, event):
 		global gamescreen
 		currentPosition = entity.getComponent("Position")
-		lastPosition = entity.getComponent("LastPosition")
 		if keys[event.key] == "Up":
-			lastPosition.value = Vector2(currentPosition.value)
-			currentPosition.value += Vector2(0, -13)
+			if currentPosition.value[1] > 22:
+				currentPosition.value += Vector2(0, -13)
 		elif keys[event.key] == "Down":
-			lastPosition.value = Vector2(currentPosition.value)
-			currentPosition.value += Vector2(0, 13)
+			if currentPosition.value[1] < 48:
+				currentPosition.value += Vector2(0, 13)
 		elif keys[event.key] in ("Interact", "Enter"):
 			if currentPosition.value == Vector2(2,22):
 				worlds["level"] = setupWorld(display)
@@ -371,7 +347,7 @@ def setupMenu(display):
 			elif currentPosition.value == Vector2(2,48):
 				quit()
 			else:
-				print "Out of bounds D:"
+				pass
 		elif keys[event.key] == "Exit":
 			quit()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
@@ -379,7 +355,6 @@ def setupMenu(display):
 
 	world.addSystem(RenderSystem(display))
 	world.addSystem(inputSystem)
-	world.addSystem(TileCollisionSystem(mapData))
 	return world
 
 def quitcheck(eventQueue):
