@@ -23,6 +23,7 @@ def setupMaze(display, (time, cellSize)):
 	# Creating the frame that goes around the maze.
 	mazeFrame = pygame.image.load(os.path.join('assets', 'images', 'puzzleframe.png'))
 	frame = auxFunctions.create(world, position=(0,0), drawable=mazeFrame, layer=1)
+	frame.addComponent(component.Collidable())
 	world.addEntity(frame)
 
 	# Creating the object for the timer.
@@ -44,7 +45,7 @@ def setupMaze(display, (time, cellSize)):
 	# Setting the walls
 	mapData = auxFunctions.TileMap('maze.tmx')
 	tileSurface = mapData.getLayerSurface(0)
-	mapEntity = auxFunctions.create(world, position=(0,0), layer=-1, sprite=tileSurface)
+	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-1)
 	world.addEntity(mapEntity)
 
 	# Creating the player
@@ -55,8 +56,10 @@ def setupMaze(display, (time, cellSize)):
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
 		currentPosition = entity.getComponent("Position")
+		print currentPosition.value
 		lastPosition = entity.getComponent("LastPosition")
-		currentPosition.value = lastPosition.value
+		print lastPosition.value
+		currentPosition.value = Vector2(lastPosition.value)
 	collidable.attachHandler(handleCollision)
 
 	playerEventHandler = player.addComponent(component.EventHandler())
@@ -111,7 +114,6 @@ def setupWorld(display):
 	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
-	# We should push entity creation into its own file/function
 	def handleInput(entity, event):
 		global gamescreen
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
@@ -193,21 +195,21 @@ def optionsMenu(display):
 	### NOTE: DON'T ADD ENTITES YET! ###
 	# See setupMenu for the comments on this :)
 	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
-	background = auxFunctions.create(position=(0,0), sprite=menuImage, layer=-2)
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-2)
 	world.addEntity(background)
 
 	menuText = pygame.image.load(os.path.join('assets', 'images', 'options.png'))
-	text = auxFunctions.create(position=(0,0), sprite=menuText, layer=-1)
+	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
 	world.addEntity(text)
 
 	mapData = auxFunctions.TileMap('menu.tmx')
 	tileSurface = mapData.getLayerSurface(0)
-	mapEntity = auxFunctions.create(position=(0,0), sprite=tileSurface, layer=-3)
+	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-3)
 	world.addEntity(mapEntity)
 
 	onImage = pygame.image.load(os.path.join("assets", "images", "on.png"))
-	musicOn = auxFunctions.create(position=(53,22), sprite=onImage, layer=3)
-	soundOn = auxFunctions.create(position=(53,34), sprite=onImage, layer=3)
+	musicOn = auxFunctions.create(world, position=(53,22), sprite=onImage, layer=3)
+	soundOn = auxFunctions.create(world, position=(53,34), sprite=onImage, layer=3)
 	if MUSIC == False:
 		musicOn.getComponent("Drawable").layer = -3
 	if SOUND == False:
@@ -217,7 +219,7 @@ def optionsMenu(display):
 	### FEEL FREE TO ADD ENTITIES AGAIN ###
 
 	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
-	cursor = auxFunctions.create(position=(2,18), lastPosition=(2,18), sprite=onImage, layer=3)
+	cursor = auxFunctions.create(world, position=(2,18), lastPosition=(2,18), sprite=cursorImage, layer=3)
 	collidable = cursor.addComponent(component.Collidable())
 	def handleCollision(entity, event):
 		currentPosition = entity.getComponent("Position")
@@ -245,7 +247,7 @@ def optionsMenu(display):
 					pygame.mixer.music.play(loops=-1)
 				else:
 					pygame.mixer.music.stop()
-			if currentPosition.value == Vector2(2,30):
+			elif currentPosition.value == Vector2(2,30):
 				SOUND = not SOUND
 				worlds[gamescreen].getEntity(4).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(4).getComponent("Drawable").layer
 			else:
@@ -268,23 +270,23 @@ def setupMenu(display):
 
 	# Add the background image
 	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
-	background = auxFunctions.create(position=(0,0), sprite=menuImage, layer=-2)
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-2)
 	world.addEntity(background)
 
 	# The text that goes on top of the world is here.
 	menuText = pygame.image.load(os.path.join('assets', 'images', 'menu.png'))
-	text = auxFunctions.create(position=(0,0), sprite=menuText, layer=-1)
+	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
 	world.addEntity(text)
 
 	# We use this tmx because I (Sanchit) am too lazy to make custom collision handling :p
 	mapData = auxFunctions.TileMap('menu.tmx')
 	tileSurface = mapData.getLayerSurface(0)
-	mapEntity = auxFunctions.create(position=(0,0), sprite=tileSurface, layer=-3)
+	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-3)
 	world.addEntity(mapEntity)
 
 	# Add the movable component
 	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
-	cursor = auxFunctions.create(position=(2,22), lastPosition=(2,22), sprite=cursorImage, layer=0)
+	cursor = auxFunctions.create(world, position=(2,22), lastPosition=(2,22), sprite=cursorImage, layer=0)
 	# Which can collide with things
 	collidable = cursor.addComponent(component.Collidable())
 	def handleCollision(entity, event):
