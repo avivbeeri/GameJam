@@ -15,7 +15,7 @@ keys = {
 	pygame.K_RETURN:"Enter",
 }
 
-MUSIC = True
+MUSIC = False
 SOUND = True
 DIFFICULTY = [
 	(30, 8),
