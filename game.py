@@ -60,11 +60,7 @@ def setupMaze(display, (time, cellSize)):
 
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
-		currentPosition = entity.getComponent("Position")
-		print currentPosition.value
-		lastPosition = entity.getComponent("LastPosition")
-		print lastPosition.value
-		currentPosition.value = Vector2(lastPosition.value)
+		entity.getComponent("Position").value = Vector2(entity.getComponent("LastPosition").value)
 	collidable.attachHandler(handleCollision)
 
 	playerEventHandler = player.addComponent(component.EventHandler())
@@ -317,8 +313,8 @@ def optionsMenu(display):
 		elif keys[event.key] in ("Interact", "Enter"):
 			if currentPosition.value[1] == 18:
 				MUSIC = not MUSIC
-				worlds[gamescreen].getEntity(2).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
-				print worlds[gamescreen].getEntity(2).getComponent("Drawable").layer
+				worlds[gamescreen].getEntity(2).getComponent("Drawable").layer = 0 - \
+						worlds[gamescreen].getEntity(2).getComponent("Drawable").layer
 				# This swaps the value between 3 and -3 - IE visible or not.
 				if MUSIC == True:
 					pygame.mixer.music.play(loops=-1)
@@ -326,7 +322,8 @@ def optionsMenu(display):
 					pygame.mixer.music.stop()
 			elif currentPosition.value[1] == 30:
 				SOUND = not SOUND
-				worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - worlds[gamescreen].getEntity(4).getComponent("Drawable").layer
+				worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - \
+						worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
 			else:
 				pass
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
