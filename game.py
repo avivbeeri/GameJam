@@ -207,19 +207,18 @@ def setupWorld(display):
 				state.accumulator = 0
 				state.modeTime = 0
 		elif state.mode == 'surprised':
-			if isVisible(entity, player):
-				if state.modeTime > 0.5:
+			if state.modeTime > 0.6:
+				if isVisible(entity, player):
 					state.mode = 'alert'
 					drawable.image = pygame.transform.flip(guardAlertSprite, imageFlip, False)
 					state.modeTime = 0
 				else:
-					state.modeTime += dt
-			else:
-				state.mode = 'patrol'
-				drawable.image = pygame.transform.flip(guardSprite, imageFlip, False)
+					state.mode = 'patrol'
+					drawable.image = pygame.transform.flip(guardSprite, imageFlip, False)
+			state.modeTime += dt
 		elif state.mode == 'alert':
 			if isVisible(entity, player):
-				if state.modeTime > 0.3:
+				if state.modeTime > 0.4:
 					quit()
 				else:
 					state.modeTime += dt
