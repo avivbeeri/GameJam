@@ -23,7 +23,6 @@ def setupMaze(display, (time, cellSize)):
 	# Creating the frame that goes around the maze.
 	mazeFrame = pygame.image.load(os.path.join('assets', 'images', 'puzzleframe.png'))
 	frame = auxFunctions.create(world, position=(0,0), drawable=mazeFrame, layer=1)
-	frame.addComponent(component.Collidable())
 	world.addEntity(frame)
 
 	# Creating the object for the timer.
@@ -52,7 +51,6 @@ def setupMaze(display, (time, cellSize)):
 	playerMarker = pygame.Surface((cellSize-1,cellSize-1)).convert()
 	playerMarker.fill((255,0,0))
 	player = auxFunctions.create(world, sprite=playerMarker, layer=0, position=(5,5), lastPosition=(5,5))
-
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
 		currentPosition = entity.getComponent("Position")
