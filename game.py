@@ -174,7 +174,7 @@ def setupWorld(display):
 	guardState = guardEntity.addComponent(component.State())
 	guardState.direction = 'right'
 	guardState.mode = 'patrol'
-	guardState.accumulator = 0
+	guardState.modeTime = 0
 
 	def guardScript(entity, dt):
 		def isVisible(entity, player):
@@ -196,15 +196,16 @@ def setupWorld(display):
 		drawable = entity.getComponent('Drawable')
 
 		if state.mode == 'patrol':
-			state.accumulator += dt
-			if state.accumulator > 5:
-				state.accumulator = 0
+			if state.modeTime > 5:
+				state.modeTime = 0
 				state.direction = 'left' if state.direction == 'right' else 'right'
 				drawable.image = pygame.transform.flip(guardSprite, state.direction == 'left', False)
+			else:
+				state.modeTime += dt
+
 			if isVisible(entity, player):
 				state.mode = 'surprised'
 				drawable.image = pygame.transform.flip(guardSurprisedSprite, state.direction == 'left', False)
-				state.accumulator = 0
 				state.modeTime = 0
 		elif state.mode == 'surprised':
 			if state.modeTime > 0.6:
@@ -227,6 +228,7 @@ def setupWorld(display):
 				drawable.image = pygame.transform.flip(guardSurprisedSprite, imageFlip, False)
 				state.modeTime = 0
 		elif state.mode == 'chase':
+			# We aren't currently using this, but it is useful!
 			velocity = entity.getComponent('Velocity')
 			if isVisible(entity, player):
 				velocity.value = playerPing.distance.normalize() * 0.3
