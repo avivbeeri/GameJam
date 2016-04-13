@@ -104,9 +104,12 @@ def setupWorld(display):
 	world.addEntity(mapEntity)
 
 	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
+	ghostSpriteFlipped = pygame.transform.flip(ghostSprite, True, False)
 	playerEntity = auxFunctions.create(world, position=(8,48), sprite=ghostSprite, layer=0, dimension=(4,12))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
+	playerState = playerEntity.addComponent(component.State())
+	playerState.flipped = False
 	collidable = playerEntity.addComponent(component.Collidable())
 
 	def handleCollision(entity, event):
@@ -120,10 +123,13 @@ def setupWorld(display):
 		global gamescreen
 		targetVelocityComponent = entity.getComponent('TargetVelocity')
 		velocityComponent = entity.getComponent('Velocity')
+		playerState = entity.getComponent('State')
 		if event.type == pygame.KEYDOWN:
 			if keys[event.key] == "Left":
+				playerState.flipped = True
 				targetVelocityComponent.value += Vector2(-0.5, 0)
 			elif keys[event.key] == "Right":
+				playerState.flipped = False
 				targetVelocityComponent.value += Vector2(0.5, 0)
 			elif keys[event.key] == "Interact":
 				collisionSystem = world.getSystem('TileCollisionSystem')
@@ -146,12 +152,12 @@ def setupWorld(display):
 									liftPosition = other.getComponent('Position').value
 									newPosition.y = liftPosition.y
 									return
+			entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState.flipped else ghostSprite)
 		elif event.type == pygame.KEYUP:
 			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(+0.5, 0)
 			elif keys[event.key] == "Right":
 				targetVelocityComponent.value += Vector2(-0.5, 0)
-
 		velocityComponent.value = targetVelocityComponent.value
 
 	playerInputHandler = playerEntity.addComponent(component.EventHandler())
