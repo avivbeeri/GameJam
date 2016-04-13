@@ -110,9 +110,9 @@ def setupWorld(display):
 
 	entity = world.createEntity()
 	entity.addComponent(component.Position())
-	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png')).convert()
+	city = pygame.image.load(os.path.join('assets', 'images', 'building_glass.png')).convert()
 	entity.addComponent(component.Drawable(city, -2))
-	# world.addEntity(entity)
+	world.addEntity(entity)
 
 	mapEntity = world.createEntity()
 	mapEntity.addComponent(component.Position())
