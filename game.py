@@ -110,8 +110,8 @@ def setupWorld(display):
 	playerEntity.addComponent(component.Acceleration())
 	playerEntity.addComponent(component.Visible())
 	playerState = playerEntity.addComponent(component.State())
-	playerState.flipped = False
-	playerState.hiding = False
+	playerState['flipped'] = False
+	playerState['hiding'] = False
 	playerEntity.addComponent(component.Collidable())
 	playerEntity.addComponent(component.TargetVelocity())
 
@@ -123,10 +123,10 @@ def setupWorld(display):
 		playerState = entity.getComponent('State')
 		if event.type == pygame.KEYDOWN:
 			if keys[event.key] == "Left":
-				playerState.flipped = True
+				playerState['flipped'] = True
 				targetVelocityComponent.value += Vector2(-0.5, 0)
 			elif keys[event.key] == "Right":
-				playerState.flipped = False
+				playerState['flipped'] = False
 				targetVelocityComponent.value += Vector2(0.5, 0)
 			elif keys[event.key] == "Interact":
 				collisionSystem = world.getSystem('TileCollisionSystem')
@@ -150,25 +150,28 @@ def setupWorld(display):
 									newPosition.y = liftPosition.y
 									return
 					elif groupManager.check(other, 'hidable'):
-						playerState.hiding = True
+						playerState['hiding'] = True
 						entity.removeComponent('Visible')
 						entity.removeComponent('Drawable')
 						entity.removeComponent('Collidable')
-						other.getComponent('State').occupied = True
-			if not playerState.hiding:
-				entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState.flipped else ghostSprite)
+						other.getComponent('State')['occupied'] = True
+						playerState['cover'] = other
+			if not playerState['hiding']:
+				entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState['flipped'] else ghostSprite)
 		elif event.type == pygame.KEYUP:
 			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(+0.5, 0)
 			elif keys[event.key] == "Right":
 				targetVelocityComponent.value += Vector2(-0.5, 0)
 			elif keys[event.key] == "Interact":
-				if playerState.hiding:
-					playerState.hiding = False
+				if playerState['hiding']:
+					playerState['hiding'] = False
+					other = playerState['cover']
+					playerState['cover'] = None
 					entity.addComponent(component.Visible())
 					entity.addComponent(component.Drawable(ghostSprite))
 					entity.addComponent(component.Collidable())
-					other.getComponent('State').occupied = False
+					other.getComponent('State')['occupied'] = False
 		velocityComponent.value = targetVelocityComponent.value
 
 	playerInputHandler = playerEntity.addComponent(component.EventHandler())
@@ -185,9 +188,9 @@ def setupWorld(display):
 	guardEntity.addComponent(component.Acceleration())
 	guardEntity.addComponent(component.Radar('player'))
 	guardState = guardEntity.addComponent(component.State())
-	guardState.direction = 'right'
-	guardState.mode = 'patrol'
-	guardState.modeTime = 0
+	guardState['direction'] = 'right'
+	guardState['mode'] = 'patrol'
+	guardState['modeTime'] = 0
 
 	def guardScript(entity, dt):
 		global worlds
@@ -203,7 +206,7 @@ def setupWorld(display):
 			player = playerPing.entity
 
 			entityPosition  = entity.getComponent('Position').value
-			entityDirection = entity.getComponent('State').direction
+			entityDirection = entity.getComponent('State')['direction']
 			playerPosition  = player.getComponent('Position').value
 			collisionSystem = world.getSystem('TileCollisionSystem')
 			if (entityDirection == 'right' and entityPosition.x <= playerPosition.x) or \
@@ -218,45 +221,45 @@ def setupWorld(display):
 			return playerPing.distance.normalize() * 0.3
 
 		def shouldImageFlip():
-			return state.direction == 'left'
+			return state['direction'] == 'left'
 
 
-		state.modeTime += dt
-		if state.mode == 'patrol':
-			if state.modeTime > 5:
-				state.modeTime = 0
-				state.direction = 'left' if state.direction == 'right' else 'right'
+		state['modeTime'] += dt
+		if state['mode'] == 'patrol':
+			if state['modeTime'] > 5:
+				state['modeTime'] = 0
+				state['direction'] = 'left' if state['direction'] == 'right' else 'right'
 				drawable.image = pygame.transform.flip(guardSprite, shouldImageFlip(), False)
 
 			if isVisible(entity, radar):
-				state.mode = 'surprised'
+				state['mode'] = 'surprised'
 				drawable.image = pygame.transform.flip(guardSurprisedSprite, shouldImageFlip(), False)
-				state.modeTime = 0
-		elif state.mode == 'surprised':
-			if state.modeTime > 0.6:
+				state['modeTime'] = 0
+		elif state['mode'] == 'surprised':
+			if state['modeTime'] > 0.6:
 				if isVisible(entity, radar):
-					state.mode = 'alert'
+					state['mode'] = 'alert'
 					drawable.image = pygame.transform.flip(guardAlertSprite, shouldImageFlip(), False)
-					state.modeTime = 0
+					state['modeTime'] = 0
 				else:
-					state.mode = 'patrol'
+					state['mode'] = 'patrol'
 					drawable.image = pygame.transform.flip(guardSprite, shouldImageFlip(), False)
-		elif state.mode == 'alert':
+		elif state['mode'] == 'alert':
 			if isVisible(entity, radar):
-				if state.modeTime > 0.4:
+				if state['modeTime'] > 0.4:
 					worlds['level'] = setupWorld(display)
 			else:
-				state.mode = 'surprised'
+				state['mode'] = 'surprised'
 				drawable.image = pygame.transform.flip(guardSurprisedSprite, shouldImageFlip(), False)
-				state.modeTime = 0
-		elif state.mode == 'chase':
+				state['modeTime'] = 0
+		elif state['mode'] == 'chase':
 			# We aren't currently using this, but it is useful!
 			velocity = entity.getComponent('Velocity')
 			if isVisible(entity, radar):
 				velocity.value = getPlayerDirection(radar)
 			else:
 				velocity.value = Vector2()
-				state.mode = 'patrol'
+				state['mode'] = 'patrol'
 
 
 	scriptComponent = guardEntity.addComponent(component.Script())
@@ -295,7 +298,7 @@ def setupWorld(display):
 	binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'bin_full.png'))
 	binEntity = auxFunctions.create(world, position=(44,31), dimension=(4,9), sprite=binSprite, layer=-1)
 	binEntity.addComponent(component.Collidable())
-	binEntity.addComponent(component.State())
+	binEntity.addComponent(component.State(occupied=True))
 	groupManager.add('hidable', binEntity)
 	world.addEntity(binEntity)
 

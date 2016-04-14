@@ -73,6 +73,8 @@ class State(Component):
 
     def __getitem__(self, key):
         return self.state[key]
+    def __setitem__(self, key, value):
+        self.state[key] = value
 
 
 class Collidable(EventHandler):
