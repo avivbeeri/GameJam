@@ -1,0 +1,27 @@
+{
+    "SOUND": true, 
+    "DIFFICULTY": {
+        "Cray Hard": [
+            10, 
+            4
+        ], 
+        "Medium": [
+            60, 
+            4
+        ], 
+        "SuperEasy": [
+            30, 
+            8
+        ], 
+        "Easy": [
+            10, 
+            8
+        ], 
+        "Hard": [
+            30, 
+            4
+        ]
+    }, 
+    "MUSIC": false, 
+    "SIZE": 512
+}
