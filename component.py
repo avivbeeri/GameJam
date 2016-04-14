@@ -67,9 +67,9 @@ class EventHandler(Component):
 
 
 class State(Component):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(State, self).__init__()
-        self.state = {}
+        self.state = kwargs if kwargs is not None else {}
 
     def __getitem__(self, key):
         return self.state[key]

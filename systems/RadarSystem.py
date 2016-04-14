@@ -8,6 +8,7 @@ class RadarSystem(System):
 
 	def process(self, entities, dt):
 		groupManager = self.world.getManager('Group')
+		collisionSystem = self.world.getSystem('TileCollisionSystem')
 		for entity in entities:
 			radar = entity.getComponent("Radar")
 			radar.targets.clear()
@@ -17,14 +18,14 @@ class RadarSystem(System):
 			for key, group in targetGroups.iteritems():
 				radar.targets[key] = set()
 				for target in group:
-					if not target.hasComponent('Visible'):
-						continue
 					ping = self.RadarPing()
 					ping.group = key
 					ping.entity = target
 					targetPosition = target.getComponent('Position').value
 					ping.position = targetPosition
 					ping.distance = targetPosition - entityPosition
+					ping.visible = target.hasComponent('Visible') and \
+						collisionSystem.isRaycastClear(entityPosition, targetPosition)
 					radar.targets[key].add(ping)
 
 			'''

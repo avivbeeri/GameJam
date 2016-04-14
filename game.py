@@ -154,6 +154,7 @@ def setupWorld(display):
 						entity.removeComponent('Visible')
 						entity.removeComponent('Drawable')
 						entity.removeComponent('Collidable')
+						other.getComponent('State').occupied = True
 			if not playerState.hiding:
 				entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState.flipped else ghostSprite)
 		elif event.type == pygame.KEYUP:
@@ -167,6 +168,7 @@ def setupWorld(display):
 					entity.addComponent(component.Visible())
 					entity.addComponent(component.Drawable(ghostSprite))
 					entity.addComponent(component.Collidable())
+					other.getComponent('State').occupied = False
 		velocityComponent.value = targetVelocityComponent.value
 
 	playerInputHandler = playerEntity.addComponent(component.EventHandler())
@@ -189,64 +191,69 @@ def setupWorld(display):
 
 	def guardScript(entity, dt):
 		global worlds
-		def isVisible(entity, player):
+		radar = entity.getComponent('Radar')
+		state = entity.getComponent('State')
+		drawable = entity.getComponent('Drawable')
+
+		def isVisible(entity, radar):
+			if 'player' not in radar.targets or len(radar.targets['player']) == 0:
+				return False
+
+			playerPing = next(iter(radar.targets['player']))
+			player = playerPing.entity
+
 			entityPosition  = entity.getComponent('Position').value
 			entityDirection = entity.getComponent('State').direction
 			playerPosition  = player.getComponent('Position').value
 			collisionSystem = world.getSystem('TileCollisionSystem')
 			if (entityDirection == 'right' and entityPosition.x <= playerPosition.x) or \
 					(entityDirection == 'left' and entityPosition.x > playerPosition.x) :
-				return collisionSystem.isRaycastClear(entityPosition, playerPosition)
+				return playerPing.visible
 			else:
 				return False
 
-		radar = entity.getComponent('Radar')
-		state = entity.getComponent('State')
-		imageFlip = state.direction == 'left'
+		def getPlayerDirection(radar):
+			playerPing = next(iter(radar.targets['player']))
+			player = playerPing.entity
+			return playerPing.distance.normalize() * 0.3
 
-		if 'player' not in radar.targets or len(radar.targets['player']) == 0:
-			return
-		playerPing = next(iter(radar.targets['player']))
-		player = playerPing.entity
-		drawable = entity.getComponent('Drawable')
+		def shouldImageFlip():
+			return state.direction == 'left'
 
+
+		state.modeTime += dt
 		if state.mode == 'patrol':
 			if state.modeTime > 5:
 				state.modeTime = 0
 				state.direction = 'left' if state.direction == 'right' else 'right'
-				drawable.image = pygame.transform.flip(guardSprite, state.direction == 'left', False)
-			else:
-				state.modeTime += dt
+				drawable.image = pygame.transform.flip(guardSprite, shouldImageFlip(), False)
 
-			if isVisible(entity, player):
+			if isVisible(entity, radar):
 				state.mode = 'surprised'
-				drawable.image = pygame.transform.flip(guardSurprisedSprite, state.direction == 'left', False)
+				drawable.image = pygame.transform.flip(guardSurprisedSprite, shouldImageFlip(), False)
 				state.modeTime = 0
 		elif state.mode == 'surprised':
 			if state.modeTime > 0.6:
-				if isVisible(entity, player):
+				if isVisible(entity, radar):
 					state.mode = 'alert'
-					drawable.image = pygame.transform.flip(guardAlertSprite, imageFlip, False)
+					drawable.image = pygame.transform.flip(guardAlertSprite, shouldImageFlip(), False)
 					state.modeTime = 0
 				else:
 					state.mode = 'patrol'
-					drawable.image = pygame.transform.flip(guardSprite, imageFlip, False)
-			state.modeTime += dt
+					drawable.image = pygame.transform.flip(guardSprite, shouldImageFlip(), False)
 		elif state.mode == 'alert':
-			if isVisible(entity, player):
+			if isVisible(entity, radar):
 				if state.modeTime > 0.4:
 					worlds['level'] = setupWorld(display)
-				else:
-					state.modeTime += dt
 			else:
 				state.mode = 'surprised'
-				drawable.image = pygame.transform.flip(guardSurprisedSprite, imageFlip, False)
+				drawable.image = pygame.transform.flip(guardSurprisedSprite, shouldImageFlip(), False)
 				state.modeTime = 0
 		elif state.mode == 'chase':
 			# We aren't currently using this, but it is useful!
 			velocity = entity.getComponent('Velocity')
-			if isVisible(entity, player):
-				velocity.value = playerPing.distance.normalize() * 0.3
+			if isVisible(entity, radar):
+				velocity.value = getPlayerDirection(radar)
 			else:
 				velocity.value = Vector2()
 				state.mode = 'patrol'
@@ -288,6 +295,7 @@ def setupWorld(display):
 	binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'bin_full.png'))
 	binEntity = auxFunctions.create(world, position=(44,31), dimension=(4,9), sprite=binSprite, layer=-1)
 	binEntity.addComponent(component.Collidable())
+	binEntity.addComponent(component.State())
 	groupManager.add('hidable', binEntity)
 	world.addEntity(binEntity)
 
