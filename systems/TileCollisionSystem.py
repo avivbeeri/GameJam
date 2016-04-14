@@ -105,12 +105,9 @@ class TileCollisionSystem(System):
             endTileY = math.ceil(maxPosition.y / self.tileMap.cellSize[1])
             endTile = Vector2(endTileX, endTileY)
 
-            tileDimensions = endTile - startTile
-
             # Test collisions in tiles which entity overlaps
-            for x in range(int(tileDimensions.x)):
-                for y in range(int(tileDimensions.y)):
-                    tileX, tileY = Vector2(x, y) + startTile
+            for tileX in range(int(startTile.x), int(endTile.x)):
+                for tileY in range(int(startTile.y), int(endTile.y)):
                     tile = self.tileMap.getTileData(tileX, tileY, 0)
                     # Record the tile location for the entity
                     if (tileX, tileY) not in self.tileEntityMap:

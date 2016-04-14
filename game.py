@@ -105,7 +105,7 @@ def setupWorld(display):
 
 	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 	ghostSpriteFlipped = pygame.transform.flip(ghostSprite, True, False)
-	playerEntity = auxFunctions.create(world, position=(8,48), sprite=ghostSprite, layer=0, dimension=(4,12))
+	playerEntity = auxFunctions.create(world, position=(8,48), sprite=ghostSprite, layer=0, dimension=(5,12))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
 	playerEntity.addComponent(component.Visible())
