@@ -123,10 +123,10 @@ def setupWorld(display):
 		if event.type == pygame.KEYDOWN:
 			if event.key in keys.keys():
 				if keys[event.key] == "Left":
-					playerState.flipped = True
+					playerState['flipped'] = True
 					targetVelocityComponent.value += Vector2(-0.5, 0)
 				elif keys[event.key] == "Right":
-					playerState.flipped = False
+					playerState['flipped'] = False
 					targetVelocityComponent.value += Vector2(0.5, 0)
 				elif keys[event.key] == "Interact":
 					collisionSystem = world.getSystem('TileCollisionSystem')
@@ -160,7 +160,6 @@ def setupWorld(display):
 					entity.getComponent('Drawable').set( \
 						ghostSpriteFlipped if playerState['flipped'] else ghostSprite \
 					)
-					entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState.flipped else ghostSprite)
 		elif event.type == pygame.KEYUP:
 			if event.key in keys.keys():
 				if keys[event.key] == "Left":
