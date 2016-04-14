@@ -46,7 +46,6 @@ class TileCollisionSystem(System):
             startTile.x, startTile.y = startTile.y, startTile.x
             endTile.x, endTile.y = endTile.y, endTile.x
 
-
         swapped = False
         if (startTile.x > endTile.x):
             startTile.x, endTile.x = endTile.x, startTile.x
