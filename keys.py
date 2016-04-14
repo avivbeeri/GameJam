@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 
 keys = {
 	pygame.K_UP:"Up",
@@ -14,12 +13,3 @@ keys = {
 	pygame.K_RCTRL:"Camo",
 	pygame.K_RETURN:"Enter",
 }
-
-MUSIC = False
-SOUND = True
-DIFFICULTY = [
-	(30, 8),
-	(10, 8),
-	(30, 4),
-	(10, 4)
-]

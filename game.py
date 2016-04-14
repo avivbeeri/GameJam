@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math, os, pygame, random
+import math, os, pygame, random, json
 import component
 import maze
 import auxFunctions
@@ -9,14 +9,12 @@ from collections import OrderedDict
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
-from systems import RenderSystem, \
-					PhysicsSystem, \
-					InputSystem, \
-					RadarSystem, \
-					ScriptSystem, \
-					TileCollisionSystem
+from systems import *
 from pytmx.util_pygame import load_pygame
-from options import *
+from keys import keys
+
+options = json.loads(open('options.json').read())
+SOUND, MUSIC, DIFFICULTY, SIZE = options["SOUND"], options["MUSIC"], options["DIFFICULTY"], options["SIZE"]
 
 inputSystem = InputSystem()
 gamescreen = "menu"
@@ -137,7 +135,7 @@ def setupWorld(display):
 				collisions = collisionSystem.getEntityCollisions(entity.id)
 				for other in collisions:
 					if groupManager.check(other, 'terminal'):
-						terminalDifficulty = DIFFICULTY[0] #Ideally the terminal itself should store the difficulty number.
+						terminalDifficulty = DIFFICULTY["Easy"] #Ideally the terminal itself should store the difficulty number.
 						worlds["maze"] = setupMaze(display, terminalDifficulty)
 						gamescreen = "maze"
 					elif groupManager.check(other, 'lift'):
@@ -416,7 +414,7 @@ def main():
 	global gamescreen, worlds
 	pygame.init()
 
-	outputSize = (512, 512)
+	outputSize = (SIZE, SIZE)
 	#Create the window and caption etc.
 	display = pygame.display.set_mode(outputSize)
 	pygame.display.set_caption('Ghost')
