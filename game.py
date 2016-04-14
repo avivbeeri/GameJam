@@ -78,6 +78,8 @@ def setupMaze(display, (time, cellSize)):
 			elif keys[event.key] == "Right":
 				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(cellSize, 0)
+			if currentPosition.value == Vector2(display.get_width()-3-cellSize, display.get_height()-3-cellSize):
+				pygame.event.post(pygame.event.Event(USEREVENT, code="MAZEWIN"))
 	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(player)
 
@@ -248,6 +250,7 @@ def setupWorld(display):
 	world.addEntity(guardEntity)
 
 	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
+	termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
 	terminal = auxFunctions.create(world, position=(16,52), dimension=(4,8), sprite=termSprite, layer=-1)
 	terminal.addComponent(component.Collidable())
 	groupManager.add('terminal', terminal)
