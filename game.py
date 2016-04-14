@@ -63,6 +63,7 @@ def setupMaze(display, (time, cellSize)):
 
 	playerEventHandler = player.addComponent(component.EventHandler())
 	def move(entity, event):
+		global worlds, gamescreen
 		currentPosition = entity.getComponent("Position")
 		lastPosition = entity.getComponent("LastPosition")
 		if event.type == pygame.KEYDOWN:
@@ -79,7 +80,9 @@ def setupMaze(display, (time, cellSize)):
 				lastPosition.value = Vector2(currentPosition.value)
 				currentPosition.value += Vector2(cellSize, 0)
 			if currentPosition.value == Vector2(display.get_width()-3-cellSize, display.get_height()-3-cellSize):
-				pygame.event.post(pygame.event.Event(USEREVENT, code="MAZEWIN"))
+				#pygame.event.post(pygame.event.Event(USEREVENT, code="MAZEWIN"))
+				gamescreen = "level"
+				worlds.popitem()
 	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(player)
 
@@ -251,8 +254,20 @@ def setupWorld(display):
 
 	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
 	termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
+	termLoss = pygame.image.load(os.path.join('assets', 'images', 'terminallose.png'))
 	terminal = auxFunctions.create(world, position=(16,52), dimension=(4,8), sprite=termSprite, layer=-1)
 	terminal.addComponent(component.Collidable())
+	termEvents = terminal.addComponent(component.EventHandler())
+
+	def terminalSprite(entity, event):
+		if event.code == "MAZEWIN":
+			print "Maze won!"
+			entity.getComponent("Drawable").image = pygame.transform.flip(termWin, imageFlip, False)
+		elif event.code == "TIMERQUIT":
+			print "Time up D:"
+			entity.getComponent("Drawable").image = pygame.transform.flip(termLoss, imageFlip, False)
+
+	termEvents.attachHandler(terminalSprite, USEREVENT)
 	groupManager.add('terminal', terminal)
 	world.addEntity(terminal)
 
