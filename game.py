@@ -66,18 +66,19 @@ def setupMaze(display, (time, cellSize)):
 		currentPosition = entity.getComponent("Position")
 		lastPosition = entity.getComponent("LastPosition")
 		if event.type == pygame.KEYDOWN:
-			if keys[event.key] == "Up":
-				lastPosition.value = Vector2(currentPosition.value)
-				currentPosition.value += Vector2(0, -cellSize)
-			elif keys[event.key] == "Down":
-				lastPosition.value = Vector2(currentPosition.value)
-				currentPosition.value += Vector2(0, cellSize)
-			elif keys[event.key] == "Left":
-				lastPosition.value = Vector2(currentPosition.value)
-				currentPosition.value += Vector2(-cellSize, 0)
-			elif keys[event.key] == "Right":
-				lastPosition.value = Vector2(currentPosition.value)
-				currentPosition.value += Vector2(cellSize, 0)
+			if event.key in keys.keys():
+				if keys[event.key] == "Up":
+					lastPosition.value = Vector2(currentPosition.value)
+					currentPosition.value += Vector2(0, -cellSize)
+				elif keys[event.key] == "Down":
+					lastPosition.value = Vector2(currentPosition.value)
+					currentPosition.value += Vector2(0, cellSize)
+				elif keys[event.key] == "Left":
+					lastPosition.value = Vector2(currentPosition.value)
+					currentPosition.value += Vector2(-cellSize, 0)
+				elif keys[event.key] == "Right":
+					lastPosition.value = Vector2(currentPosition.value)
+					currentPosition.value += Vector2(cellSize, 0)
 	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(player)
 
@@ -124,39 +125,41 @@ def setupWorld(display):
 		velocityComponent = entity.getComponent('Velocity')
 		playerState = entity.getComponent('State')
 		if event.type == pygame.KEYDOWN:
-			if keys[event.key] == "Left":
-				playerState.flipped = True
-				targetVelocityComponent.value += Vector2(-0.5, 0)
-			elif keys[event.key] == "Right":
-				playerState.flipped = False
-				targetVelocityComponent.value += Vector2(0.5, 0)
-			elif keys[event.key] == "Interact":
-				collisionSystem = world.getSystem('TileCollisionSystem')
-				collisions = collisionSystem.getEntityCollisions(entity.id)
-				for other in collisions:
-					if groupManager.check(other, 'terminal'):
-						terminalDifficulty = options["DIFFICULTY"]["Easy"] #Ideally the terminal itself should store the difficulty number.
-						worlds["maze"] = setupMaze(display, terminalDifficulty)
-						gamescreen = "maze"
-					elif groupManager.check(other, 'lift'):
-						originalLiftId = other.id
-						liftPosition = other.getComponent('Position').value
-						liftTilePosition = collisionSystem.getTilePosition(liftPosition)
-						for height in range(collisionSystem.tileMap.mapSize[1]):
-							entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
-							for other in entities:
-								if groupManager.check(other, 'lift') and \
-										other.id != originalLiftId:
-									newPosition = entity.getComponent('Position').value
-									liftPosition = other.getComponent('Position').value
-									newPosition.y = liftPosition.y
-									return
-			entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState.flipped else ghostSprite)
+			if event.key in keys.keys():
+				if keys[event.key] == "Left":
+					playerState.flipped = True
+					targetVelocityComponent.value += Vector2(-0.5, 0)
+				elif keys[event.key] == "Right":
+					playerState.flipped = False
+					targetVelocityComponent.value += Vector2(0.5, 0)
+				elif keys[event.key] == "Interact":
+					collisionSystem = world.getSystem('TileCollisionSystem')
+					collisions = collisionSystem.getEntityCollisions(entity.id)
+					for other in collisions:
+						if groupManager.check(other, 'terminal'):
+							terminalDifficulty = options["DIFFICULTY"]["Easy"] #Ideally the terminal itself should store the difficulty number.
+							worlds["maze"] = setupMaze(display, terminalDifficulty)
+							gamescreen = "maze"
+						elif groupManager.check(other, 'lift'):
+							originalLiftId = other.id
+							liftPosition = other.getComponent('Position').value
+							liftTilePosition = collisionSystem.getTilePosition(liftPosition)
+							for height in range(collisionSystem.tileMap.mapSize[1]):
+								entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
+								for other in entities:
+									if groupManager.check(other, 'lift') and \
+											other.id != originalLiftId:
+										newPosition = entity.getComponent('Position').value
+										liftPosition = other.getComponent('Position').value
+										newPosition.y = liftPosition.y
+										return
+				entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState.flipped else ghostSprite)
 		elif event.type == pygame.KEYUP:
-			if keys[event.key] == "Left":
-				targetVelocityComponent.value += Vector2(+0.5, 0)
-			elif keys[event.key] == "Right":
-				targetVelocityComponent.value += Vector2(-0.5, 0)
+			if event.key in keys.keys():
+				if keys[event.key] == "Left":
+					targetVelocityComponent.value += Vector2(+0.5, 0)
+				elif keys[event.key] == "Right":
+					targetVelocityComponent.value += Vector2(-0.5, 0)
 		velocityComponent.value = targetVelocityComponent.value
 
 	playerInputHandler = playerEntity.addComponent(component.EventHandler())
@@ -312,30 +315,31 @@ def optionsMenu(display):
 	def move(entity, event):
 		global gamescreen, options
 		currentPosition = entity.getComponent("Position")
-		if keys[event.key] == "Up":
-			if currentPosition.value[1] > 18:
-				currentPosition.value += Vector2(0, -12)
-		elif keys[event.key] == "Down":
-			if currentPosition.value[1] < 30:
-				currentPosition.value += Vector2(0, 12)
-		elif keys[event.key] in ("Interact", "Enter"):
-			if currentPosition.value[1] == 18:
-				options["MUSIC"] = not options["MUSIC"]
-				worlds[gamescreen].getEntity(2).getComponent("Drawable").layer = 0 - \
-						worlds[gamescreen].getEntity(2).getComponent("Drawable").layer
-				# This swaps the value between 3 and -3 - IE visible or not.
-				if options["MUSIC"] == True:
-					pygame.mixer.music.play(loops=-1)
+		if event.key in keys.keys():
+			if keys[event.key] == "Up":
+				if currentPosition.value[1] > 18:
+					currentPosition.value += Vector2(0, -12)
+			elif keys[event.key] == "Down":
+				if currentPosition.value[1] < 30:
+					currentPosition.value += Vector2(0, 12)
+			elif keys[event.key] in ("Interact", "Enter"):
+				if currentPosition.value[1] == 18:
+					options["MUSIC"] = not options["MUSIC"]
+					worlds[gamescreen].getEntity(2).getComponent("Drawable").layer = 0 - \
+							worlds[gamescreen].getEntity(2).getComponent("Drawable").layer
+					# This swaps the value between 3 and -3 - IE visible or not.
+					if options["MUSIC"] == True:
+						pygame.mixer.music.play(loops=-1)
+					else:
+						pygame.mixer.music.stop()
+				elif currentPosition.value[1] == 30:
+					options["SOUND"] = not options["SOUND"]
+					worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - \
+							worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
 				else:
-					pygame.mixer.music.stop()
-			elif currentPosition.value[1] == 30:
-				options["SOUND"] = not options["SOUND"]
-				worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - \
-						worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
-			else:
-				pass
-		with open('options.json', "w") as f:
-			json.dump(options, f, indent=4)
+					pass
+			with open('options.json', "w") as f:
+				json.dump(options, f, indent=4)
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
@@ -369,25 +373,26 @@ def setupMenu(display):
 	def move(entity, event):
 		global gamescreen
 		currentPosition = entity.getComponent("Position")
-		if keys[event.key] == "Up":
-			if currentPosition.value[1] > 22:
-				currentPosition.value += Vector2(0, -13)
-		elif keys[event.key] == "Down":
-			if currentPosition.value[1] < 48:
-				currentPosition.value += Vector2(0, 13)
-		elif keys[event.key] in ("Interact", "Enter"):
-			if currentPosition.value == Vector2(2,22):
-				worlds["level"] = setupWorld(display)
-				gamescreen = "level"
-			elif currentPosition.value == Vector2(2,35):
-				worlds["options"] = optionsMenu(display)
-				gamescreen = "options"
-			elif currentPosition.value == Vector2(2,48):
+		if event.key in keys.keys():
+			if keys[event.key] == "Up":
+				if currentPosition.value[1] > 22:
+					currentPosition.value += Vector2(0, -13)
+			elif keys[event.key] == "Down":
+				if currentPosition.value[1] < 48:
+					currentPosition.value += Vector2(0, 13)
+			elif keys[event.key] in ("Interact", "Enter"):
+				if currentPosition.value == Vector2(2,22):
+					worlds["level"] = setupWorld(display)
+					gamescreen = "level"
+				elif currentPosition.value == Vector2(2,35):
+					worlds["options"] = optionsMenu(display)
+					gamescreen = "options"
+				elif currentPosition.value == Vector2(2,48):
+					quit()
+				else:
+					pass
+			elif keys[event.key] == "Exit":
 				quit()
-			else:
-				pass
-		elif keys[event.key] == "Exit":
-			quit()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
@@ -403,9 +408,10 @@ def quitcheck(eventQueue):
 		if event.type == QUIT:
 			retval = 1
 		elif event.type == KEYDOWN:
-			if keys[event.key] == "Exit":
-				worlds.popitem()
-				gamescreen = worlds.keys()[-1]
+			if event.key in keys.keys():
+				if keys[event.key] == "Exit":
+					worlds.popitem()
+					gamescreen = worlds.keys()[-1]
 		elif (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
 			gamescreen = "level"
 	eventQueue = []
