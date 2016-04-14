@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pygame.math import Vector2
+from newvector import Vector2
 import pygame
 from ecs import System
 import math

@@ -8,10 +8,13 @@ class Vector2(object):
        """
     __slots__ = ['x', 'y']
  
-    def __init__(self, x_or_pair, y = None):
-        if y == None:
-            self.x = x_or_pair[0]
-            self.y = x_or_pair[1]
+    def __init__(self, x_or_pair=(0,0), y=0):
+        if not y:
+            if type(x_or_pair) == tuple:
+                self.x = x_or_pair[0]
+                self.y = x_or_pair[1]
+            else:
+                self.x = x_or_pair
         else:
             self.x = x_or_pair
             self.y = y

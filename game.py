@@ -7,7 +7,7 @@ import maze
 import auxFunctions
 from collections import OrderedDict
 from pygame.locals import *
-from pygame.math import Vector2
+from newvector import Vector2
 from ecs import *
 from systems import *
 from pytmx.util_pygame import load_pygame

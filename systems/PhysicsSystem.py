@@ -1,6 +1,6 @@
 from ecs import System
 import math
-import pygame.math
+import newvector
 
 class PhysicsSystem(System):
 
