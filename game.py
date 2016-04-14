@@ -157,7 +157,9 @@ def setupWorld(display):
 						other.getComponent('State')['occupied'] = True
 						playerState['cover'] = other
 			if not playerState['hiding']:
-				entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState['flipped'] else ghostSprite)
+				entity.getComponent('Drawable').set( \
+					ghostSpriteFlipped if playerState['flipped'] else ghostSprite \
+				)
 		elif event.type == pygame.KEYUP:
 			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(+0.5, 0)
@@ -294,11 +296,21 @@ def setupWorld(display):
 	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
 
-	binSprite = pygame.image.load(os.path.join('assets', 'images', 'bin.png'))
-	binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'bin_full.png'))
-	binEntity = auxFunctions.create(world, position=(44,31), dimension=(4,9), sprite=binSprite, layer=-1)
+	binSprite = pygame.image.load(os.path.join('assets', 'images', 'plant.png'))
+	binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
+	binEntity = auxFunctions.create(world, position=(38,28), dimension=(10,12), sprite=binSprite, layer=-1)
 	binEntity.addComponent(component.Collidable())
-	binEntity.addComponent(component.State(occupied=True))
+	binEntity.addComponent(component.State(occupied=False))
+	binScript = binEntity.addComponent(component.Script())
+	def binHandler(entity, dt):
+		state = entity.getComponent('State')
+		drawable = entity.getComponent('Drawable')
+		if state['occupied']:
+			drawable.set(binFullSprite, -1)
+		else:
+			drawable.set(binSprite, -1)
+
+	binScript.attach(binHandler)
 	groupManager.add('hidable', binEntity)
 	world.addEntity(binEntity)
 
