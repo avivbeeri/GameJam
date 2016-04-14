@@ -111,12 +111,8 @@ def setupWorld(display):
 	playerEntity.addComponent(component.Visible())
 	playerState = playerEntity.addComponent(component.State())
 	playerState.flipped = False
-	collidable = playerEntity.addComponent(component.Collidable())
-
-	def handleCollision(entity, event):
-		pass
-
-	collidable.attachHandler(handleCollision)
+	playerState.hiding = False
+	playerEntity.addComponent(component.Collidable())
 	playerEntity.addComponent(component.TargetVelocity())
 
 	# Demonstration of how to handle input.
@@ -153,12 +149,24 @@ def setupWorld(display):
 									liftPosition = other.getComponent('Position').value
 									newPosition.y = liftPosition.y
 									return
-			entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState.flipped else ghostSprite)
+					elif groupManager.check(other, 'hidable'):
+						playerState.hiding = True
+						entity.removeComponent('Visible')
+						entity.removeComponent('Drawable')
+						entity.removeComponent('Collidable')
+			if not playerState.hiding:
+				entity.getComponent('Drawable').set(ghostSpriteFlipped if playerState.flipped else ghostSprite)
 		elif event.type == pygame.KEYUP:
 			if keys[event.key] == "Left":
 				targetVelocityComponent.value += Vector2(+0.5, 0)
 			elif keys[event.key] == "Right":
 				targetVelocityComponent.value += Vector2(-0.5, 0)
+			elif keys[event.key] == "Interact":
+				if playerState.hiding:
+					playerState.hiding = False
+					entity.addComponent(component.Visible())
+					entity.addComponent(component.Drawable(ghostSprite))
+					entity.addComponent(component.Collidable())
 		velocityComponent.value = targetVelocityComponent.value
 
 	playerInputHandler = playerEntity.addComponent(component.EventHandler())
@@ -255,7 +263,7 @@ def setupWorld(display):
 	groupManager.add('terminal', terminal)
 	world.addEntity(terminal)
 
-	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'lift.png'))
+	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'stairs.png'))
 	doorEntity = auxFunctions.create(world, position=(52,48), dimension=(4,12), sprite=liftSprite, layer=-1)
 	doorEntity.addComponent(component.Collidable())
 	groupManager.add('lift', doorEntity)
@@ -275,6 +283,13 @@ def setupWorld(display):
 	doorEntity.addComponent(component.Collidable())
 	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
+
+	binSprite = pygame.image.load(os.path.join('assets', 'images', 'bin.png'))
+	binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'bin_full.png'))
+	binEntity = auxFunctions.create(world, position=(44,31), dimension=(4,9), sprite=binSprite, layer=-1)
+	binEntity.addComponent(component.Collidable())
+	groupManager.add('hidable', binEntity)
+	world.addEntity(binEntity)
 
 	world.addSystem(inputSystem)
 	world.addSystem(RadarSystem())
