@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math, os, pygame, random
+import math, os, pygame, random, json
 import component
 import maze
 import auxFunctions
@@ -9,14 +9,12 @@ from collections import OrderedDict
 from pygame.locals import *
 from pygame.math import Vector2
 from ecs import *
-from systems import RenderSystem, \
-					PhysicsSystem, \
-					InputSystem, \
-					RadarSystem, \
-					ScriptSystem, \
-					TileCollisionSystem
+from systems import *
 from pytmx.util_pygame import load_pygame
-from options import *
+from keys import keys
+
+with open('options.json', "r") as f:
+	options = json.load(f)
 
 inputSystem = InputSystem()
 gamescreen = "menu"
@@ -137,7 +135,7 @@ def setupWorld(display):
 				collisions = collisionSystem.getEntityCollisions(entity.id)
 				for other in collisions:
 					if groupManager.check(other, 'terminal'):
-						terminalDifficulty = DIFFICULTY[0] #Ideally the terminal itself should store the difficulty number.
+						terminalDifficulty = options["DIFFICULTY"]["Easy"] #Ideally the terminal itself should store the difficulty number.
 						worlds["maze"] = setupMaze(display, terminalDifficulty)
 						gamescreen = "maze"
 					elif groupManager.check(other, 'lift'):
@@ -299,9 +297,9 @@ def optionsMenu(display):
 	onImage = pygame.image.load(os.path.join("assets", "images", "on.png"))
 	musicOn = auxFunctions.create(world, position=(53,22), sprite=onImage, layer=3)
 	soundOn = auxFunctions.create(world, position=(53,34), sprite=onImage, layer=3)
-	if MUSIC == False:
+	if options["MUSIC"] == False:
 		musicOn.getComponent("Drawable").layer = -3
-	if SOUND == False:
+	if options["SOUND"] == False:
 		soundOn.getComponent("Drawable").layer = -3
 	world.addEntity(musicOn)
 	world.addEntity(soundOn)
@@ -312,7 +310,7 @@ def optionsMenu(display):
 
 	cursorEventHandler = cursor.addComponent(component.EventHandler())
 	def move(entity, event):
-		global gamescreen, MUSIC, SOUND
+		global gamescreen, options
 		currentPosition = entity.getComponent("Position")
 		if keys[event.key] == "Up":
 			if currentPosition.value[1] > 18:
@@ -322,20 +320,22 @@ def optionsMenu(display):
 				currentPosition.value += Vector2(0, 12)
 		elif keys[event.key] in ("Interact", "Enter"):
 			if currentPosition.value[1] == 18:
-				MUSIC = not MUSIC
+				options["MUSIC"] = not options["MUSIC"]
 				worlds[gamescreen].getEntity(2).getComponent("Drawable").layer = 0 - \
 						worlds[gamescreen].getEntity(2).getComponent("Drawable").layer
 				# This swaps the value between 3 and -3 - IE visible or not.
-				if MUSIC == True:
+				if options["MUSIC"] == True:
 					pygame.mixer.music.play(loops=-1)
 				else:
 					pygame.mixer.music.stop()
 			elif currentPosition.value[1] == 30:
-				SOUND = not SOUND
+				options["SOUND"] = not options["SOUND"]
 				worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - \
 						worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
 			else:
 				pass
+		with open('options.json', "w") as f:
+			json.dump(options, f, indent=4)
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
@@ -348,7 +348,7 @@ def setupMenu(display):
 
 	# Add the music
 	pygame.mixer.music.load(os.path.join('assets','music','BlueBeat.wav'))
-	if MUSIC == True:
+	if options["MUSIC"] == True:
 		pygame.mixer.music.play(loops=-1)
 
 	# Add the background image
@@ -416,7 +416,7 @@ def main():
 	global gamescreen, worlds
 	pygame.init()
 
-	outputSize = (512, 512)
+	outputSize = (options["SIZE"], options["SIZE"])
 	#Create the window and caption etc.
 	display = pygame.display.set_mode(outputSize)
 	pygame.display.set_caption('Ghost')
