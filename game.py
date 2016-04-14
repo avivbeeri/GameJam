@@ -99,12 +99,31 @@ def setupWorld(display):
 
 	city = pygame.image.load(os.path.join('assets', 'images', 'building_glass.png'))
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-2)
-	# world.addEntity(background)
+	world.addEntity(background)
 
 	mapData = auxFunctions.TileMap('test.tmx')
 	tileSurface = mapData.getLayerSurface(0)
 	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-1)
 	world.addEntity(mapEntity)
+
+#	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
+	termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
+	termLoss = pygame.image.load(os.path.join('assets', 'images', 'terminallose.png'))
+	terminal = auxFunctions.create(world, position=(16,52), dimension=(4,8), sprite=termLoss, layer=-1)
+	terminal.addComponent(component.Collidable())
+	# termEvents = terminal.addComponent(component.EventHandler())
+
+	# def terminalSprite(entity, event):
+	# 	if event.code == "MAZEWIN":
+	# 		print "Maze won!"
+	# 		entity.getComponent("Drawable").image = pygame.transform.flip(termWin, imageFlip, False)
+	# 	elif event.code == "TIMERQUIT":
+	# 		print "Time up D:"
+	# 		entity.getComponent("Drawable").image = pygame.transform.flip(termLoss, imageFlip, False)
+
+	# termEvents.attachHandler(terminalSprite, USEREVENT)
+	groupManager.add('terminal', terminal)
+	world.addEntity(terminal)
 
 	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 	ghostSpriteFlipped = pygame.transform.flip(ghostSprite, True, False)
@@ -140,9 +159,10 @@ def setupWorld(display):
 				collisions = collisionSystem.getEntityCollisions(entity.id)
 				for other in collisions:
 					if groupManager.check(other, 'terminal'):
-						terminalDifficulty = options["DIFFICULTY"]["Easy"] #Ideally the terminal itself should store the difficulty number.
-						worlds["maze"] = setupMaze(display, terminalDifficulty)
-						gamescreen = "maze"
+						other.getComponent('Drawable').set(termWin)
+						#terminalDifficulty = options["DIFFICULTY"]["Easy"] #Ideally the terminal itself should store the difficulty number.
+						#worlds["maze"] = setupMaze(display, terminalDifficulty)
+						#gamescreen = "maze"
 					elif groupManager.check(other, 'lift'):
 						originalLiftId = other.id
 						liftPosition = other.getComponent('Position').value
@@ -251,25 +271,6 @@ def setupWorld(display):
 	scriptComponent.attach(guardScript)
 	collidable = guardEntity.addComponent(component.Collidable())
 	world.addEntity(guardEntity)
-
-	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
-	termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
-	termLoss = pygame.image.load(os.path.join('assets', 'images', 'terminallose.png'))
-	terminal = auxFunctions.create(world, position=(16,52), dimension=(4,8), sprite=termSprite, layer=-1)
-	terminal.addComponent(component.Collidable())
-	termEvents = terminal.addComponent(component.EventHandler())
-
-	def terminalSprite(entity, event):
-		if event.code == "MAZEWIN":
-			print "Maze won!"
-			entity.getComponent("Drawable").image = pygame.transform.flip(termWin, imageFlip, False)
-		elif event.code == "TIMERQUIT":
-			print "Time up D:"
-			entity.getComponent("Drawable").image = pygame.transform.flip(termLoss, imageFlip, False)
-
-	termEvents.attachHandler(terminalSprite, USEREVENT)
-	groupManager.add('terminal', terminal)
-	world.addEntity(terminal)
 
 	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'lift.png'))
 	doorEntity = auxFunctions.create(world, position=(52,48), dimension=(4,12), sprite=liftSprite, layer=-1)
