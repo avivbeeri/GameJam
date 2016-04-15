@@ -77,6 +77,12 @@ class State(Component):
         self.state[key] = value
 
 
+class SpriteState(State):
+    def __init(self, **kwargs):
+        super(SpriteState, self).__init()
+        self.current = None
+
+
 class Collidable(EventHandler):
     def attachHandler(self, handler):
         super(Collidable, self).attachHandler(pygame.USEREVENT, handler)

@@ -3,7 +3,6 @@
 
 import math, os, pygame, random, json
 import component
-import maze
 import auxFunctions
 from collections import OrderedDict
 from pygame.locals import *
@@ -20,74 +19,6 @@ inputSystem = InputSystem()
 gamescreen = "menu"
 worlds = OrderedDict()
 
-def setupMaze(display, (time, cellSize)):
-	world = World()
-
-	# Creating the frame that goes around the maze.
-	mazeFrame = pygame.image.load(os.path.join('assets', 'images', 'puzzleframe.png'))
-	frame = auxFunctions.create(world, position=(0,0), drawable=mazeFrame, layer=1)
-	world.addEntity(frame)
-
-	# Creating the object for the timer.
-	timeLayer = pygame.Surface((display.get_width()-8, 2))
-	timer = auxFunctions.create(world, position=(4,display.get_height()-3), sprite=timeLayer, layer=2)
-	timer.addComponent(maze.Timer(timeLayer, time))
-	timer.addComponent(component.Script())
-	timer.getComponent("Script").attach(timer.getComponent('MazeTimer').update)
-	world.addEntity(timer)
-
-	# Creating the object for the maze.
-	mazeLayer = pygame.Surface((display.get_width()-8,display.get_height()-8))
-	mazeContent = auxFunctions.create(world, position=(4,4), sprite=mazeLayer, layer=-1)
-	mazeContent.addComponent(maze.Maze(mazeLayer, cellSize))
-	mazeContent.addComponent(component.Script())
-	mazeContent.getComponent("Script").attach(mazeContent.getComponent("Maze").update)
-	world.addEntity(mazeContent)
-
-	# Setting the walls
-	mapData = auxFunctions.TileMap('maze.tmx')
-	tileSurface = mapData.getLayerSurface(0)
-	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-1)
-	world.addEntity(mapEntity)
-
-	# Creating the player
-	playerMarker = pygame.Surface((cellSize-1,cellSize-1)).convert()
-	playerMarker.fill((255,0,0))
-	player = auxFunctions.create(world, sprite=playerMarker, layer=0, position=(5,5),\
-								lastPosition=(5,5), dimension=(cellSize-1, cellSize-1))
-
-	collidable = player.addComponent(component.Collidable())
-	def handleCollision(entity, event):
-		entity.getComponent("Position").value = Vector2(entity.getComponent("LastPosition").value)
-	collidable.attachHandler(handleCollision)
-
-	playerEventHandler = player.addComponent(component.EventHandler())
-	def move(entity, event):
-		currentPosition = entity.getComponent("Position")
-		lastPosition = entity.getComponent("LastPosition")
-		if event.type == pygame.KEYDOWN:
-			if event.key in keys.keys():
-				if keys[event.key] == "Up":
-					lastPosition.value = Vector2(currentPosition.value)
-					currentPosition.value += Vector2(0, -cellSize)
-				elif keys[event.key] == "Down":
-					lastPosition.value = Vector2(currentPosition.value)
-					currentPosition.value += Vector2(0, cellSize)
-				elif keys[event.key] == "Left":
-					lastPosition.value = Vector2(currentPosition.value)
-					currentPosition.value += Vector2(-cellSize, 0)
-				elif keys[event.key] == "Right":
-					lastPosition.value = Vector2(currentPosition.value)
-					currentPosition.value += Vector2(cellSize, 0)
-	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
-	world.addEntity(player)
-
-	world.addSystem(RenderSystem(display))
-	world.addSystem(ScriptSystem())
-	world.addSystem(inputSystem)
-	world.addSystem(TileCollisionSystem(mapData))
-	return world
-
 # Creates a world
 def setupWorld(display):
 	world = World()
@@ -101,6 +32,15 @@ def setupWorld(display):
 	tileSurface = mapData.getLayerSurface(0)
 	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-1)
 	world.addEntity(mapEntity)
+
+	termWin = pygame.image.load(os.path.join('assets', 'images', 'bin.png'))
+	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
+	terminal = auxFunctions.create(world, position=(16,52), dimension=(4,8), sprite=termSprite, layer=-1)
+	terminal.addComponent(component.Collidable())
+	termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
+	termState.current = 'locked'
+	groupManager.add('terminal', terminal)
+	world.addEntity(terminal)
 
 	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 	ghostSpriteFlipped = pygame.transform.flip(ghostSprite, True, False)
@@ -133,9 +73,7 @@ def setupWorld(display):
 					collisions = collisionSystem.getEntityCollisions(entity.id)
 					for other in collisions:
 						if groupManager.check(other, 'terminal'):
-							terminalDifficulty = options["DIFFICULTY"]["Easy"] #Ideally the terminal itself should store the difficulty number.
-							worlds["maze"] = setupMaze(display, terminalDifficulty)
-							gamescreen = "maze"
+							other.getComponent('SpriteState').current = "win"
 						elif groupManager.check(other, 'lift'):
 							originalLiftId = other.id
 							liftPosition = other.getComponent('Position').value
@@ -271,12 +209,6 @@ def setupWorld(display):
 	collidable = guardEntity.addComponent(component.Collidable())
 	world.addEntity(guardEntity)
 
-	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
-	terminal = auxFunctions.create(world, position=(16,52), dimension=(4,8), sprite=termSprite, layer=-1)
-	terminal.addComponent(component.Collidable())
-	groupManager.add('terminal', terminal)
-	world.addEntity(terminal)
-
 	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'stairs.png'))
 	doorEntity = auxFunctions.create(world, position=(52,48), dimension=(4,12), sprite=liftSprite, layer=-1)
 	doorEntity.addComponent(component.Collidable())
@@ -322,6 +254,7 @@ def setupWorld(display):
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(RenderSystem(display))
+	world.addSystem(SpriteSystem())
 	return world
 
 def optionsMenu(display):

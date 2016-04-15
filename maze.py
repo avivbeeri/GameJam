@@ -119,3 +119,71 @@ def mazeUpdate(screen, maze, mazeFrame, timer):
 	screen.blit(mazeFrame, (0,-1))
 	timer.update()
 	screen.blit(timer.timeLayer, (4,screen.get_height()-4))
+	
+def setupMaze(display, (time, cellSize)):
+	world = World()
+
+	# Creating the frame that goes around the maze.
+	mazeFrame = pygame.image.load(os.path.join('assets', 'images', 'puzzleframe.png'))
+	frame = auxFunctions.create(world, position=(0,0), drawable=mazeFrame, layer=1)
+	world.addEntity(frame)
+
+	# Creating the object for the timer.
+	timeLayer = pygame.Surface((display.get_width()-8, 2))
+	timer = auxFunctions.create(world, position=(4,display.get_height()-3), sprite=timeLayer, layer=2)
+	timer.addComponent(maze.Timer(timeLayer, time))
+	timer.addComponent(component.Script())
+	timer.getComponent("Script").attach(timer.getComponent('MazeTimer').update)
+	world.addEntity(timer)
+
+	# Creating the object for the maze.
+	mazeLayer = pygame.Surface((display.get_width()-8,display.get_height()-8))
+	mazeContent = auxFunctions.create(world, position=(4,4), sprite=mazeLayer, layer=-1)
+	mazeContent.addComponent(maze.Maze(mazeLayer, cellSize))
+	mazeContent.addComponent(component.Script())
+	mazeContent.getComponent("Script").attach(mazeContent.getComponent("Maze").update)
+	world.addEntity(mazeContent)
+
+	# Setting the walls
+	mapData = auxFunctions.TileMap('maze.tmx')
+	tileSurface = mapData.getLayerSurface(0)
+	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-1)
+	world.addEntity(mapEntity)
+
+	# Creating the player
+	playerMarker = pygame.Surface((cellSize-1,cellSize-1)).convert()
+	playerMarker.fill((255,0,0))
+	player = auxFunctions.create(world, sprite=playerMarker, layer=0, position=(5,5),\
+								lastPosition=(5,5), dimension=(cellSize-1, cellSize-1))
+
+	collidable = player.addComponent(component.Collidable())
+	def handleCollision(entity, event):
+		entity.getComponent("Position").value = Vector2(entity.getComponent("LastPosition").value)
+	collidable.attachHandler(handleCollision)
+
+	playerEventHandler = player.addComponent(component.EventHandler())
+	def move(entity, event):
+		currentPosition = entity.getComponent("Position")
+		lastPosition = entity.getComponent("LastPosition")
+		if event.type == pygame.KEYDOWN:
+			if event.key in keys.keys():
+				if keys[event.key] == "Up":
+					lastPosition.value = Vector2(currentPosition.value)
+					currentPosition.value += Vector2(0, -cellSize)
+				elif keys[event.key] == "Down":
+					lastPosition.value = Vector2(currentPosition.value)
+					currentPosition.value += Vector2(0, cellSize)
+				elif keys[event.key] == "Left":
+					lastPosition.value = Vector2(currentPosition.value)
+					currentPosition.value += Vector2(-cellSize, 0)
+				elif keys[event.key] == "Right":
+					lastPosition.value = Vector2(currentPosition.value)
+					currentPosition.value += Vector2(cellSize, 0)
+	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
+	world.addEntity(player)
+
+	world.addSystem(RenderSystem(display))
+	world.addSystem(ScriptSystem())
+	world.addSystem(inputSystem)
+	world.addSystem(TileCollisionSystem(mapData))
+	return world
