@@ -10,7 +10,7 @@ class SpriteSystem(System):
     def process(self, entities, dt):
         for entity in entities:
             currentSprite = entity.getComponent("Drawable")
-            possibleStates = entity.getComponent("SpriteState").state
+            possibleStates = entity.getComponent("SpriteState")
             currentState = entity.getComponent("SpriteState").current
             if currentSprite.image is not possibleStates[currentState]:
                 currentSprite.set(possibleStates[currentState])
