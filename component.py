@@ -44,9 +44,10 @@ class Drawable(Component):
         super(Drawable, self).__init__()
         self.set(surface, layer)
 
-    def set(self, surface, layer = 0):
+    def set(self, surface, layer=None):
         self.image = surface
-        self.layer = layer
+        if layer is not None:
+            self.layer = layer
 
 
 class EventHandler(Component):

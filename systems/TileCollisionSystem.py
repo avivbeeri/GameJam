@@ -60,8 +60,7 @@ class TileCollisionSystem(System):
             coord = (y, x) if isSteep else (x, y)
             tiles.append(coord)
             tileX, tileY = coord
-            tile = self.tileMap.getTileData(tileX, tileY, 0)
-            if tile == 'SOLID':
+            if self.tileMap.isTileSolid(tileX, tileY):
                 return False
             error -= abs(delta.y)
             while error < 0:
@@ -107,12 +106,11 @@ class TileCollisionSystem(System):
             # Test collisions in tiles which entity overlaps
             for tileX in range(int(startTile.x), int(endTile.x)):
                 for tileY in range(int(startTile.y), int(endTile.y)):
-                    tile = self.tileMap.getTileData(tileX, tileY, 0)
                     # Record the tile location for the entity
                     if (tileX, tileY) not in self.tileEntityMap:
                         self.tileEntityMap[tileX, tileY] = set()
                     self.tileEntityMap[tileX, tileY].add(entity)
-                    if tile == 'SOLID':
+                    if self.tileMap.isTileSolid(tileX, tileY):
                         tileCollidedEntities.add(entity)
 
         # Dispatch events and correct the physics

@@ -24,18 +24,18 @@ def setupWorld(display):
 	world = World()
 	groupManager = world.getManager('Group')
 
-	city = pygame.image.load(os.path.join('assets', 'images', 'building_glass.png'))
-	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-2)
-	# world.addEntity(background)
+	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
+	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
+	world.addEntity(background)
 
 	mapData = auxFunctions.TileMap('test.tmx')
-	tileSurface = mapData.getLayerSurface(0)
-	mapEntity = auxFunctions.create(world, position=(0,0), sprite=tileSurface, layer=-1)
-	world.addEntity(mapEntity)
+	for index, surface in enumerate(mapData.getSurfaces()):
+		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
+		world.addEntity(mapEntity)
 
 	termWin = pygame.image.load(os.path.join('assets', 'images', 'bin.png'))
 	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
-	terminal = auxFunctions.create(world, position=(16,52), dimension=(4,8), sprite=termSprite, layer=-1)
+	terminal = auxFunctions.create(world, position=(16,48), dimension=(4,8), sprite=termSprite, layer=0)
 	terminal.addComponent(component.Collidable())
 	termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
 	termState.current = 'locked'
@@ -44,7 +44,7 @@ def setupWorld(display):
 
 	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 	ghostSpriteFlipped = pygame.transform.flip(ghostSprite, True, False)
-	playerEntity = auxFunctions.create(world, position=(8,48), sprite=ghostSprite, layer=0, dimension=(5,12))
+	playerEntity = auxFunctions.create(world, position=(8,44), sprite=ghostSprite, layer=1, dimension=(5,12))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
 	playerEntity.addComponent(component.Visible())
@@ -110,7 +110,7 @@ def setupWorld(display):
 						other = playerState['cover']
 						playerState['cover'] = None
 						entity.addComponent(component.Visible())
-						entity.addComponent(component.Drawable(ghostSprite))
+						entity.addComponent(component.Drawable(ghostSprite, 1))
 						entity.addComponent(component.Collidable())
 						other.getComponent('State')['occupied'] = False
 
@@ -125,7 +125,7 @@ def setupWorld(display):
 	guardSprite = pygame.image.load(os.path.join('assets', 'images', 'guard.png'))
 	guardSurprisedSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_surprised.png'))
 	guardAlertSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_alert.png'))
-	guardEntity = auxFunctions.create(world, position=(8,26), dimension=(4,14), sprite=guardSprite, layer=0)
+	guardEntity = auxFunctions.create(world, position=(8,22), dimension=(4,14), sprite=guardSprite, layer=1)
 	guardEntity.addComponent(component.Velocity((0, 0)))
 	guardEntity.addComponent(component.Acceleration())
 	guardEntity.addComponent(component.Radar('player'))
@@ -210,29 +210,29 @@ def setupWorld(display):
 	world.addEntity(guardEntity)
 
 	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'stairs.png'))
-	doorEntity = auxFunctions.create(world, position=(52,48), dimension=(4,12), sprite=liftSprite, layer=-1)
+	doorEntity = auxFunctions.create(world, position=(52,44), dimension=(4,12), sprite=liftSprite, layer=0)
 	doorEntity.addComponent(component.Collidable())
 	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
 
-	doorEntity = auxFunctions.create(world, position=(52,28), dimension=(4,12), sprite=liftSprite, layer=-1)
+	doorEntity = auxFunctions.create(world, position=(52,24), dimension=(4,12), sprite=liftSprite, layer=0)
 	doorEntity.addComponent(component.Collidable())
 	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
 
-	doorEntity = auxFunctions.create(world, position=(28,8), dimension=(4,12), sprite=liftSprite, layer=-1)
+	doorEntity = auxFunctions.create(world, position=(28,4), dimension=(4,12), sprite=liftSprite, layer=0)
 	doorEntity.addComponent(component.Collidable())
 	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
 
-	doorEntity = auxFunctions.create(world, position=(28,28), dimension=(4,12), sprite=liftSprite, layer=-1)
+	doorEntity = auxFunctions.create(world, position=(28,24), dimension=(4,12), sprite=liftSprite, layer=0)
 	doorEntity.addComponent(component.Collidable())
 	groupManager.add('lift', doorEntity)
 	world.addEntity(doorEntity)
 
 	binSprite = pygame.image.load(os.path.join('assets', 'images', 'plant.png'))
 	binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
-	binEntity = auxFunctions.create(world, position=(38,28), dimension=(10,12), sprite=binSprite, layer=-1)
+	binEntity = auxFunctions.create(world, position=(38,24), dimension=(10,12), sprite=binSprite, layer=0)
 	binEntity.addComponent(component.Collidable())
 	binEntity.addComponent(component.State(occupied=False))
 	binScript = binEntity.addComponent(component.Script())
@@ -240,9 +240,9 @@ def setupWorld(display):
 		state = entity.getComponent('State')
 		drawable = entity.getComponent('Drawable')
 		if state['occupied']:
-			drawable.set(binFullSprite, -1)
+			drawable.set(binFullSprite)
 		else:
-			drawable.set(binSprite, -1)
+			drawable.set(binSprite)
 
 	binScript.attach(binHandler)
 	groupManager.add('hidable', binEntity)
