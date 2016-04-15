@@ -1,6 +1,6 @@
 from pygame import *
 import pygame
-from pygame.math import Vector2
+from newvector import Vector2
 from ecs import Component
 
 class Visible(Component):

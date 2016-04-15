@@ -1,6 +1,6 @@
 from ecs import System
 import math
-import pygame.math
+import newvector
 
 class PhysicsSystem(System):
 
@@ -39,5 +39,5 @@ class PhysicsSystem(System):
             if (math.fabs(y) < 0.001): y = 0
 
             # Update components with new values
-            velocityComponent.value = pygame.math.Vector2((x, y))
+            velocityComponent.value = newvector.Vector2((x, y))
             positionComponent.value = currentPosition + velocityComponent.value

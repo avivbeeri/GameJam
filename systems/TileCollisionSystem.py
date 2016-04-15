@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pygame.math import Vector2
+from newvector import Vector2
 import pygame
 from ecs import System
 import math
@@ -45,7 +45,6 @@ class TileCollisionSystem(System):
         if isSteep:
             startTile.x, startTile.y = startTile.y, startTile.x
             endTile.x, endTile.y = endTile.y, endTile.x
-
 
         swapped = False
         if (startTile.x > endTile.x):
