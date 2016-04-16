@@ -21,23 +21,28 @@ with open('options.json', "r") as f:
 gamescreen = "menu"
 worlds = OrderedDict()
 
+
+def quitHandler(event):
+	global gamescreen
+	if event.type == QUIT:
+		quit()
+	elif event.type == KEYDOWN:
+		if event.key in keys:
+			if keys[event.key] == "Exit":
+				worlds.popitem()
+				if len(worlds) == 0:
+					quit()
+				gamescreen = worlds.keys()[-1]
+	elif event.type == enums.GAMEOVER:
+		worlds.popitem()
+		gamescreen = worlds.keys()[-1]
+
 # Creates a world
 def setupWorld(display):
 	world = World()
 	groupManager = world.getManager('Group')
 
-	def quitHandler(event):
-		global gamescreen
-		if event.type == QUIT:
-			quit()
-		elif event.type == KEYDOWN:
-			if event.key in keys:
-				if keys[event.key] == "Exit":
-						worlds.popitem()
-						gamescreen = worlds.keys()[-1]
-		elif event.type == enums.GAMEOVER:
-			worlds.popitem()
-			gamescreen = worlds.keys()[-1]
+
 
 	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
 
@@ -74,6 +79,7 @@ def setupWorld(display):
 
 def optionsMenu(display):
 	world = World()
+	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
 	### NOTE: DON'T ADD ENTITES YET! ###
 	# See setupMenu for the comments on this :)
 	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
@@ -160,6 +166,7 @@ def gameOver(display):
 
 def setupMenu(display):
 	world = World()
+	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
 
 	# Add the music
 	pygame.mixer.music.load(os.path.join('assets','music','BlueBeat.wav'))
