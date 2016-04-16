@@ -25,7 +25,6 @@ termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
 ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 def createGhost(world, position):
     groupManager = world.getManager('Group')
-    collisionSystem = world.getSystem('TileCollisionSystem')
 
     playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(5,12))
     playerEntity.addComponent(component.Velocity((0, 0)))
@@ -56,6 +55,7 @@ def createGhost(world, position):
                         if groupManager.check(other, 'terminal'):
                             other.getComponent('SpriteState').current = "win"
                         elif groupManager.check(other, 'lift'):
+                            collisionSystem = world.getSystem('TileCollisionSystem')
                             originalLiftId = other.id
                             liftPosition = other.getComponent('Position').value
                             liftTilePosition = collisionSystem.getTilePosition(liftPosition)

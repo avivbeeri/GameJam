@@ -2,7 +2,6 @@ from pygame import *
 import pygame
 from newvector import Vector2
 from ecs import Component
-import enums
 
 class Visible(Component):
     pass
