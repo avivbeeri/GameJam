@@ -42,11 +42,13 @@ def setupWorld(display):
 
 	def gameOverHandler(event):
 		if event.type == enums.GAMEOVER:
+			pygame.time.wait(1000)
 			worlds["level"] = gameOver(display)
 	world.on([enums.GAMEOVER], gameOverHandler)
 
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
+			pygame.time.wait(1000)
 			worlds["level"] = missionComplete(display, level02)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 

@@ -44,6 +44,7 @@ class World(PubSub, object):
         return self.managers[managerType]
 
     def update(self, dt):
+        self.processEventQueue()
         for system in self.systems:
             entities = system.getProcessableEntities(self)
             system.process(entities, dt)

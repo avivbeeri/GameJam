@@ -1,6 +1,7 @@
 class PubSub(object):
     def __init__(self):
         super(PubSub, self).__init__()
+        self.eventQueue = []
         self.handlers = {}
 
     def on(self, eventTypes, handler):
@@ -15,9 +16,12 @@ class PubSub(object):
     def post(self, events):
         if not hasattr(events, '__iter__'):
             events = (events,)
+        self.eventQueue += events
 
-        for event in events:
+    def processEventQueue(self):
+        for event in self.eventQueue:
             eventType = event.type
             if eventType in self.handlers:
                 for handler in self.handlers[eventType]:
                     handler(event)
+        del self.eventQueue[:]
