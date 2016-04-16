@@ -1,5 +1,6 @@
 class PubSub(object):
     def __init__(self):
+        super(PubSub, self).__init__()
         self.eventQueue = []
         self.handlers = {}
 

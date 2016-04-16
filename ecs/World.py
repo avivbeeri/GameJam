@@ -5,6 +5,7 @@ from .eventQueue import PubSub
 
 class World(PubSub, object):
     def __init__(self):
+        super(World, self).__init__()
         self.idCounter = 0
         self.entities = {}
         self.systems = []
