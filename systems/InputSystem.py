@@ -15,3 +15,9 @@ class InputSystem(System):
                 inputComponent = entity.getComponent('EventHandler')
                 inputComponent.handle(event)
         del self.eventQueue[:]
+
+    def onAttach(self, world):
+        super(InputSystem, self).onAttach(world)
+        def handle(event):
+            self.eventQueue.append(event)
+        world.on([pygame.KEYUP, pygame.KEYDOWN], handle)

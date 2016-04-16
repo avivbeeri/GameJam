@@ -16,7 +16,6 @@ from keys import keys
 with open('options.json', "r") as f:
 	options = json.load(f)
 
-inputSystem = InputSystem()
 gamescreen = "menu"
 worlds = OrderedDict()
 
@@ -24,6 +23,18 @@ worlds = OrderedDict()
 def setupWorld(display):
 	world = World()
 	groupManager = world.getManager('Group')
+
+	def quitHandler(event):
+		global gamescreen
+		if event.type == QUIT:
+			quit()
+		elif event.type == KEYDOWN:
+			if event.key in keys.keys():
+				if keys[event.key] == "Exit":
+						worlds.popitem()
+						gamescreen = worlds.keys()[-1]
+
+	world.on([QUIT, KEYDOWN], quitHandler)
 
 	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
@@ -47,7 +58,7 @@ def setupWorld(display):
 
 	entities.createPlant(world, (38, 24))
 
-	world.addSystem(inputSystem)
+	world.addSystem(InputSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
@@ -115,7 +126,7 @@ def optionsMenu(display):
 	world.addEntity(cursor)
 
 	world.addSystem(RenderSystem(display))
-	world.addSystem(inputSystem)
+	world.addSystem(InputSystem())
 	return world
 
 def gameOver(display):
@@ -139,7 +150,7 @@ def gameOver(display):
 	world.addEntity(cursor)
 
 	world.addSystem(RenderSystem(display))
-	world.addSystem(inputSystem)
+	world.addSystem(InputSystem())
 	return world
 
 def setupMenu(display):
@@ -192,26 +203,8 @@ def setupMenu(display):
 	world.addEntity(cursor)
 
 	world.addSystem(RenderSystem(display))
-	world.addSystem(inputSystem)
+	world.addSystem(InputSystem())
 	return world
-
-def quitcheck(eventQueue):
-	retval = 0
-	global gamescreen
-	for event in eventQueue:
-	# Check if the user has quit, and if so quit.
-		if event.type == QUIT:
-			retval = 1
-		elif event.type == KEYDOWN:
-			if event.key in keys.keys():
-				if keys[event.key] == "Exit":
-					worlds.popitem()
-					gamescreen = worlds.keys()[-1]
-		elif (event.type == USEREVENT) and (event.code == "TIMERQUIT"):
-			gamescreen = "level"
-	eventQueue = []
-	return retval
-
 
 def main():
 	global gamescreen, worlds
@@ -235,21 +228,19 @@ def main():
 	# Later this could be delegated to a "State" object.
 	worlds["menu"] = setupMenu(screen)
 	renderSystem = RenderSystem(screen)
-	eventQueue = []
 
 	dt = (1.0 / 60.0) * 1000;
 	accumulator = 0
 	currentTime = pygame.time.get_ticks()
 
-	while quitcheck(eventQueue) != 1:
+	while True:
 		newTime = pygame.time.get_ticks()
 		frameTime = newTime - currentTime
 		currentTime = newTime
 		accumulator += frameTime
 
-		# Retrieve input events for processing
-		eventQueue = pygame.event.get()
-		inputSystem.eventQueue += eventQueue
+		# Retrieve input events for processing and pass them to the world
+		worlds[gamescreen].post(pygame.event.get())
 		while (accumulator >= dt):
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt

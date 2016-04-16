@@ -1,4 +1,3 @@
-from pygame import event
 from .Entity import Entity
 from .GroupManager import GroupManager
 from .eventQueue import PubSub
@@ -10,7 +9,6 @@ class World(PubSub, object):
         self.entities = {}
         self.systems = []
         self.managers = { 'Group': GroupManager(self) }
-        print self.eventQueue
 
 
     def createEntity(self):
@@ -46,7 +44,6 @@ class World(PubSub, object):
         return self.managers[managerType]
 
     def update(self, dt):
-        self.eventQueue += event.get()
         for system in self.systems:
             entities = system.getProcessableEntities(self)
             system.process(entities, dt)
