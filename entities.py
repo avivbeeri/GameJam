@@ -28,7 +28,7 @@ termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
 
 # Text
 pygame.font.init()
-pressStart = pygame.font.Font(os.path.join('assets', 'fonts', 'visitor1.ttf'), 10)
+pressStart = pygame.font.Font(os.path.join('assets', 'fonts', 'silkscreen.ttf'), 8)
 
 ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 def createGhost(world, position):
@@ -127,11 +127,11 @@ def createBin(world, position):
 
 def createPlant(world, position):
     groupManager = world.getManager('Group')
-    binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
-    binEntity.addComponent(component.Collidable())
-    binState = binEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
-    groupManager.add('hidable', binEntity)
-    world.addEntity(binEntity)
+    plantEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=plantSprite, layer=0)
+    plantEntity.addComponent(component.Collidable())
+    binState = plantEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
+    groupManager.add('hidable', plantEntity)
+    world.addEntity(plantEntity)
 
 def createStairs(world, position):
     groupManager = world.getManager('Group')

@@ -33,15 +33,18 @@ def quitHandler(event):
 				if len(worlds) == 0:
 					quit()
 				gamescreen = worlds.keys()[-1]
-	elif event.type == enums.GAMEOVER:
-		worlds.popitem()
-		gamescreen = worlds.keys()[-1]
 
 # Creates a world
 def setupWorld(display):
 	world = World()
 	groupManager = world.getManager('Group')
-	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
+	world.on([QUIT, KEYDOWN], quitHandler)
+
+	def gameOverHandler(event):
+		if event.type == enums.GAMEOVER:
+			worlds["level"] = gameOver(display)
+
+	world.on([enums.GAMEOVER], gameOverHandler)
 
 	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
@@ -70,14 +73,14 @@ def setupWorld(display):
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
-	world.addSystem(RenderSystem(display))
+	# world.addSystem(RenderSystem(display))
 	world.addSystem(SpriteSystem())
 	return world
 
 def level03(display):
 	world = World()
 	groupManager = world.getManager('Group')
-	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
+	world.on([QUIT, KEYDOWN], quitHandler)
 
 	mapData = auxFunctions.TileMap('outdoors3.tmx')
 	for index, surface in enumerate(mapData.getSurfaces()):
@@ -100,14 +103,14 @@ def level03(display):
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
-	world.addSystem(RenderSystem(display))
+	# world.addSystem(RenderSystem(display))
 	world.addSystem(SpriteSystem())
 	return world
 
 def level02(display):
 	world = World()
 	groupManager = world.getManager('Group')
-	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
+	world.on([QUIT, KEYDOWN], quitHandler)
 
 	mapData = auxFunctions.TileMap('outdoors2.tmx')
 	for index, surface in enumerate(mapData.getSurfaces()):
@@ -129,14 +132,14 @@ def level02(display):
 	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
-	world.addSystem(RenderSystem(display))
+	# world.addSystem(RenderSystem(display))
 	world.addSystem(SpriteSystem())
 	return world
 
 def level01(display):
 	world = World()
 	groupManager = world.getManager('Group')
-	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
+	world.on([QUIT, KEYDOWN], quitHandler)
 
 	mapData = auxFunctions.TileMap('outdoors1.tmx')
 	for index, surface in enumerate(mapData.getSurfaces()):
@@ -155,13 +158,13 @@ def level01(display):
 	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
-	world.addSystem(RenderSystem(display))
+	# world.addSystem(RenderSystem(display))
 	world.addSystem(SpriteSystem())
 	return world
 
 def optionsMenu(display):
 	world = World()
-	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
+	world.on([QUIT, KEYDOWN], quitHandler)
 	### NOTE: DON'T ADD ENTITES YET! ###
 	# See setupMenu for the comments on this :)
 	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
@@ -218,37 +221,37 @@ def optionsMenu(display):
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
-	world.addSystem(RenderSystem(display))
+	# world.addSystem(RenderSystem(display))
 	world.addSystem(InputSystem())
 	return world
 
 def gameOver(display):
 	world = World()
+	world.on([QUIT, KEYDOWN], quitHandler)
+	entities.createText(world, (13, 0), "MISSION")
+	entities.createText(world, (17, 8), "FAILED")
+	entities.createText(world, (2, 24), "PRESS ENTER TO")
+	entities.createText(world, (6, 32), "TRY AGAIN")
 
-	menuText = pygame.image.load(os.path.join('assets', 'images', 'options.png'))
-	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
-	world.addEntity(text)
-
-	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
-	cursor = auxFunctions.create(world, position=(2,18), sprite=cursorImage, layer=3)
-
-	cursorEventHandler = cursor.addComponent(component.EventHandler())
+	inputEntity = world.createEntity()
+	inputEventHandler = inputEntity.addComponent(component.EventHandler())
 	def move(entity, event):
 		global gamescreen, options
 		if event.type == pygame.KEYDOWN:
 			if event.key in keys:
 				if keys[event.key] in ("Interact", "Enter"):
-					worlds[gamescreen] = setupWorld()
-	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
-	world.addEntity(cursor)
+					worlds[gamescreen] = setupWorld(display)
 
-	world.addSystem(RenderSystem(display))
+	inputEventHandler.attachHandler(pygame.KEYDOWN, move)
+	world.addEntity(inputEntity)
+
+	# world.addSystem(RenderSystem(display))
 	world.addSystem(InputSystem())
 	return world
 
 def setupMenu(display):
 	world = World()
-	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
+	world.on([QUIT, KEYDOWN], quitHandler)
 
 	# Add the music
 	pygame.mixer.music.load(os.path.join('assets','music','BlueBeat.wav'))
@@ -282,7 +285,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level01(display)
+					worlds["level"] = setupWorld(display)
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
@@ -296,7 +299,7 @@ def setupMenu(display):
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
-	world.addSystem(RenderSystem(display))
+	# world.addSystem(RenderSystem(display))
 	world.addSystem(InputSystem())
 	return world
 
