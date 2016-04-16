@@ -10,8 +10,12 @@ from newvector import Vector2
 stairSprite = pygame.image.load(os.path.join('assets', 'images', 'stairs.png'))
 
 # Plants
-binSprite = pygame.image.load(os.path.join('assets', 'images', 'plant.png'))
-binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
+plantSprite = pygame.image.load(os.path.join('assets', 'images', 'plant.png'))
+plantHidingSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
+
+# Bins
+binSprite = pygame.image.load(os.path.join('assets', 'images', 'bin.png'))
+binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'bin_full.png'))
 
 # Guards
 guardSprite = pygame.image.load(os.path.join('assets', 'images', 'guard.png'))
@@ -21,6 +25,10 @@ guardAlertSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_ale
 # Terminal
 termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
 termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
+
+# Text
+pygame.font.init()
+pressStart = pygame.font.Font(os.path.join('assets', 'fonts', 'visitor1.ttf'), 10)
 
 ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 def createGhost(world, position):
@@ -101,12 +109,19 @@ def createGhost(world, position):
     groupManager.add('player', playerEntity)
     world.addEntity(playerEntity)
 
+def createBin(world, position):
+    groupManager = world.getManager('Group')
+    binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
+    binEntity.addComponent(component.Collidable())
+    binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
+    groupManager.add('hidable', binEntity)
+    world.addEntity(binEntity)
 
 def createPlant(world, position):
     groupManager = world.getManager('Group')
     binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
     binEntity.addComponent(component.Collidable())
-    binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
+    binState = binEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
     groupManager.add('hidable', binEntity)
     world.addEntity(binEntity)
 
@@ -213,3 +228,17 @@ def createGuard(world, position, accOffset=0):
     guardEntity.addComponent(component.Script()).attach(guardScript)
     guardEntity.addComponent(component.Collidable())
     world.addEntity(guardEntity)
+
+def createTerminal(world, position):
+    groupManager = world.getManager('Group')
+    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
+    terminal.addComponent(component.Collidable())
+    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
+    termState.current = 'locked'
+    groupManager.add('terminal', terminal)
+    world.addEntity(terminal)
+
+def createText(world, position, text):
+    renderedText = pressStart.render(text, False, (255,255,255))
+    blittedText = auxFunctions.create(world, position=position, sprite=renderedText, layer=6)
+    world.addEntity(blittedText)

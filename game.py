@@ -50,7 +50,7 @@ def setupWorld(display):
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
 	world.addEntity(background)
 
-	mapData = auxFunctions.TileMap('test.tmx')
+	mapData = auxFunctions.TileMap('indoors1.tmx')
 	for index, surface in enumerate(mapData.getSurfaces()):
 		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
 		world.addEntity(mapEntity)
@@ -71,6 +71,88 @@ def setupWorld(display):
 	world.addSystem(InputSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
+	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
+	world.addSystem(RenderSystem(display))
+	world.addSystem(SpriteSystem())
+	return world
+
+def level03(display):
+	world = World()
+	groupManager = world.getManager('Group')
+
+	mapData = auxFunctions.TileMap('outdoors3.tmx')
+	for index, surface in enumerate(mapData.getSurfaces()):
+		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
+		world.addEntity(mapEntity)
+
+	entities.createGhost(world, (4,44))
+	entities.createGuard(world, (54,42))
+	entities.createBin(world, (20,47))
+
+	entities.createStairs(world, (42,44))
+	entities.createStairs(world, (42,20))
+
+	entities.createText(world, (1,1), "A guard!")
+	entities.createText(world, (1,8), "I'd better")
+	entities.createText(world, (1,15), "hide!")
+
+	world.addSystem(inputSystem)
+	world.addSystem(RadarSystem())
+	world.addSystem(ScriptSystem())
+	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
+	world.addSystem(RenderSystem(display))
+	world.addSystem(SpriteSystem())
+	return world
+
+def level02(display):
+	world = World()
+	groupManager = world.getManager('Group')
+
+	mapData = auxFunctions.TileMap('outdoors2.tmx')
+	for index, surface in enumerate(mapData.getSurfaces()):
+		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
+		world.addEntity(mapEntity)
+
+	entities.createGhost(world, (4,20))
+
+	entities.createStairs(world, (48,44))
+	entities.createStairs(world, (48,20))
+
+	entities.createTerminal(world, (36,48))
+	# A door leading to the next level would give a reason to use this terminal.
+
+	entities.createText(world, (1,1), "Blocked.")
+	entities.createText(world, (1,8), "Heading")
+	entities.createText(world, (1,15), "down!")
+
+	world.addSystem(inputSystem)
+	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
+	world.addSystem(RenderSystem(display))
+	world.addSystem(SpriteSystem())
+	return world
+
+def level01(display):
+	world = World()
+	groupManager = world.getManager('Group')
+
+	mapData = auxFunctions.TileMap('outdoors1.tmx')
+	for index, surface in enumerate(mapData.getSurfaces()):
+		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
+		world.addEntity(mapEntity)
+
+	entities.createGhost(world, (4,44))
+	entities.createBin(world, (34,47))
+
+	entities.createText(world, (15,1), "If I'm")
+	entities.createText(world, (10,8), "going to")
+	entities.createText(world, (2,15), "get in, I'll")
+	entities.createText(world, (11,23), "need to")
+	entities.createText(world, (1,31), "stay hidden")
+
+	world.addSystem(inputSystem)
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(RenderSystem(display))
@@ -200,7 +282,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = setupWorld(display)
+					worlds["level"] = level02(display)
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
@@ -210,7 +292,7 @@ def setupMenu(display):
 				else:
 					pass
 			elif keys[event.key] == "Exit":
-				quit()
+				pygame.quit()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
