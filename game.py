@@ -64,7 +64,7 @@ def setupWorld(display):
 
 	entities.createGhost(world, (8, 44))
 
-	entities.createTerminal(world, (16, 48))
+	entities.createTerminal(world, (16, 8))
 	entities.createGuard(world, (8, 22))
 	entities.createGuard(world, (50, 2), 2)
 
@@ -261,9 +261,9 @@ def missionComplete(display, nextWorldFunc):
 	world = World()
 	world.on([QUIT, KEYDOWN], quitHandler)
 	entities.createText(world, (13, 0), "MISSION")
-	entities.createText(world, (17, 8), "SUCCESS")
+	entities.createText(world, (11, 8), "SUCCESS")
 	entities.createText(world, (2, 24), "PRESS ENTER TO")
-	entities.createText(world, (6, 32), "CONTINUE")
+	entities.createText(world, (9, 32), "CONTINUE")
 
 	inputEntity = world.createEntity()
 	inputEventHandler = inputEntity.addComponent(component.EventHandler())
