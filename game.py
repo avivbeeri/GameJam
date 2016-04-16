@@ -299,6 +299,30 @@ def optionsMenu(display):
 	world.addSystem(inputSystem)
 	return world
 
+def gameOver(display):
+	world = World()
+
+	menuText = pygame.image.load(os.path.join('assets', 'images', 'options.png'))
+	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
+	world.addEntity(text)
+
+	cursorImage = pygame.image.load(os.path.join('assets', 'images', 'cursor.png'))
+	cursor = auxFunctions.create(world, position=(2,18), sprite=cursorImage, layer=3)
+
+	cursorEventHandler = cursor.addComponent(component.EventHandler())
+	def move(entity, event):
+		global gamescreen, options
+		if event.type == pygame.KEYDOWN:
+			if event.key in keys.keys():
+				if keys[event.key] in ("Interact", "Enter"):
+					worlds[gamescreen] = setupWorld()
+	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
+	world.addEntity(cursor)
+
+	world.addSystem(RenderSystem(display))
+	world.addSystem(inputSystem)
+	return world
+
 def setupMenu(display):
 	world = World()
 
