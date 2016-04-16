@@ -62,6 +62,8 @@ def createGhost(world, position):
                     for other in collisions:
                         if groupManager.check(other, 'terminal'):
                             other.getComponent('SpriteState').current = "win"
+                            event = pygame.event.Event(enums.LEVELCOMPLETE)
+                            world.post(event)
                         elif groupManager.check(other, 'lift'):
                             collisionSystem = world.getSystem('TileCollisionSystem')
                             originalLiftId = other.id

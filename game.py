@@ -43,8 +43,13 @@ def setupWorld(display):
 	def gameOverHandler(event):
 		if event.type == enums.GAMEOVER:
 			worlds["level"] = gameOver(display)
-
 	world.on([enums.GAMEOVER], gameOverHandler)
+
+	def levelCompleteHandler(event):
+		if event.type == enums.LEVELCOMPLETE:
+			worlds["level"] = missionComplete(display, level02)
+	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
+
 
 	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
@@ -123,6 +128,7 @@ def level02(display):
 	entities.createStairs(world, (48,20))
 
 	entities.createTerminal(world, (36,48))
+
 	# A door leading to the next level would give a reason to use this terminal.
 
 	entities.createText(world, (1,1), "Blocked.")
@@ -241,6 +247,30 @@ def gameOver(display):
 			if event.key in keys:
 				if keys[event.key] in ("Interact", "Enter"):
 					worlds[gamescreen] = setupWorld(display)
+
+	inputEventHandler.attachHandler(pygame.KEYDOWN, move)
+	world.addEntity(inputEntity)
+
+	# world.addSystem(RenderSystem(display))
+	world.addSystem(InputSystem())
+	return world
+
+def missionComplete(display, nextWorldFunc):
+	world = World()
+	world.on([QUIT, KEYDOWN], quitHandler)
+	entities.createText(world, (13, 0), "MISSION")
+	entities.createText(world, (17, 8), "SUCCESS")
+	entities.createText(world, (2, 24), "PRESS ENTER TO")
+	entities.createText(world, (6, 32), "CONTINUE")
+
+	inputEntity = world.createEntity()
+	inputEventHandler = inputEntity.addComponent(component.EventHandler())
+	def move(entity, event):
+		global gamescreen, options
+		if event.type == pygame.KEYDOWN:
+			if event.key in keys:
+				if keys[event.key] in ("Interact", "Enter"):
+					worlds[gamescreen] = nextWorldFunc(display)
 
 	inputEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(inputEntity)
