@@ -1,4 +1,5 @@
 from ecs import System
+import pygame
 
 class RenderSystem(System):
 
@@ -13,7 +14,8 @@ class RenderSystem(System):
         for entity in entities:
             drawable = entity.getComponent('Drawable')
             position = entity.getComponent('Position')
-            images.append((drawable.image, position.value, drawable.layer))
+            flippedImage = pygame.transform.flip(drawable.image, drawable.flipped, False)
+            images.append((flippedImage, position.value, drawable.layer))
 
         sortedImages = sorted(images, key=lambda image: image[2])
         for surface, position, layer in sortedImages:

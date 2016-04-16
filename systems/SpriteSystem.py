@@ -12,5 +12,5 @@ class SpriteSystem(System):
             currentSprite = entity.getComponent("Drawable")
             possibleStates = entity.getComponent("SpriteState")
             currentState = entity.getComponent("SpriteState").current
-            if currentSprite.image is not possibleStates[currentState]:
+            if currentState is not None:
                 currentSprite.set(possibleStates[currentState])

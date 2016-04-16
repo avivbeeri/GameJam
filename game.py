@@ -43,7 +43,6 @@ def setupWorld(display):
 	world.addEntity(terminal)
 
 	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
-	ghostSpriteFlipped = pygame.transform.flip(ghostSprite, True, False)
 	playerEntity = auxFunctions.create(world, position=(8,44), sprite=ghostSprite, layer=1, dimension=(5,12))
 	playerEntity.addComponent(component.Velocity((0, 0)))
 	playerEntity.addComponent(component.Acceleration())
@@ -92,12 +91,10 @@ def setupWorld(display):
 							entity.removeComponent('Visible')
 							entity.removeComponent('Drawable')
 							entity.removeComponent('Collidable')
-							other.getComponent('State')['occupied'] = True
+							other.getComponent('SpriteState').current = 'occupied'
 							playerState['cover'] = other
 				if not playerState['hiding']:
-					entity.getComponent('Drawable').set( \
-						ghostSpriteFlipped if playerState['flipped'] else ghostSprite \
-					)
+					entity.getComponent('Drawable').flip(playerState['flipped'])
 		elif event.type == pygame.KEYUP:
 			if event.key in keys.keys():
 				if keys[event.key] == "Left":
@@ -112,7 +109,7 @@ def setupWorld(display):
 						entity.addComponent(component.Visible())
 						entity.addComponent(component.Drawable(ghostSprite, 1))
 						entity.addComponent(component.Collidable())
-						other.getComponent('State')['occupied'] = False
+						other.getComponent('SpriteState').current = 'empty'
 
 		velocityComponent.value = targetVelocityComponent.value
 
@@ -129,6 +126,7 @@ def setupWorld(display):
 	guardEntity.addComponent(component.Velocity((0, 0)))
 	guardEntity.addComponent(component.Acceleration())
 	guardEntity.addComponent(component.Radar('player'))
+	guardEntity.addComponent(component.SpriteState(patrol=guardSprite, surprised=guardSurprisedSprite, alert=guardAlertSprite))
 	guardState = guardEntity.addComponent(component.State())
 	guardState['direction'] = 'right'
 	guardState['mode'] = 'patrol'
@@ -138,6 +136,7 @@ def setupWorld(display):
 		global worlds
 		radar = entity.getComponent('Radar')
 		state = entity.getComponent('State')
+		spriteState = entity.getComponent('SpriteState')
 		drawable = entity.getComponent('Drawable')
 
 		def isVisible(entity, radar):
@@ -171,28 +170,24 @@ def setupWorld(display):
 			if state['modeTime'] > 5:
 				state['modeTime'] = 0
 				state['direction'] = 'left' if state['direction'] == 'right' else 'right'
-				drawable.image = pygame.transform.flip(guardSprite, shouldImageFlip(), False)
 
 			if isVisible(entity, radar):
 				state['mode'] = 'surprised'
-				drawable.image = pygame.transform.flip(guardSurprisedSprite, shouldImageFlip(), False)
 				state['modeTime'] = 0
 		elif state['mode'] == 'surprised':
 			if state['modeTime'] > 0.6:
 				if isVisible(entity, radar):
 					state['mode'] = 'alert'
-					drawable.image = pygame.transform.flip(guardAlertSprite, shouldImageFlip(), False)
 					state['modeTime'] = 0
 				else:
 					state['mode'] = 'patrol'
-					drawable.image = pygame.transform.flip(guardSprite, shouldImageFlip(), False)
 		elif state['mode'] == 'alert':
 			if isVisible(entity, radar):
 				if state['modeTime'] > 0.4:
 					worlds['level'] = setupWorld(display)
 			else:
 				state['mode'] = 'surprised'
-				drawable.image = pygame.transform.flip(guardSurprisedSprite, shouldImageFlip(), False)
+				drawable.flip(shouldImageFlip())
 				state['modeTime'] = 0
 		elif state['mode'] == 'chase':
 			# We aren't currently using this, but it is useful!
@@ -202,6 +197,9 @@ def setupWorld(display):
 			else:
 				velocity.value = Vector2()
 				state['mode'] = 'patrol'
+
+		drawable.flip(shouldImageFlip())
+		spriteState.current = state['mode']
 
 
 	scriptComponent = guardEntity.addComponent(component.Script())
@@ -234,17 +232,7 @@ def setupWorld(display):
 	binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
 	binEntity = auxFunctions.create(world, position=(38,24), dimension=(10,12), sprite=binSprite, layer=0)
 	binEntity.addComponent(component.Collidable())
-	binEntity.addComponent(component.State(occupied=False))
-	binScript = binEntity.addComponent(component.Script())
-	def binHandler(entity, dt):
-		state = entity.getComponent('State')
-		drawable = entity.getComponent('Drawable')
-		if state['occupied']:
-			drawable.set(binFullSprite)
-		else:
-			drawable.set(binSprite)
-
-	binScript.attach(binHandler)
+	binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
 	groupManager.add('hidable', binEntity)
 	world.addEntity(binEntity)
 

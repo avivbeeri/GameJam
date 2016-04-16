@@ -40,7 +40,6 @@ def create(world, **kwargs):
 class TileMap:
     def __init__(self, fileName):
         self._tmx = load_pygame(os.path.join('assets', fileName))
-        print self._tmx.layers
         self.mapSize = (self._tmx.width, self._tmx.height)
         self.cellSize = (self._tmx.tilewidth, self._tmx.tileheight)
         self.solidityMap = [None] * self.getTileTotal()

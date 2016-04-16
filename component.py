@@ -43,12 +43,18 @@ class Drawable(Component):
     def __init__(self, surface, layer = 0):
         super(Drawable, self).__init__()
         self.set(surface, layer)
+        self.flipped = False
 
     def set(self, surface, layer=None):
         self.image = surface
         if layer is not None:
             self.layer = layer
 
+    def flip(self, flip=None):
+        if flip is None:
+            self.flipped = not self.flipped
+        else:
+            self.flipped = flip
 
 class EventHandler(Component):
     def __init__(self):
@@ -79,8 +85,8 @@ class State(Component):
 
 
 class SpriteState(State):
-    def __init(self, **kwargs):
-        super(SpriteState, self).__init()
+    def __init__(self, **kwargs):
+        super(SpriteState, self).__init__(**kwargs)
         self.current = None
 
 
