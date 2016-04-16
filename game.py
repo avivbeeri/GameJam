@@ -34,14 +34,8 @@ def setupWorld(display):
 		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
 		world.addEntity(mapEntity)
 
-	termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
-	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
-	terminal = auxFunctions.create(world, position=(16,48), dimension=(4,8), sprite=termSprite, layer=0)
-	terminal.addComponent(component.Collidable())
-	termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
-	termState.current = 'locked'
-	groupManager.add('terminal', terminal)
-	world.addEntity(terminal)
+
+	entities.createTerminal(world, (16, 48))
 
 	ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 	playerEntity = auxFunctions.create(world, position=(8,44), sprite=ghostSprite, layer=1, dimension=(5,12))

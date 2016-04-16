@@ -15,6 +15,10 @@ guardSprite = pygame.image.load(os.path.join('assets', 'images', 'guard.png'))
 guardSurprisedSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_surprised.png'))
 guardAlertSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_alert.png'))
 
+# Terminal
+termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
+termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
+
 def createPlant(world, position):
     groupManager = world.getManager('Group')
     binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
@@ -119,3 +123,12 @@ def createGuard(world, position, accOffset=0):
     scriptComponent.attach(guardScript)
     collidable = guardEntity.addComponent(component.Collidable())
     world.addEntity(guardEntity)
+
+def createTerminal(world, position):
+    groupManager = world.getManager('Group')
+    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
+    terminal.addComponent(component.Collidable())
+    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
+    termState.current = 'locked'
+    groupManager.add('terminal', terminal)
+    world.addEntity(terminal)
