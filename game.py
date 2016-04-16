@@ -29,7 +29,7 @@ def setupWorld(display):
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
 	world.addEntity(background)
 
-	mapData = auxFunctions.TileMap('test.tmx')
+	mapData = auxFunctions.TileMap('indoors1.tmx')
 	for index, surface in enumerate(mapData.getSurfaces()):
 		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
 		world.addEntity(mapEntity)
@@ -233,7 +233,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level01(display)
+					worlds["level"] = setupWorld(display)
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
