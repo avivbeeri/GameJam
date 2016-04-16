@@ -90,6 +90,7 @@ class TileCollisionSystem(System):
             positionComponent = entity.getComponent('Position')
             position = positionComponent.value
             collidable = entity.getComponent('Collidable')
+            collidable.collisionSet.clear()
             # Does entity have a size?
             dimension = entity.getComponent('Dimension').value \
                     if entity.hasComponent('Dimension') \

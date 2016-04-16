@@ -41,9 +41,6 @@ def quitHandler(event):
 def setupWorld(display):
 	world = World()
 	groupManager = world.getManager('Group')
-
-
-
 	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
 
 	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
@@ -80,6 +77,7 @@ def setupWorld(display):
 def level03(display):
 	world = World()
 	groupManager = world.getManager('Group')
+	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
 
 	mapData = auxFunctions.TileMap('outdoors3.tmx')
 	for index, surface in enumerate(mapData.getSurfaces()):
@@ -109,6 +107,7 @@ def level03(display):
 def level02(display):
 	world = World()
 	groupManager = world.getManager('Group')
+	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
 
 	mapData = auxFunctions.TileMap('outdoors2.tmx')
 	for index, surface in enumerate(mapData.getSurfaces()):
@@ -137,6 +136,7 @@ def level02(display):
 def level01(display):
 	world = World()
 	groupManager = world.getManager('Group')
+	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
 
 	mapData = auxFunctions.TileMap('outdoors1.tmx')
 	for index, surface in enumerate(mapData.getSurfaces()):
@@ -282,7 +282,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level02(display)
+					worlds["level"] = level01(display)
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)

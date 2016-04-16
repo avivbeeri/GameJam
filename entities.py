@@ -97,10 +97,11 @@ def createGhost(world, position):
                         other = playerState['cover']
                         playerState['cover'] = None
                         entity.addComponent(component.Visible())
-                        entity.addComponent(component.Drawable(ghostSprite, 1))
+                        entity.addComponent(component.Drawable(ghostSprite))
                         entity.addComponent(component.Collidable())
                         other.getComponent('SpriteState').current = 'empty'
-
+        if playerState['hiding']:
+            targetVelocityComponent.value = Vector2(0, 0)
         velocityComponent.value = targetVelocityComponent.value
 
     playerInputHandler = playerEntity.addComponent(component.EventHandler())
