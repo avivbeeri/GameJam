@@ -97,7 +97,7 @@ def level03(display):
 	entities.createText(world, (1,8), "I'd better")
 	entities.createText(world, (1,15), "hide!")
 
-	world.addSystem(inputSystem)
+	world.addSystem(InputSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
@@ -127,7 +127,7 @@ def level02(display):
 	entities.createText(world, (1,8), "Heading")
 	entities.createText(world, (1,15), "down!")
 
-	world.addSystem(inputSystem)
+	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(RenderSystem(display))
@@ -152,7 +152,7 @@ def level01(display):
 	entities.createText(world, (11,23), "need to")
 	entities.createText(world, (1,31), "stay hidden")
 
-	world.addSystem(inputSystem)
+	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(RenderSystem(display))
