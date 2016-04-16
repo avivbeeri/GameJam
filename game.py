@@ -67,12 +67,12 @@ def level02(display):
 
 	entities.createGhost(world, (4,44))
 	entities.createGuard(world, (56,42))
-	entities.createBin(world, (28,47))
+	entities.createBin(world, (20,47))
 
-	entities.createStairs(world, (40,44))
-	entities.createStairs(world, (40,20))
+	entities.createStairs(world, (46,44))
+	entities.createStairs(world, (46,20))
 
-	# We need to create a way of adding text so that we can have some story here.
+	# Add some basic tutorial?
 	world.addSystem(inputSystem)
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
