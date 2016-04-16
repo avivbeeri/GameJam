@@ -13,3 +13,8 @@ keys = {
 	pygame.K_RCTRL:"Camo",
 	pygame.K_RETURN:"Enter",
 }
+
+# User-defined Event values
+USEREVENT = pygame.USEREVENT
+COLLISION = USEREVENT + 1
+GAMEOVER = USEREVENT + 2

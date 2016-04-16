@@ -6,7 +6,6 @@ class InputSystem(System):
     def __init__(self):
         super(InputSystem, self).__init__();
         self.requirements = ('EventHandler',)
-        self.eventQueue = []
 
     def process(self, entities, dt):
         # process the queued events

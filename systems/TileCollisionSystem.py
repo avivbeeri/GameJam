@@ -3,6 +3,7 @@ from newvector import Vector2
 import pygame
 from ecs import System
 import math
+from util import enums
 
 
 class TileCollisionSystem(System):
@@ -119,8 +120,8 @@ class TileCollisionSystem(System):
         # NOTE: We currently don't update the tileEntityMap with physics corrections
         for entity in tileCollidedEntities:
             # Dispatch a collision event
-            data = {'code': 'COLLISION', 'collisionType': 'tile' }
-            event = pygame.event.Event(pygame.USEREVENT, data)
+            event = pygame.event.Event(enums.COLLISION, {'collisionType': 'tile'})
+            self.world.post(event)
             entity.getComponent('Collidable').handle(event)
             if entity.hasComponent('Velocity'):
                 # Correct entity position
@@ -142,15 +143,19 @@ class TileCollisionSystem(System):
                 currentEntity = entities.pop()
                 checkedEntities.add(currentEntity)
                 for other in entities:
+                    # Check if the two entities are actually colliding
                     if other not in self.entityCollisionSet[currentEntity.id] and \
                         areEntitiesColliding(currentEntity, other):
-                        # Check if the two entities are actually colliding
+                        # Update the component collision sets
                         self.entityCollisionSet[currentEntity.id].add(other)
                         self.entityCollisionSet[other.id].add(currentEntity)
-                        data = { 'code': 'COLLISION', 'collisionType': 'entity', 'other': entity.id }
-                        event = pygame.event.Event(pygame.USEREVENT, data)
-                        currentEntity.getComponent('Collidable').handle(event)
-                        other.getComponent('Collidable').handle(event)
+
+                        # Dispatch a collision event
+                        event = pygame.event.Event(enums.COLLISION, {'collisionType': 'entity', 'other': entity.id})
+                        self.world.post(event)
+
+                        currentEntity.getComponent('Collidable').collisionSet = self.entityCollisionSet[currentEntity.id]
+                        other.getComponent('Collidable').collisionSet = self.entityCollisionSet[other.id]
                 self.tileEntityMap[key] = checkedEntities
 
 

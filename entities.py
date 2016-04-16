@@ -1,7 +1,8 @@
 import auxFunctions
 import component
 import pygame, os
-from keys import keys
+from util.enums import keys
+from util import enums
 from newvector import Vector2
 
 # Load assets
@@ -24,6 +25,8 @@ termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
 ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 def createGhost(world, position):
     groupManager = world.getManager('Group')
+    collisionSystem = world.getSystem('TileCollisionSystem')
+
     playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(5,12))
     playerEntity.addComponent(component.Velocity((0, 0)))
     playerEntity.addComponent(component.Acceleration())
@@ -40,7 +43,7 @@ def createGhost(world, position):
         velocityComponent = entity.getComponent('Velocity')
         playerState = entity.getComponent('State')
         if event.type == pygame.KEYDOWN:
-            if event.key in keys.keys():
+            if event.key in keys:
                 if keys[event.key] == "Left":
                     playerState['flipped'] = True
                     targetVelocityComponent.value += Vector2(-0.5, 0)
@@ -48,8 +51,7 @@ def createGhost(world, position):
                     playerState['flipped'] = False
                     targetVelocityComponent.value += Vector2(0.5, 0)
                 elif keys[event.key] == "Interact":
-                    collisionSystem = world.getSystem('TileCollisionSystem')
-                    collisions = collisionSystem.getEntityCollisions(entity.id)
+                    collisions = entity.getComponent('Collidable').collisionSet
                     for other in collisions:
                         if groupManager.check(other, 'terminal'):
                             other.getComponent('SpriteState').current = "win"
@@ -57,7 +59,7 @@ def createGhost(world, position):
                             originalLiftId = other.id
                             liftPosition = other.getComponent('Position').value
                             liftTilePosition = collisionSystem.getTilePosition(liftPosition)
-                            for height in range(collisionSystem.tileMap.mapSize[1]):
+                            for height in range(collisionSystem.tileMap.getHeightInTiles()):
                                 entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
                                 for other in entities:
                                     if groupManager.check(other, 'lift') and \
@@ -76,7 +78,7 @@ def createGhost(world, position):
                 if not playerState['hiding']:
                     entity.getComponent('Drawable').flip(playerState['flipped'])
         elif event.type == pygame.KEYUP:
-            if event.key in keys.keys():
+            if event.key in keys:
                 if keys[event.key] == "Left":
                     targetVelocityComponent.value += Vector2(+0.5, 0)
                 elif keys[event.key] == "Right":
@@ -115,6 +117,14 @@ def createStairs(world, position):
     groupManager.add('lift', stairEntity)
     world.addEntity(stairEntity)
 
+def createTerminal(world, position):
+    groupManager = world.getManager('Group')
+    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
+    terminal.addComponent(component.Collidable())
+    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
+    termState.current = 'locked'
+    groupManager.add('terminal', terminal)
+    world.addEntity(terminal)
 
 def createGuard(world, position, accOffset=0):
     groupManager = world.getManager('Group')
@@ -181,8 +191,8 @@ def createGuard(world, position, accOffset=0):
         elif state['mode'] == 'alert':
             if isVisible(entity, radar):
                 if state['modeTime'] > 0.4:
-                    print 'FIRE EVENT: GAMEOVER'
-                    quit()
+                    event = pygame.event.Event(enums.GAMEOVER)
+                    world.post(event)
             else:
                 state['mode'] = 'surprised'
                 drawable.flip(shouldImageFlip())
@@ -200,16 +210,6 @@ def createGuard(world, position, accOffset=0):
         spriteState.current = state['mode']
 
 
-    scriptComponent = guardEntity.addComponent(component.Script())
-    scriptComponent.attach(guardScript)
-    collidable = guardEntity.addComponent(component.Collidable())
+    guardEntity.addComponent(component.Script()).attach(guardScript)
+    guardEntity.addComponent(component.Collidable())
     world.addEntity(guardEntity)
-
-def createTerminal(world, position):
-    groupManager = world.getManager('Group')
-    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
-    terminal.addComponent(component.Collidable())
-    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
-    termState.current = 'locked'
-    groupManager.add('terminal', terminal)
-    world.addEntity(terminal)

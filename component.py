@@ -2,6 +2,7 @@ from pygame import *
 import pygame
 from newvector import Vector2
 from ecs import Component
+import enums
 
 class Visible(Component):
     pass
@@ -93,10 +94,10 @@ class SpriteState(State):
         self.current = None
 
 
-class Collidable(EventHandler):
+class Collidable(Component):
     def attachHandler(self, handler):
-        super(Collidable, self).attachHandler(pygame.USEREVENT, handler)
-
+        super(Collidable, self).__init__()
+        self.collisionSet = set()
 
 class Script(Component):
     def __init__(self):

@@ -11,7 +11,9 @@ from newvector import Vector2
 from ecs import *
 from systems import *
 from pytmx.util_pygame import load_pygame
-from keys import keys
+from util.enums import keys
+from util import enums
+
 
 with open('options.json', "r") as f:
 	options = json.load(f)
@@ -29,12 +31,15 @@ def setupWorld(display):
 		if event.type == QUIT:
 			quit()
 		elif event.type == KEYDOWN:
-			if event.key in keys.keys():
+			if event.key in keys:
 				if keys[event.key] == "Exit":
 						worlds.popitem()
 						gamescreen = worlds.keys()[-1]
+		elif event.type == enums.GAMEOVER:
+			worlds.popitem()
+			gamescreen = worlds.keys()[-1]
 
-	world.on([QUIT, KEYDOWN], quitHandler)
+	world.on([QUIT, KEYDOWN, enums.GAMEOVER], quitHandler)
 
 	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
@@ -97,7 +102,7 @@ def optionsMenu(display):
 	def move(entity, event):
 		global gamescreen, options
 		currentPosition = entity.getComponent("Position")
-		if event.key in keys.keys():
+		if event.key in keys:
 			if keys[event.key] == "Up":
 				if currentPosition.value[1] > 18:
 					currentPosition.value += Vector2(0, -12)
@@ -143,7 +148,7 @@ def gameOver(display):
 	def move(entity, event):
 		global gamescreen, options
 		if event.type == pygame.KEYDOWN:
-			if event.key in keys.keys():
+			if event.key in keys:
 				if keys[event.key] in ("Interact", "Enter"):
 					worlds[gamescreen] = setupWorld()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
@@ -179,7 +184,7 @@ def setupMenu(display):
 	def move(entity, event):
 		global gamescreen
 		currentPosition = entity.getComponent("Position")
-		if event.key in keys.keys():
+		if event.key in keys:
 			if keys[event.key] == "Up":
 				if currentPosition.value[1] > 22:
 					currentPosition.value += Vector2(0, -13)

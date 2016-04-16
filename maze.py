@@ -166,7 +166,7 @@ def setupMaze(display, (time, cellSize)):
 		currentPosition = entity.getComponent("Position")
 		lastPosition = entity.getComponent("LastPosition")
 		if event.type == pygame.KEYDOWN:
-			if event.key in keys.keys():
+			if event.key in enums.keys():
 				if keys[event.key] == "Up":
 					lastPosition.value = Vector2(currentPosition.value)
 					currentPosition.value += Vector2(0, -cellSize)
