@@ -72,6 +72,10 @@ def level02(display):
 	entities.createStairs(world, (46,44))
 	entities.createStairs(world, (46,20))
 
+	entities.createText(world, (1,1), "A guard!")
+	entities.createText(world, (1,8), "I'd better")
+	entities.createText(world, (1,15), "hide!")
+
 	# Add some basic tutorial?
 	world.addSystem(inputSystem)
 	world.addSystem(RadarSystem())
@@ -92,7 +96,13 @@ def level01(display):
 		world.addEntity(mapEntity)
 
 	entities.createGhost(world, (4,44))
-	entities.createBin(world, (30,47))
+	entities.createBin(world, (34,47))
+
+	entities.createText(world, (15,1), "If I'm")
+	entities.createText(world, (10,8), "going to")
+	entities.createText(world, (2,15), "get in, I'll")
+	entities.createText(world, (11,23), "need to")
+	entities.createText(world, (1,31), "stay hidden")
 
 	# We need to create a way of adding text so that we can have some story here.
 	world.addSystem(inputSystem)
@@ -223,7 +233,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level02(display)
+					worlds["level"] = level01(display)
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
@@ -233,7 +243,7 @@ def setupMenu(display):
 				else:
 					pass
 			elif keys[event.key] == "Exit":
-				quit()
+				pygame.quit()
 	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 

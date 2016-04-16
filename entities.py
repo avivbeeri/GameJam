@@ -25,6 +25,10 @@ guardAlertSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_ale
 termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
 termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
 
+# Text
+pygame.font.init()
+pressStart = pygame.font.Font(os.path.join('assets', 'fonts', 'visitor1.ttf'), 10)
+
 ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 def createGhost(world, position):
     groupManager = world.getManager('Group')
@@ -224,3 +228,8 @@ def createTerminal(world, position):
     termState.current = 'locked'
     groupManager.add('terminal', terminal)
     world.addEntity(terminal)
+
+def createText(world, position, text):
+    renderedText = pressStart.render(text, False, (255,255,255))
+    blittedText = auxFunctions.create(world, position=position, sprite=renderedText, layer=6)
+    world.addEntity(blittedText)
