@@ -1,6 +1,8 @@
 import auxFunctions
 import component
 import pygame, os
+from keys import keys
+from newvector import Vector2
 
 # Load assets
 # Stairs
@@ -18,6 +20,85 @@ guardAlertSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_ale
 # Terminal
 termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
 termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
+
+ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
+def createGhost(world, position):
+    groupManager = world.getManager('Group')
+    playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(5,12))
+    playerEntity.addComponent(component.Velocity((0, 0)))
+    playerEntity.addComponent(component.Acceleration())
+    playerEntity.addComponent(component.Visible())
+    playerState = playerEntity.addComponent(component.State())
+    playerState['flipped'] = False
+    playerState['hiding'] = False
+    playerEntity.addComponent(component.Collidable())
+    playerEntity.addComponent(component.TargetVelocity())
+
+    # Demonstration of how to handle input.
+    def handleInput(entity, event):
+        targetVelocityComponent = entity.getComponent('TargetVelocity')
+        velocityComponent = entity.getComponent('Velocity')
+        playerState = entity.getComponent('State')
+        if event.type == pygame.KEYDOWN:
+            if event.key in keys.keys():
+                if keys[event.key] == "Left":
+                    playerState['flipped'] = True
+                    targetVelocityComponent.value += Vector2(-0.5, 0)
+                elif keys[event.key] == "Right":
+                    playerState['flipped'] = False
+                    targetVelocityComponent.value += Vector2(0.5, 0)
+                elif keys[event.key] == "Interact":
+                    collisionSystem = world.getSystem('TileCollisionSystem')
+                    collisions = collisionSystem.getEntityCollisions(entity.id)
+                    for other in collisions:
+                        if groupManager.check(other, 'terminal'):
+                            other.getComponent('SpriteState').current = "win"
+                        elif groupManager.check(other, 'lift'):
+                            originalLiftId = other.id
+                            liftPosition = other.getComponent('Position').value
+                            liftTilePosition = collisionSystem.getTilePosition(liftPosition)
+                            for height in range(collisionSystem.tileMap.mapSize[1]):
+                                entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
+                                for other in entities:
+                                    if groupManager.check(other, 'lift') and \
+                                            other.id != originalLiftId:
+                                        newPosition = entity.getComponent('Position').value
+                                        liftPosition = other.getComponent('Position').value
+                                        newPosition.y = liftPosition.y
+                                        return
+                        elif groupManager.check(other, 'hidable'):
+                            playerState['hiding'] = True
+                            entity.removeComponent('Visible')
+                            entity.removeComponent('Drawable')
+                            entity.removeComponent('Collidable')
+                            other.getComponent('SpriteState').current = 'occupied'
+                            playerState['cover'] = other
+                if not playerState['hiding']:
+                    entity.getComponent('Drawable').flip(playerState['flipped'])
+        elif event.type == pygame.KEYUP:
+            if event.key in keys.keys():
+                if keys[event.key] == "Left":
+                    targetVelocityComponent.value += Vector2(+0.5, 0)
+                elif keys[event.key] == "Right":
+                    targetVelocityComponent.value += Vector2(-0.5, 0)
+                elif keys[event.key] == "Interact":
+                    if playerState['hiding']:
+                        playerState['hiding'] = False
+                        other = playerState['cover']
+                        playerState['cover'] = None
+                        entity.addComponent(component.Visible())
+                        entity.addComponent(component.Drawable(ghostSprite, 1))
+                        entity.addComponent(component.Collidable())
+                        other.getComponent('SpriteState').current = 'empty'
+
+        velocityComponent.value = targetVelocityComponent.value
+
+    playerInputHandler = playerEntity.addComponent(component.EventHandler())
+    playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
+    playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
+    groupManager.add('player', playerEntity)
+    world.addEntity(playerEntity)
+
 
 def createPlant(world, position):
     groupManager = world.getManager('Group')
