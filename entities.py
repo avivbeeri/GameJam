@@ -39,8 +39,8 @@ def createGhost(world, position):
     playerEntity.addComponent(component.Acceleration())
     playerEntity.addComponent(component.Visible())
     playerState = playerEntity.addComponent(component.State())
-    playerState['flipped'] = False
     playerState['hiding'] = False
+    playerState['moving'] = False
     playerEntity.addComponent(component.Collidable())
     playerEntity.addComponent(component.TargetVelocity())
 
@@ -52,10 +52,10 @@ def createGhost(world, position):
         if event.type == pygame.KEYDOWN:
             if event.key in keys:
                 if keys[event.key] == "Left":
-                    playerState['flipped'] = True
                     targetVelocityComponent.value += Vector2(-0.5, 0)
+                    playerState['moving'] = True
                 elif keys[event.key] == "Right":
-                    playerState['flipped'] = False
+                    playerState['moving'] = True
                     targetVelocityComponent.value += Vector2(0.5, 0)
                 elif keys[event.key] == "Interact":
                     collisions = entity.getComponent('Collidable').collisionSet
@@ -83,13 +83,11 @@ def createGhost(world, position):
                             entity.removeComponent('Collidable')
                             other.getComponent('SpriteState').current = 'occupied'
                             playerState['cover'] = other
-                if not playerState['hiding']:
-                    entity.getComponent('Drawable').flip(playerState['flipped'])
         elif event.type == pygame.KEYUP:
             if event.key in keys:
-                if keys[event.key] == "Left":
+                if keys[event.key] == "Left" and playerState['moving']:
                     targetVelocityComponent.value += Vector2(+0.5, 0)
-                elif keys[event.key] == "Right":
+                elif keys[event.key] == "Right" and playerState['moving']:
                     targetVelocityComponent.value += Vector2(-0.5, 0)
                 elif keys[event.key] == "Interact":
                     if playerState['hiding']:
@@ -97,11 +95,20 @@ def createGhost(world, position):
                         other = playerState['cover']
                         playerState['cover'] = None
                         entity.addComponent(component.Visible())
-                        entity.addComponent(component.Drawable(ghostSprite))
+                        entity.addComponent(component.Drawable(ghostSprite, 1))
                         entity.addComponent(component.Collidable())
                         other.getComponent('SpriteState').current = 'empty'
+
+            if targetVelocityComponent.value.get_length() == 0:
+                playerState['moving'] = False
+
+        # Make sure we don't move while hiding.
         if playerState['hiding']:
             targetVelocityComponent.value = Vector2(0, 0)
+            # playerState['moving'] = False
+        elif targetVelocityComponent.value.x != 0:
+            entity.getComponent('Drawable').flip(targetVelocityComponent.value.x < 0)
+
         velocityComponent.value = targetVelocityComponent.value
 
     playerInputHandler = playerEntity.addComponent(component.EventHandler())

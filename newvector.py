@@ -245,6 +245,7 @@ class Vector2(object):
 
     def get_length(self):
         return math.sqrt(self.x**2 + self.y**2)
+
     def __setlength(self, value):
         length = self.get_length()
         self.x *= value/length
