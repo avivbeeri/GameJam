@@ -4,6 +4,11 @@ class System(object):
     def __init__(self):
         self.requirements = []
         self.world = None
+        self.eventQueue = []
+
+    def onAttach(self, world):
+        self.world = world
+        pass
 
     def getProcessableEntities(self, world):
         entities = world.getAllEntities()

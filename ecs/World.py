@@ -1,12 +1,15 @@
+from pygame import event
 from .Entity import Entity
 from .GroupManager import GroupManager
+from .eventQueue import PubSub
 
-class World:
+class World(PubSub, object):
     def __init__(self):
         self.idCounter = 0
         self.entities = {}
         self.systems = []
         self.managers = { 'Group': GroupManager(self) }
+        print self.eventQueue
 
 
     def createEntity(self):
@@ -29,7 +32,7 @@ class World:
 
     def addSystem(self, system):
         self.systems.append(system)
-        system.world = self
+        system.onAttach(self)
 
 
     def getSystem(self, systemName):
@@ -42,6 +45,7 @@ class World:
         return self.managers[managerType]
 
     def update(self, dt):
+        self.eventQueue += event.get()
         for system in self.systems:
             entities = system.getProcessableEntities(self)
             system.process(entities, dt)
