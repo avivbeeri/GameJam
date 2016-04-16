@@ -289,7 +289,7 @@ def optionsMenu(display):
 							worlds[gamescreen].getEntity(2).getComponent("Drawable").layer
 					# This swaps the value between 3 and -3 - IE visible or not.
 					if options["MUSIC"] == True:
-						pygame.mixer.music.play(loops=-1)
+						pygame.mixer.music.play(-1)
 					else:
 						pygame.mixer.music.stop()
 				elif currentPosition.value[1] == 30:
@@ -313,7 +313,7 @@ def setupMenu(display):
 	# Add the music
 	pygame.mixer.music.load(os.path.join('assets','music','BlueBeat.wav'))
 	if options["MUSIC"] == True:
-		pygame.mixer.music.play(loops=-1)
+		pygame.mixer.music.play(-1)
 
 	# Add the background image
 	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
