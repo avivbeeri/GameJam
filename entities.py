@@ -9,8 +9,12 @@ from newvector import Vector2
 stairSprite = pygame.image.load(os.path.join('assets', 'images', 'stairs.png'))
 
 # Plants
-binSprite = pygame.image.load(os.path.join('assets', 'images', 'plant.png'))
-binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
+plantSprite = pygame.image.load(os.path.join('assets', 'images', 'plant.png'))
+plantHidingSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
+
+# Bins
+binSprite = pygame.image.load(os.path.join('assets', 'images', 'bin.png'))
+binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'bin_full.png'))
 
 # Guards
 guardSprite = pygame.image.load(os.path.join('assets', 'images', 'guard.png'))
@@ -99,12 +103,19 @@ def createGhost(world, position):
     groupManager.add('player', playerEntity)
     world.addEntity(playerEntity)
 
+def createBin(world, position):
+    groupManager = world.getManager('Group')
+    binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
+    binEntity.addComponent(component.Collidable())
+    binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
+    groupManager.add('hidable', binEntity)
+    world.addEntity(binEntity)
 
 def createPlant(world, position):
     groupManager = world.getManager('Group')
     binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
     binEntity.addComponent(component.Collidable())
-    binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
+    binState = binEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
     groupManager.add('hidable', binEntity)
     world.addEntity(binEntity)
 

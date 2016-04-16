@@ -56,6 +56,52 @@ def setupWorld(display):
 	world.addSystem(SpriteSystem())
 	return world
 
+def level02(display):
+	world = World()
+	groupManager = world.getManager('Group')
+
+	mapData = auxFunctions.TileMap('outdoors2.tmx')
+	for index, surface in enumerate(mapData.getSurfaces()):
+		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
+		world.addEntity(mapEntity)
+
+	entities.createGhost(world, (4,44))
+	entities.createGuard(world, (56,42))
+	entities.createBin(world, (28,47))
+
+	entities.createStairs(world, (40,44))
+	entities.createStairs(world, (40,20))
+
+	# We need to create a way of adding text so that we can have some story here.
+	world.addSystem(inputSystem)
+	world.addSystem(RadarSystem())
+	world.addSystem(ScriptSystem())
+	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
+	world.addSystem(RenderSystem(display))
+	world.addSystem(SpriteSystem())
+	return world
+
+def level01(display):
+	world = World()
+	groupManager = world.getManager('Group')
+
+	mapData = auxFunctions.TileMap('outdoors1.tmx')
+	for index, surface in enumerate(mapData.getSurfaces()):
+		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
+		world.addEntity(mapEntity)
+
+	entities.createGhost(world, (4,44))
+	entities.createBin(world, (30,47))
+
+	# We need to create a way of adding text so that we can have some story here.
+	world.addSystem(inputSystem)
+	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
+	world.addSystem(RenderSystem(display))
+	world.addSystem(SpriteSystem())
+	return world
+
 def optionsMenu(display):
 	world = World()
 	### NOTE: DON'T ADD ENTITES YET! ###
@@ -177,7 +223,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = setupWorld(display)
+					worlds["level"] = level02(display)
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
