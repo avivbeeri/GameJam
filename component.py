@@ -94,7 +94,7 @@ class SpriteState(State):
 
 
 class Collidable(Component):
-    def attachHandler(self, handler):
+    def __init__(self):
         super(Collidable, self).__init__()
         self.collisionSet = set()
 

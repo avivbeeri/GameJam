@@ -122,7 +122,6 @@ class TileCollisionSystem(System):
             # Dispatch a collision event
             event = pygame.event.Event(enums.COLLISION, {'collisionType': 'tile'})
             self.world.post(event)
-            entity.getComponent('Collidable').handle(event)
             if entity.hasComponent('Velocity'):
                 # Correct entity position
                 positionComponent = entity.getComponent('Position')
