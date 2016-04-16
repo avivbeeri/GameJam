@@ -40,15 +40,18 @@ class TargetVelocity(Vector):
     pass
 
 class Drawable(Component):
-    def __init__(self, surface, layer = 0):
+    def __init__(self, surface, layer = 0, offset=(0,0)):
         super(Drawable, self).__init__()
         self.set(surface, layer)
         self.flipped = False
+        self.offset = Vector2(offset)
 
-    def set(self, surface, layer=None):
+    def set(self, surface, layer=None, offset=None):
         self.image = surface
         if layer is not None:
             self.layer = layer
+        if offset is not None:
+            self.offset = Vector2(offset)
 
     def flip(self, flip=None):
         if flip is None:

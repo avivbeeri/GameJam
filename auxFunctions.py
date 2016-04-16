@@ -20,8 +20,10 @@ def create(world, **kwargs):
     if 'sprite' in kwargs:
         if 'layer' not in kwargs:
             kwargs['layer'] = 0
+        if 'offset' not in kwargs:
+            kwargs['offset'] = (0, 0)
         kwargs['sprite'].convert_alpha()
-        entity.addComponent(component.Drawable(kwargs['sprite'], kwargs['layer']))
+        entity.addComponent(component.Drawable(kwargs['sprite'], kwargs['layer'], kwargs['offset']))
 
     if 'attachClass' in kwargs:
         if 'classArgs' not in kwargs:

@@ -33,7 +33,7 @@ def setupWorld(display):
 		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
 		world.addEntity(mapEntity)
 
-	termWin = pygame.image.load(os.path.join('assets', 'images', 'bin.png'))
+	termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
 	termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
 	terminal = auxFunctions.create(world, position=(16,48), dimension=(4,8), sprite=termSprite, layer=0)
 	terminal.addComponent(component.Collidable())
@@ -208,25 +208,17 @@ def setupWorld(display):
 	world.addEntity(guardEntity)
 
 	liftSprite = pygame.image.load(os.path.join('assets', 'images', 'stairs.png'))
-	doorEntity = auxFunctions.create(world, position=(52,44), dimension=(4,12), sprite=liftSprite, layer=0)
-	doorEntity.addComponent(component.Collidable())
-	groupManager.add('lift', doorEntity)
-	world.addEntity(doorEntity)
 
-	doorEntity = auxFunctions.create(world, position=(52,24), dimension=(4,12), sprite=liftSprite, layer=0)
-	doorEntity.addComponent(component.Collidable())
-	groupManager.add('lift', doorEntity)
-	world.addEntity(doorEntity)
+	def createStairs(world, position):
+		doorEntity = auxFunctions.create(world, position=position, dimension=(5,12), sprite=liftSprite, layer=0, offset=(0,-1))
+		doorEntity.addComponent(component.Collidable())
+		groupManager.add('lift', doorEntity)
+		world.addEntity(doorEntity)
 
-	doorEntity = auxFunctions.create(world, position=(28,4), dimension=(4,12), sprite=liftSprite, layer=0)
-	doorEntity.addComponent(component.Collidable())
-	groupManager.add('lift', doorEntity)
-	world.addEntity(doorEntity)
-
-	doorEntity = auxFunctions.create(world, position=(28,24), dimension=(4,12), sprite=liftSprite, layer=0)
-	doorEntity.addComponent(component.Collidable())
-	groupManager.add('lift', doorEntity)
-	world.addEntity(doorEntity)
+	createStairs(world, (52,44))
+	createStairs(world, (52,24))
+	createStairs(world, (28,4))
+	createStairs(world, (28,24))
 
 	binSprite = pygame.image.load(os.path.join('assets', 'images', 'plant.png'))
 	binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
