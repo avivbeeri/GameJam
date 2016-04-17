@@ -1,5 +1,9 @@
 from ecs import System
 import pygame
+from newvector import Vector2
+
+DEBUG = False
+colors = [(255, 255, 255, 255), (255, 0, 255, 255), (0, 255, 255, 255), (255, 255, 0, 255)]
 
 class RenderSystem(System):
 
@@ -15,6 +19,12 @@ class RenderSystem(System):
             drawable = entity.getComponent('Drawable')
             position = entity.getComponent('Position') .value + drawable.offset
             flippedImage = pygame.transform.flip(drawable.image, drawable.flipped, False)
+            # if DEBUG, we can draw hitboxes
+            if DEBUG and entity.hasComponent('Dimension'):
+                dimension = entity.getComponent('Dimension').value
+                debugImage = pygame.Surface(dimension)
+                debugImage.fill(colors[entity.id % 4])
+                images.append((debugImage, position - drawable.offset, drawable.layer + 2))
             images.append((flippedImage, position, drawable.layer))
 
         sortedImages = sorted(images, key=lambda image: image[2])

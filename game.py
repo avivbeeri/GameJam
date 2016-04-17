@@ -52,6 +52,7 @@ def createWorld(levelFile):
 		world.addEntity(mapEntity)
 
 	world.addSystem(InputSystem())
+	world.addSystem(InteractionSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
@@ -75,7 +76,6 @@ def setupWorld():
 
 	entities.createGhost(world, (8, 44))
 
-	entities.createTerminal(world, (16, 8))
 	entities.createGuard(world, (8, 22))
 	entities.createGuard(world, (50, 2), 2)
 
@@ -85,6 +85,13 @@ def setupWorld():
 	entities.createStairs(world, (28, 24))
 
 	entities.createPlant(world, (38, 24))
+
+	terminal = entities.createTerminal(world, (16, 8))
+	def terminalHandler(entity, event):
+		other = world.getEntity(event.entity)
+		event = pygame.event.Event(enums.LEVELCOMPLETE)
+		world.post(event)
+	terminal.getComponent('Interactable').attach(terminalHandler)
 
 	return world
 
@@ -119,7 +126,12 @@ def level02():
 	entities.createStairs(world, (48,20))
 
 	# A door leading to the next level would give a reason to use this terminal.
-	entities.createTerminal(world, (36,48))
+	terminal = entities.createTerminal(world, (36,48))
+	def terminalHandler(entity, event):
+		other = world.getEntity(event.entity)
+		event = pygame.event.Event(enums.LEVELCOMPLETE)
+		world.post(event)
+	terminal.getComponent('Interactable').attach(terminalHandler)
 
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
@@ -205,7 +217,7 @@ def optionsMenu(display):
 					pass
 			with open('options.json', "w") as f:
 				json.dump(options, f, indent=4)
-	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
+	cursorEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
 	# world.addSystem(RenderSystem(display))
@@ -229,7 +241,7 @@ def gameOver(display):
 				if keys[event.key] in ("Interact", "Enter"):
 					worlds[gamescreen] = setupWorld(display)
 
-	inputEventHandler.attachHandler(pygame.KEYDOWN, move)
+	inputEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(inputEntity)
 
 	world.addSystem(InputSystem())
@@ -252,7 +264,7 @@ def missionComplete(nextWorldFunc):
 				if keys[event.key] in ("Interact", "Enter"):
 					worlds[gamescreen] = nextWorldFunc()
 
-	inputEventHandler.attachHandler(pygame.KEYDOWN, move)
+	inputEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(inputEntity)
 
 	world.addSystem(InputSystem())
@@ -305,7 +317,7 @@ def setupMenu(display):
 					pass
 			elif keys[event.key] == "Exit":
 				pygame.quit()
-	cursorEventHandler.attachHandler(pygame.KEYDOWN, move)
+	cursorEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
 	# world.addSystem(RenderSystem(display))

@@ -2,6 +2,7 @@ from pygame import *
 import pygame
 from newvector import Vector2
 from ecs import Component
+from util import enums
 
 class Visible(Component):
     pass
@@ -64,7 +65,7 @@ class EventHandler(Component):
         super(EventHandler, self).__init__()
         self.handlers = {}
 
-    def attachHandler(self, eventName, handler):
+    def attach(self, eventName, handler):
         if not eventName in self.handlers:
             self.handlers[eventName] = []
         self.handlers[eventName].append(handler)
@@ -74,6 +75,16 @@ class EventHandler(Component):
         if eventName in self.handlers and len(self.handlers[eventName]) > 0:
             for handler in self.handlers[eventName]:
                 handler(self.entity, event)
+
+
+class Interactable(EventHandler):
+    def __init__(self, handler):
+        super(Interactable, self).__init__()
+        self.attach(handler)
+
+    def attach(self, handler):
+        eventName = enums.INTERACT
+        super(Interactable, self).attach(eventName, handler)
 
 
 class State(Component):

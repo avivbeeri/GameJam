@@ -34,7 +34,7 @@ ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 def createGhost(world, position):
     groupManager = world.getManager('Group')
 
-    playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(5,12))
+    playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(4,12), offset=(-1, 0))
     playerEntity.addComponent(component.Velocity((0, 0)))
     playerEntity.addComponent(component.Acceleration())
     playerEntity.addComponent(component.Visible())
@@ -60,9 +60,8 @@ def createGhost(world, position):
                 elif keys[event.key] == "Interact":
                     collisions = entity.getComponent('Collidable').collisionSet
                     for other in collisions:
-                        if groupManager.check(other, 'terminal'):
-                            other.getComponent('SpriteState').current = "win"
-                            event = pygame.event.Event(enums.LEVELCOMPLETE)
+                        if other.hasComponent('Interactable'):
+                            event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
                             world.post(event)
                         elif groupManager.check(other, 'lift'):
                             collisionSystem = world.getSystem('TileCollisionSystem')
@@ -118,10 +117,11 @@ def createGhost(world, position):
         velocityComponent.value = targetVelocityComponent.value
 
     playerInputHandler = playerEntity.addComponent(component.EventHandler())
-    playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
-    playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
+    playerInputHandler.attach(pygame.KEYDOWN, handleInput)
+    playerInputHandler.attach(pygame.KEYUP, handleInput)
     groupManager.add('player', playerEntity)
-    return world.addEntity(playerEntity)
+    world.addEntity(playerEntity)
+    return playerEntity
 
 def createBin(world, position):
     groupManager = world.getManager('Group')
@@ -145,10 +145,26 @@ def createPlant(world, position):
 
 def createStairs(world, position):
     groupManager = world.getManager('Group')
-    stairEntity = auxFunctions.create(world, position=position, dimension=(5,12), sprite=stairSprite, layer=0, offset=(0,-1))
+    stairEntity = auxFunctions.create(world, position=position, dimension=(6,12), sprite=stairSprite, layer=0, offset=(-1, -1))
     stairEntity.addComponent(component.Collidable())
     groupManager.add('lift', stairEntity)
-    return world.addEntity(stairEntity)
+    world.addEntity(stairEntity)
+    return stairEntity
+
+def createTerminal(world, position):
+    groupManager = world.getManager('Group')
+    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
+    terminal.addComponent(component.Collidable())
+    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
+    termState.current = 'locked'
+
+    def interactHandler(entity, event):
+        terminal.getComponent('SpriteState').current = "win"
+    terminal.addComponent(component.Interactable(interactHandler))
+
+    groupManager.add('terminal', terminal)
+    world.addEntity(terminal)
+    return terminal
 
 def createGuard(world, position, accOffset=0):
     groupManager = world.getManager('Group')
@@ -236,18 +252,11 @@ def createGuard(world, position, accOffset=0):
 
     guardEntity.addComponent(component.Script()).attach(guardScript)
     guardEntity.addComponent(component.Collidable())
-    return world.addEntity(guardEntity)
-
-def createTerminal(world, position):
-    groupManager = world.getManager('Group')
-    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
-    terminal.addComponent(component.Collidable())
-    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
-    termState.current = 'locked'
-    groupManager.add('terminal', terminal)
-    return world.addEntity(terminal)
+    world.addEntity(guardEntity)
+    return guardEntity
 
 def createText(world, position, text):
     renderedText = silkScreen.render(text, False, (255,255,255))
     blittedText = auxFunctions.create(world, position=position, sprite=renderedText, layer=6)
-    return world.addEntity(blittedText)
+    world.addEntity(blittedText)
+    return blittedText
