@@ -5,3 +5,4 @@ from ScriptSystem import *
 from TileCollisionSystem import *
 from RadarSystem import *
 from SpriteSystem import *
+from InteractionSystem import *

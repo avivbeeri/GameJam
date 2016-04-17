@@ -159,7 +159,7 @@ def setupMaze(display, (time, cellSize)):
 	collidable = player.addComponent(component.Collidable())
 	def handleCollision(entity, event):
 		entity.getComponent("Position").value = Vector2(entity.getComponent("LastPosition").value)
-	collidable.attachHandler(handleCollision)
+	collidable.attach(handleCollision)
 
 	playerEventHandler = player.addComponent(component.EventHandler())
 	def move(entity, event):
@@ -179,7 +179,7 @@ def setupMaze(display, (time, cellSize)):
 				elif keys[event.key] == "Right":
 					lastPosition.value = Vector2(currentPosition.value)
 					currentPosition.value += Vector2(cellSize, 0)
-	playerEventHandler.attachHandler(pygame.KEYDOWN, move)
+	playerEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(player)
 
 	world.addSystem(RenderSystem(display))
