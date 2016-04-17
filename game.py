@@ -52,7 +52,7 @@ def createWorld(levelFile):
 		world.addEntity(mapEntity)
 
 	world.addSystem(InputSystem())
-	world.addSystem(InteractionSystem())
+	#world.addSystem(InteractionSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
@@ -306,7 +306,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level02()
+					worlds["level"] = level01()
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)

@@ -5,7 +5,7 @@ pygame.mixer.init()
 
 class SoundSystem(System):
 
-    def process(self, event, dt):
+    def handle(event):
         if event.code == "bin":
             self.binSound.play()
         elif event.code == 'terminal':
@@ -20,8 +20,11 @@ class SoundSystem(System):
     def __init__(self, world):
         super(SoundSystem, self).__init__();
         self.requirements = ('EventHandler',)
-        world.on([pygame.USEREVENT], self.process)
+        world.on([pygame.USEREVENT], self.handle)
         self.binSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'bin.wav'))
         self.hackSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'hack.wav'))
         self.leafSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'leaves2.wav'))
         self.shootSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'shoot.wav'))
+
+    def process(self, event, dt):
+        pass
