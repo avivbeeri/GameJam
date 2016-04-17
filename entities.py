@@ -57,7 +57,28 @@ def createGhost(world, position):
                 elif keys[event.key] == "Right":
                     playerState['moving'] = True
                     targetVelocityComponent.value += Vector2(0.5, 0)
-                elif keys[event.key] == "Interact":
+                elif keys[event.key] == "Up":
+                    collisions = entity.getComponent('Collidable').collisionSet
+                    for other in collisions:
+                        if other.hasComponent('Interactable'):
+                            event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
+                            world.post(event)
+                        elif groupManager.check(other, 'lift'):
+                            collisionSystem = world.getSystem('TileCollisionSystem')
+                            originalLiftId = other.id
+                            liftPosition = other.getComponent('Position').value
+                            liftTilePosition = collisionSystem.getTilePosition(liftPosition)
+                            for height in range(collisionSystem.tileMap.getHeightInTiles(), 0, -1):
+                                entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
+                                for other in entities:
+                                    if groupManager.check(other, 'lift') and \
+                                            other.id != originalLiftId:
+                                        newPosition = entity.getComponent('Position').value
+                                        liftPosition = other.getComponent('Position').value
+                                        if newPosition.y > liftPosition.y:
+                                            newPosition.y = liftPosition.y
+                                            return
+                elif keys[event.key] == "Down":
                     collisions = entity.getComponent('Collidable').collisionSet
                     for other in collisions:
                         if other.hasComponent('Interactable'):
@@ -75,8 +96,15 @@ def createGhost(world, position):
                                             other.id != originalLiftId:
                                         newPosition = entity.getComponent('Position').value
                                         liftPosition = other.getComponent('Position').value
-                                        newPosition.y = liftPosition.y
-                                        return
+                                        if newPosition.y < liftPosition.y:
+                                            newPosition.y = liftPosition.y
+                                            return
+                elif keys[event.key] == "Interact":
+                    collisions = entity.getComponent('Collidable').collisionSet
+                    for other in collisions:
+                        if other.hasComponent('Interactable'):
+                            event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
+                            world.post(event)
                         elif groupManager.check(other, 'hidable'):
                             playerState['hiding'] = True
                             entity.removeComponent('Visible')

@@ -104,14 +104,16 @@ def level04():
 
 	entities.createStairs(world, (12,44))
 	entities.createStairs(world, (12,24))
-	entities.createTerminal(world, (5,28))
+	entities.createStairs(world, (12,4))
+	entities.createPlant(world, (2,24))
+	entities.createTerminal(world, (5,8))
 
-	entities.createStairs(world, (52,44))
-	entities.createStairs(world, (52,24))
-	entities.createStairs(world, (42,24))
-	entities.createStairs(world, (42,4))
+	entities.createStairs(world, (44,44))
+	entities.createStairs(world, (44,24))
+	entities.createPlant(world, (50,24))
+	entities.createStairs(world, (44,4))
 
-	entities.createTerminal(world, (12,8))
+	entities.createTerminal(world, (36,8))
 
 	return world
 
