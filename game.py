@@ -222,7 +222,7 @@ def optionsMenu(display):
 	world.addSystem(InputSystem())
 	return world
 
-def gameOver(display):
+def gameOver():
 	world = World()
 	world.on([QUIT, KEYDOWN], quitHandler)
 	entities.createText(world, (13, 0), "MISSION")
@@ -304,7 +304,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level01()
+					worlds["level"] = setupWorld()
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
