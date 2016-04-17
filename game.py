@@ -188,6 +188,7 @@ def level01(display):
 	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
+	world.addSystem(SoundSystem(world))
 	# world.addSystem(RenderSystem(display))
 	world.addSystem(SpriteSystem())
 	return world

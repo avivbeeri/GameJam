@@ -85,6 +85,10 @@ def createGhost(world, position):
                             entity.removeComponent('Collidable')
                             other.getComponent('SpriteState').current = 'occupied'
                             playerState['cover'] = other
+                            if groupManager.check(other, 'plant'):
+                                pygame.event.post(USEREVENT, 'plant')
+                            elif groupManager.check(other, 'bin'):
+                                pygame.event.post(USEREVENT, 'bin')
         elif event.type == pygame.KEYUP:
             if event.key in keys:
                 if keys[event.key] == "Left" and playerState['moving']:

@@ -1,20 +1,11 @@
 from ecs import System
-import pygame
+import pygame, os
 
 pygame.mixer.init()
 
 class SoundSystem(System):
 
-    def __init__(self):
-        super(SoundSystem, self).__init__();
-        self.requirements = ('EventHandler',)
-        world.on([pygame.USEREVENT], handle)
-        self.binSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'bin.wav'))
-        self.hackSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'hack.wav'))
-        self.leafSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'leaves2.wav'))
-        self.shootSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'shoot.wav'))
-
-    def process(self, event):
+    def process(self, event, dt):
         if event.code == "bin":
             self.binSound.play()
         elif event.code == 'terminal':
@@ -26,7 +17,11 @@ class SoundSystem(System):
         else:
             print "Event code not known!"
 
-    def onAttach(self, world):
-        super(SoundSystem, self).onAttach(world)
-        def handle(event):
-            self.eventQueue.append(event)
+    def __init__(self, world):
+        super(SoundSystem, self).__init__();
+        self.requirements = ('EventHandler',)
+        world.on([pygame.USEREVENT], self.process)
+        self.binSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'bin.wav'))
+        self.hackSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'hack.wav'))
+        self.leafSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'leaves2.wav'))
+        self.shootSound = pygame.mixer.Sound(os.path.join('assets', 'sounds', 'shoot.wav'))
