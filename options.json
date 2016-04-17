@@ -1,5 +1,5 @@
 {
-    "SOUND": false, 
+    "SOUND": true, 
     "DIFFICULTY": {
         "Cray Hard": [
             10, 
@@ -22,6 +22,6 @@
             4
         ]
     }, 
-    "MUSIC": false, 
+    "MUSIC": true, 
     "SIZE": 512
 }

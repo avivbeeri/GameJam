@@ -58,7 +58,7 @@ def createWorld(levelFile):
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(SpriteSystem())
-	world.addSystem(SoundSystem(world))
+	world.addSystem(SoundSystem(world, options['SOUND']))
 	return world
 
 def setupWorld():
@@ -157,8 +157,6 @@ def level01():
 			pygame.time.wait(1000)
 			worlds["level"] = missionComplete(level02)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
-
-	world.addSystem(SoundSystem(world))
 	return world
 
 def optionsMenu(display):
