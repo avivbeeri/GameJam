@@ -95,6 +95,26 @@ def setupWorld():
 
 	return world
 
+def level04():
+	world = createWorld('indoors2.tmx')
+
+	entities.createGhost(world, (8,44))
+
+	entities.createGuard(world, (28,22))
+
+	entities.createStairs(world, (12,44))
+	entities.createStairs(world, (12,24))
+	entities.createTerminal(world, (5,28))
+
+	entities.createStairs(world, (52,44))
+	entities.createStairs(world, (52,24))
+	entities.createStairs(world, (42,24))
+	entities.createStairs(world, (42,4))
+
+	entities.createTerminal(world, (12,8))
+
+	return world
+
 def level03():
 	world = createWorld('outdoors3.tmx')
 
@@ -237,7 +257,7 @@ def gameOver():
 		if event.type == pygame.KEYDOWN:
 			if event.key in keys:
 				if keys[event.key] in ("Interact", "Enter"):
-					worlds[gamescreen] = setupWorld(display)
+					worlds[gamescreen] = setupWorld()
 
 	inputEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(inputEntity)
@@ -304,7 +324,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = setupWorld()
+					worlds["level"] = level04()
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
