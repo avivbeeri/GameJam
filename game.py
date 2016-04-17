@@ -52,7 +52,7 @@ def createWorld(levelFile):
 		world.addEntity(mapEntity)
 
 	world.addSystem(InputSystem())
-	#world.addSystem(InteractionSystem())
+	world.addSystem(InteractionSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())
