@@ -68,7 +68,7 @@ def createGhost(world, position):
                             originalLiftId = other.id
                             liftPosition = other.getComponent('Position').value
                             liftTilePosition = collisionSystem.getTilePosition(liftPosition)
-                            for height in range(collisionSystem.tileMap.getHeightInTiles(), 0, -1):
+                            for height in range(int(liftTilePosition.y), 0, -1):
                                 entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
                                 for other in entities:
                                     if groupManager.check(other, 'lift') and \
@@ -89,7 +89,7 @@ def createGhost(world, position):
                             originalLiftId = other.id
                             liftPosition = other.getComponent('Position').value
                             liftTilePosition = collisionSystem.getTilePosition(liftPosition)
-                            for height in range(collisionSystem.tileMap.getHeightInTiles()):
+                            for height in range(int(liftTilePosition.y), collisionSystem.tileMap.getHeightInTiles()):
                                 entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
                                 for other in entities:
                                     if groupManager.check(other, 'lift') and \
