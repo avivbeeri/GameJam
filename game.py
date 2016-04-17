@@ -98,6 +98,17 @@ def setupWorld():
 def level04():
 	world = createWorld('indoors2.tmx')
 
+	def offscreenHandler(event):
+		event = pygame.event.Event(enums.LEVELCOMPLETE)
+		world.post(event)
+	world.on(enums.OFFSCREEN, offscreenHandler)
+
+	def offscreenHandler(event):
+		if event.type == enums.LEVELCOMPLETE:
+			pygame.time.wait(1000)
+			worlds["level"] = missionComplete(level01)
+	world.on(enums.LEVELCOMPLETE, offscreenHandler)
+
 	entities.createGhost(world, (8,44))
 
 	entities.createGuard(world, (28,22))
