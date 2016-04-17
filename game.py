@@ -339,7 +339,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = setupWorld(display)
+					worlds["level"] = level01(display)
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
