@@ -169,7 +169,7 @@ def level03():
 	world.addEntity(background)
 
 	entities.createGhost(world, (4,44))
-	entities.createGuard(world, (54,42), 0, 2)
+	entities.createGuard(world, (54,42), 1, 2)
 	entities.createBin(world, (20,47))
 
 	entities.createStairs(world, (42,44))
