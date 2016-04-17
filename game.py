@@ -49,7 +49,7 @@ def setupWorld(display):
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(display, level02)
+			worlds["level"] = missionComplete(display, level01)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
 
@@ -104,6 +104,18 @@ def level03(display):
 	entities.createText(world, (1,1), "A guard! I'd")
 	entities.createText(world, (1,8), "better hide!")
 
+	def gameOverHandler(event):
+		if event.type == enums.GAMEOVER:
+			pygame.time.wait(1000)
+			worlds["level"] = gameOver(display)
+	world.on([enums.GAMEOVER], gameOverHandler)
+
+	def levelCompleteHandler(event):
+		if event.type == enums.LEVELCOMPLETE:
+			pygame.time.wait(1000)
+			worlds["level"] = missionComplete(display, setupWorld)
+	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
+
 	world.addSystem(InputSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
@@ -129,6 +141,12 @@ def level02(display):
 	entities.createStairs(world, (48,20))
 
 	entities.createTerminal(world, (36,48))
+
+	def levelCompleteHandler(event):
+		if event.type == enums.LEVELCOMPLETE:
+			pygame.time.wait(1000)
+			worlds["level"] = missionComplete(display, level03)
+	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
 	# A door leading to the next level would give a reason to use this terminal.
 
@@ -160,6 +178,12 @@ def level01(display):
 	entities.createText(world, (8,8), "to get in,")
 	entities.createText(world, (3,15), "I'll need to")
 	entities.createText(world, (1,23), "stay hidden.")
+
+	def levelCompleteHandler(event):
+		if event.type == enums.LEVELCOMPLETE:
+			pygame.time.wait(1000)
+			worlds["level"] = missionComplete(display, level02)
+	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
 	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())
