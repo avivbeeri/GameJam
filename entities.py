@@ -160,6 +160,7 @@ def createTerminal(world, position):
 
     def interactHandler(entity, event):
         terminal.getComponent('SpriteState').current = "win"
+        world.post(pygame.event.Event(enums.SOUNDEVENT, code="terminal"))
     terminal.addComponent(component.Interactable(interactHandler))
 
     groupManager.add('terminal', terminal)
@@ -232,6 +233,7 @@ def createGuard(world, position, accOffset=0):
             if isVisible(entity, radar):
                 if state['modeTime'] > 0.4:
                     event = pygame.event.Event(enums.GAMEOVER)
+                    world.post(pygame.event.Event(enums.SOUNDEVENT, code="shoot"))
                     world.post(event)
             else:
                 state['mode'] = 'surprised'
