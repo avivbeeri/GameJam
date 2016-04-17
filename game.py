@@ -331,6 +331,8 @@ def main():
 	# Create the world
 	# Later this could be delegated to a "State" object.
 	worlds["menu"] = setupMenu(screen)
+
+	# Set up our render system, which we share between all worlds
 	renderSystem = RenderSystem(screen)
 
 	dt = (1.0 / 60.0) * 1000;
@@ -345,6 +347,7 @@ def main():
 
 		# Retrieve input events for processing and pass them to the world
 		worlds[gamescreen].post(pygame.event.get())
+		renderSystem.world = worlds[gamescreen]
 		while (accumulator >= dt):
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt

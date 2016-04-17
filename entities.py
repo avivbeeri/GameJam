@@ -117,7 +117,7 @@ def createGhost(world, position):
     playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
     playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
     groupManager.add('player', playerEntity)
-    world.addEntity(playerEntity)
+    return world.addEntity(playerEntity)
 
 def createBin(world, position):
     groupManager = world.getManager('Group')
@@ -125,7 +125,7 @@ def createBin(world, position):
     binEntity.addComponent(component.Collidable())
     binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
     groupManager.add('hidable', binEntity)
-    world.addEntity(binEntity)
+    return world.addEntity(binEntity)
 
 def createPlant(world, position):
     groupManager = world.getManager('Group')
@@ -133,14 +133,14 @@ def createPlant(world, position):
     plantEntity.addComponent(component.Collidable())
     binState = plantEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
     groupManager.add('hidable', plantEntity)
-    world.addEntity(plantEntity)
+    return world.addEntity(plantEntity)
 
 def createStairs(world, position):
     groupManager = world.getManager('Group')
     stairEntity = auxFunctions.create(world, position=position, dimension=(5,12), sprite=stairSprite, layer=0, offset=(0,-1))
     stairEntity.addComponent(component.Collidable())
     groupManager.add('lift', stairEntity)
-    world.addEntity(stairEntity)
+    return world.addEntity(stairEntity)
 
 def createTerminal(world, position):
     groupManager = world.getManager('Group')
@@ -149,7 +149,7 @@ def createTerminal(world, position):
     termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
     termState.current = 'locked'
     groupManager.add('terminal', terminal)
-    world.addEntity(terminal)
+    return world.addEntity(terminal)
 
 def createGuard(world, position, accOffset=0):
     groupManager = world.getManager('Group')
@@ -237,7 +237,7 @@ def createGuard(world, position, accOffset=0):
 
     guardEntity.addComponent(component.Script()).attach(guardScript)
     guardEntity.addComponent(component.Collidable())
-    world.addEntity(guardEntity)
+    return world.addEntity(guardEntity)
 
 def createTerminal(world, position):
     groupManager = world.getManager('Group')
@@ -246,9 +246,9 @@ def createTerminal(world, position):
     termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
     termState.current = 'locked'
     groupManager.add('terminal', terminal)
-    world.addEntity(terminal)
+    return world.addEntity(terminal)
 
 def createText(world, position, text):
     renderedText = silkScreen.render(text, False, (255,255,255))
     blittedText = auxFunctions.create(world, position=position, sprite=renderedText, layer=6)
-    world.addEntity(blittedText)
+    return world.addEntity(blittedText)
