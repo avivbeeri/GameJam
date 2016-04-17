@@ -64,20 +64,26 @@ def createGhost(world, position):
                             event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
                             world.post(event)
                         elif groupManager.check(other, 'lift') and keys[event.key] in ("Up", "Down"):
-                            collisionSystem = world.getSystem('TileCollisionSystem')
                             originalLiftId = other.id
                             liftPosition = other.getComponent('Position').value
-                            liftTilePosition = collisionSystem.getTilePosition(liftPosition)
+                            lifts = []
                             for lift in groupManager.get('lift'):
                                 newPosition = lift.getComponent('Position').value
-                                if newPosition.x == liftPosition.x:
-                                    selfPosition = entity.getComponent('Position').value
-                                    if keys[event.key] == "Up" and newPosition.y < liftPosition.y:
-                                        selfPosition.y, selfPosition.x = newPosition.y, newPosition.x
-                                        return
-                                    elif keys[event.key] == 'Down' and newPosition.y > liftPosition.y:
-                                        selfPosition.y, selfPosition.x = newPosition.y, newPosition.x
-                                        return
+                                if newPosition.x == liftPosition.x and lift.id != originalLiftId:
+                                    lifts.append((lift, newPosition.y, abs(newPosition.y - liftPosition.y)))
+
+                            selfPosition = entity.getComponent('Position').value
+                            valid = True
+                            if keys[event.key] == "Up":
+                                lifts = sorted(lifts, key=lambda lift: (not (lift[1] < liftPosition.y), lift[2]))
+                                target = lifts[0][0].getComponent('Position').value
+                                valid = target.y < liftPosition.y
+                            elif keys[event.key] == "Down":
+                                lifts = sorted(lifts, key=lambda lift: (not (lift[1] > liftPosition.y), lift[2]))
+                                target = lifts[0][0].getComponent('Position').value
+                                valid = target.y > liftPosition.y
+                            selfPosition.y, selfPosition.x = target.y,  target.x
+
                         elif groupManager.check(other, 'hidable') and keys[event.key] == 'Interact':
                             playerState['hiding'] = True
                             entity.removeComponent('Visible')
