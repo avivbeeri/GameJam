@@ -103,12 +103,42 @@ def setupWorld():
 
 	return world
 
+def level05():
+	world = createWorld('indoors3.tmx')
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
+	world.addEntity(background)
+
+	entities.createGhost(world, (4,4))
+	entities.createPlant(world, (2,4))
+	entities.createBin(world, (22,7))
+	entities.createGuard(world, (52,2), 0, 2)
+	entities.createGuard(world, (34,42), 0, 1.5)
+
+	entities.createStairs(world, (46,4))
+	entities.createStairs(world, (46,24))
+	entities.createStairs(world, (46,44))
+
+	entities.createStairs(world, (6,24))
+	entities.createStairs(world, (6,44))
+	entities.createTerminal(world, (27, 48))
+	entities.createTerminal(world, (15, 48))
+
+	def levelCompleteHandler(event):
+		if event.type == enums.LEVELCOMPLETE:
+			pygame.time.wait(1000)
+			worlds["level"] = finishGame()
+	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
+
+	return world
+
+
 def level04():
 	world = createWorld('indoors2.tmx')
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(setupWorld)
+			worlds["level"] = missionComplete(level05)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
 	entities.createGhost(world, (8,44))
@@ -130,11 +160,16 @@ def level04():
 
 	return world
 
+
+
 def level03():
 	world = createWorld('outdoors3.tmx')
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
+	world.addEntity(background)
 
 	entities.createGhost(world, (4,44))
-	entities.createGuard(world, (54,42))
+	entities.createGuard(world, (54,42), 0, 2)
 	entities.createBin(world, (20,47))
 
 	entities.createStairs(world, (42,44))
@@ -154,7 +189,9 @@ def level03():
 
 def level02():
 	world = createWorld('outdoors2.tmx')
-	groupManager = world.getManager('Group')
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
+	world.addEntity(background)
 
 	entities.createGhost(world, (4,20))
 
@@ -174,6 +211,10 @@ def level02():
 def level01():
 	world = createWorld('outdoors1.tmx')
 
+	menuImage = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
+	world.addEntity(background)
+
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
@@ -183,10 +224,9 @@ def level01():
 	entities.createGhost(world, (4,44))
 	entities.createBin(world, (34,47))
 
-	entities.createText(world, (4,1), "If I'm going")
-	entities.createText(world, (8,8), "to get in,")
-	entities.createText(world, (3,15), "I'll need to")
-	entities.createText(world, (1,23), "stay hidden.")
+	entities.createText(world, (11,1), "You can")
+	entities.createText(world, (11,8), "interact")
+	entities.createText(world, (-1,16), "with objects")
 
 	return world
 
@@ -256,8 +296,8 @@ def optionsMenu(display):
 def gameOver():
 	world = World()
 	world.on([QUIT, KEYDOWN], quitHandler)
-	entities.createText(world, (13, 0), "MISSION")
-	entities.createText(world, (17, 8), "FAILED")
+	entities.createText(world, (13, 4), "MISSION")
+	entities.createText(world, (17, 12), "FAILED")
 	entities.createText(world, (2, 24), "PRESS ENTER TO")
 	entities.createText(world, (6, 32), "TRY AGAIN")
 
@@ -268,7 +308,7 @@ def gameOver():
 		if event.type == pygame.KEYDOWN:
 			if event.key in keys:
 				if keys[event.key] in ("Interact", "Enter"):
-					worlds[gamescreen] = setupWorld()
+					worlds[gamescreen] = level01()
 
 	inputEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(inputEntity)
@@ -279,8 +319,8 @@ def gameOver():
 def missionComplete(nextWorldFunc):
 	world = World()
 	world.on([QUIT, KEYDOWN], quitHandler)
-	entities.createText(world, (13, 0), "MISSION")
-	entities.createText(world, (11, 8), "SUCCESS")
+	entities.createText(world, (13, 4), "MISSION")
+	entities.createText(world, (11, 12), "SUCCESS")
 	entities.createText(world, (2, 24), "PRESS ENTER TO")
 	entities.createText(world, (9, 32), "CONTINUE")
 
@@ -298,6 +338,34 @@ def missionComplete(nextWorldFunc):
 
 	world.addSystem(InputSystem())
 	return world
+
+def finishGame():
+	world = World()
+	world.on([QUIT, KEYDOWN], quitHandler)
+	entities.createText(world, (13, 4),  "MISSION")
+	entities.createText(world, (7, 12), "COMPLETED")
+	entities.createText(world, (4, 24),  "THANKS FOR")
+	entities.createText(world, (12, 32),  "PLAYING")
+
+	inputEntity = world.createEntity()
+	inputEventHandler = inputEntity.addComponent(component.EventHandler())
+	def move(entity, event):
+		global gamescreen, options
+		if event.type == pygame.KEYDOWN:
+			if event.key in keys:
+				if keys[event.key] in ("Interact", "Enter"):
+					worlds.popitem()
+					if len(worlds) == 0:
+						quit()
+					gamescreen = worlds.keys()[-1]
+
+	inputEventHandler.attach(pygame.KEYDOWN, move)
+	world.addEntity(inputEntity)
+
+	world.addSystem(InputSystem())
+	return world
+
+
 
 def setupMenu(display):
 	world = World()
@@ -335,7 +403,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level04()
+					worlds["level"] = level01()
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)

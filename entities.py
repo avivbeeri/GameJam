@@ -174,7 +174,7 @@ def createTerminal(world, position):
     world.addEntity(terminal)
     return terminal
 
-def createGuard(world, position, accOffset=0):
+def createGuard(world, position, accOffset=0, cycleTime=5):
     groupManager = world.getManager('Group')
     guardEntity = auxFunctions.create(world, position=position, dimension=(4,14), sprite=guardSprite, layer=1)
     guardEntity.addComponent(component.Velocity((0, 0)))
@@ -222,7 +222,7 @@ def createGuard(world, position, accOffset=0):
 
         state['modeTime'] += dt
         if state['mode'] == 'patrol':
-            if state['modeTime'] > 5:
+            if state['modeTime'] > cycleTime:
                 state['modeTime'] = 0
                 state['direction'] = 'left' if state['direction'] == 'right' else 'right'
 
