@@ -54,7 +54,6 @@ class TileMap:
         for layer in self._tmx.visible_layers:
             self.parseLayer(layer)
 
-
     def parseLayer(self, layer):
         index = self._tmx.layers.index(layer)
         isSolid = layer.properties['solid'] == 'true' \
@@ -82,8 +81,17 @@ class TileMap:
         return tuple(self.solidityMap)
 
     def isTileSolid(self, x, y):
-        index = int(x + (y * self.getWidthInTiles()))
-        return self.solidityMap[index] == True
+        if  (0 <= x and x < self.getWidthInTiles()) and \
+            (0 <= y and y < self.getHeightInTiles()):
+            index = int(x + (y * self.getWidthInTiles()))
+            return self.solidityMap[index] == True
+        # Allow us to move one tile off screen.
+        if x < -1 or x >= self.getWidthInTiles() + 1 or \
+                y < -1 or y >= self.getHeightInTiles() + 1:
+            return True
+        else:
+            return False
+
 
     def getTileTotal(self):
         return self.mapSize[0] * self.mapSize[1]
@@ -99,3 +107,10 @@ class TileMap:
 
     def getHeightInTiles(self):
         return self.mapSize[1]
+
+    def printSolidityMap(self):
+        for y in range(self.getHeightInTiles()):
+            output = []
+            for x in range(self.getWidthInTiles()):
+                output += [self.isTileSolid(x, y)]
+            print output

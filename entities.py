@@ -183,7 +183,7 @@ def createGuard(world, position, accOffset=0):
             playerPosition  = player.getComponent('Position').value
             collisionSystem = world.getSystem('TileCollisionSystem')
             if (entityDirection == 'right' and entityPosition.x <= playerPosition.x) or \
-                    (entityDirection == 'left' and entityPosition.x > playerPosition.x) :
+                    (entityDirection == 'left' and entityPosition.x > playerPosition.x):
                 return playerPing.visible
             else:
                 return False
