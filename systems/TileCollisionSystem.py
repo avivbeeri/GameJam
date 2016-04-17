@@ -99,14 +99,10 @@ class TileCollisionSystem(System):
             # Calculate the number of tiles entity overlaps
             maxPosition = position + dimension
             startTile = self.getTilePosition(position)
-
-            # We can't refactor this calculation because we use math.ceil here.
-            endTileX = math.ceil(maxPosition.x / self.tileMap.cellSize[0])
-            endTileY = math.ceil(maxPosition.y / self.tileMap.cellSize[1])
-            endTile = Vector2(endTileX, endTileY)
+            endTile = self.getTilePosition(maxPosition)
 
             # Test collisions in tiles which entity overlaps
-            for tileX in range(int(startTile.x), int(endTile.x)):
+            for tileX in range(int(startTile.x), int(endTile.x + 1)):
                 for tileY in range(int(startTile.y), int(endTile.y)):
                     # Record the tile location for the entity
                     if (tileX, tileY) not in self.tileEntityMap:
@@ -165,10 +161,10 @@ def areEntitiesColliding(entity1, entity2):
     position2 = entity2.getComponent('Position').value
     dimension2 = getEntityDimension(entity2)
 
-    return (position1.x < position2.x + dimension2.x) and \
-        (position1.x + dimension1.x > position2.x) and \
-        (position1.y < position2.y + dimension2.y) and \
-        (position1.y + dimension1.y > position2.y)
+    return (int(position1.x) < int(position2.x) + dimension2.x) and \
+        (int(position1.x) + dimension1.x > int(position2.x)) and \
+        (int(position1.y) < int(position2.y) + dimension2.y) and \
+        (int(position1.y) + dimension1.y > int(position2.y))
 
 def getEntityDimension(entity):
     return entity.getComponent('Dimension').value \

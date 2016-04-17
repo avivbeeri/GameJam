@@ -75,7 +75,6 @@ def setupWorld():
 
 	entities.createGhost(world, (8, 44))
 
-	entities.createTerminal(world, (16, 8))
 	entities.createGuard(world, (8, 22))
 	entities.createGuard(world, (50, 2), 2)
 
@@ -85,6 +84,13 @@ def setupWorld():
 	entities.createStairs(world, (28, 24))
 
 	entities.createPlant(world, (38, 24))
+
+	terminal = entities.createTerminal(world, (16, 8))
+	def terminalHandler(entity, event):
+		other = world.getEntity(event.entity)
+		event = pygame.event.Event(enums.LEVELCOMPLETE)
+		world.post(event)
+	terminal.getComponent('Interactable').attach(terminalHandler)
 
 	return world
 
@@ -120,14 +126,11 @@ def level02():
 
 	# A door leading to the next level would give a reason to use this terminal.
 	terminal = entities.createTerminal(world, (36,48))
-	terminalInput = terminal.getComponent('Interactable')
-
 	def terminalHandler(entity, event):
 		other = world.getEntity(event.entity)
 		event = pygame.event.Event(enums.LEVELCOMPLETE)
 		world.post(event)
-
-	terminalInput.attach(terminalHandler)
+	terminal.getComponent('Interactable').attach(terminalHandler)
 
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:

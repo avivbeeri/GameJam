@@ -34,7 +34,7 @@ ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 def createGhost(world, position):
     groupManager = world.getManager('Group')
 
-    playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(5,12))
+    playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(4,12), offset=(-1, 0))
     playerEntity.addComponent(component.Velocity((0, 0)))
     playerEntity.addComponent(component.Acceleration())
     playerEntity.addComponent(component.Visible())
@@ -139,7 +139,7 @@ def createPlant(world, position):
 
 def createStairs(world, position):
     groupManager = world.getManager('Group')
-    stairEntity = auxFunctions.create(world, position=position, dimension=(5,12), sprite=stairSprite, layer=0, offset=(0,-1))
+    stairEntity = auxFunctions.create(world, position=position, dimension=(6,12), sprite=stairSprite, layer=0, offset=(-1, -1))
     stairEntity.addComponent(component.Collidable())
     groupManager.add('lift', stairEntity)
     world.addEntity(stairEntity)
