@@ -117,8 +117,8 @@ class TileCollisionSystem(System):
         # NOTE: We currently don't update the tileEntityMap with physics corrections
         for entity in tileCollidedEntities:
             # Dispatch a collision event
-            if self.isOffscreen(entity):
-                event = pygame.event.Event(enums.OFFSCREEN)
+            if self.isOffscreen(entity) is not None:
+                event = pygame.event.Event(enums.OFFSCREEN, { 'entity': entity.id, 'edge': self.isOffscreen(entity) })
             else:
                 event = pygame.event.Event(enums.COLLISION, {'collisionType': 'tile'})
             self.world.post(event)
@@ -165,11 +165,16 @@ class TileCollisionSystem(System):
         tilePosition = self.getTilePosition(position)
         tileDimension = self.getTilePosition(dimension)
 
-        if tilePosition.x < -1 or tilePosition.x + tileDimension.x >= self.tileMap.getWidthInTiles() + 1 or \
-                tilePosition.y < -1 or tilePosition.y + tileDimension.y >= self.tileMap.getHeightInTiles() + 1:
-            return True
+        if tilePosition.x < -1:
+            return 'LEFT'
+        elif tilePosition.x + tileDimension.x >= self.tileMap.getWidthInTiles() + 1:
+            return 'RIGHT'
+        elif tilePosition.y < -1:
+            return 'TOP'
+        elif tilePosition.y + tileDimension.y >= self.tileMap.getHeightInTiles() + 1:
+            return 'BOTTOM'
         else:
-            return False
+            return None
 
 def areEntitiesColliding(entity1, entity2):
     position1 = entity1.getComponent('Position').value
