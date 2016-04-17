@@ -46,6 +46,19 @@ def createWorld(levelFile):
 			worlds["level"] = gameOver()
 	world.on([enums.GAMEOVER], gameOverHandler)
 
+	def offscreenHandler(event):
+		if event.edge != 'RIGHT':
+			return
+		groupManager = world.getManager('Group')
+		terminals = groupManager.get('terminal')
+		success = True
+		for terminal in terminals:
+			success = success and terminal.getComponent('SpriteState').current == 'win'
+		if success:
+			event = pygame.event.Event(enums.LEVELCOMPLETE)
+			world.post(event)
+	world.on(enums.OFFSCREEN, offscreenHandler)
+
 	mapData = auxFunctions.TileMap(levelFile)
 	for index, surface in enumerate(mapData.getSurfaces()):
 		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
@@ -86,29 +99,17 @@ def setupWorld():
 
 	entities.createPlant(world, (38, 24))
 
-	terminal = entities.createTerminal(world, (16, 8))
-	def terminalHandler(entity, event):
-		other = world.getEntity(event.entity)
-		event = pygame.event.Event(enums.LEVELCOMPLETE)
-		world.post(event)
-	terminal.getComponent('Interactable').attach(terminalHandler)
+	entities.createTerminal(world, (16, 8))
 
 	return world
 
 def level04():
 	world = createWorld('indoors2.tmx')
-
-	def offscreenHandler(event):
-		print event.edge
-		event = pygame.event.Event(enums.LEVELCOMPLETE)
-		world.post(event)
-	world.on(enums.OFFSCREEN, offscreenHandler)
-
-	def offscreenHandler(event):
+	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(level01)
-	world.on(enums.LEVELCOMPLETE, offscreenHandler)
+			worlds["level"] = missionComplete(setupWorld)
+	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
 	entities.createGhost(world, (8,44))
 
@@ -145,8 +146,9 @@ def level03():
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(setupWorld)
+			worlds["level"] = missionComplete(level04)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
+
 
 	return world
 
@@ -159,13 +161,7 @@ def level02():
 	entities.createStairs(world, (48,44))
 	entities.createStairs(world, (48,20))
 
-	# A door leading to the next level would give a reason to use this terminal.
-	terminal = entities.createTerminal(world, (36,48))
-	def terminalHandler(entity, event):
-		other = world.getEntity(event.entity)
-		event = pygame.event.Event(enums.LEVELCOMPLETE)
-		world.post(event)
-	terminal.getComponent('Interactable').attach(terminalHandler)
+	entities.createTerminal(world, (36,48))
 
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
@@ -178,9 +174,11 @@ def level02():
 def level01():
 	world = createWorld('outdoors1.tmx')
 
-	def offscreenHandler(event):
-		print event.edge
-	world.on(enums.OFFSCREEN, offscreenHandler)
+	def levelCompleteHandler(event):
+		if event.type == enums.LEVELCOMPLETE:
+			pygame.time.wait(1000)
+			worlds["level"] = missionComplete(level02)
+	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
 	entities.createGhost(world, (4,44))
 	entities.createBin(world, (34,47))
@@ -190,11 +188,6 @@ def level01():
 	entities.createText(world, (3,15), "I'll need to")
 	entities.createText(world, (1,23), "stay hidden.")
 
-	def levelCompleteHandler(event):
-		if event.type == enums.LEVELCOMPLETE:
-			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(level02)
-	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 	return world
 
 def optionsMenu(display):
@@ -342,7 +335,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level04()
+					worlds["level"] = level01()
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
