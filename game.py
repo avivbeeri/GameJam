@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math, os, pygame, random, json
+import math, os, pygame, random, json, sys
 import component
 import auxFunctions
 import entities
@@ -341,11 +341,11 @@ def setupMenu(display):
 					worlds["options"] = optionsMenu(display)
 					gamescreen = "options"
 				elif currentPosition.value == Vector2(2,48):
-					quit()
+					sys.exit()
 				else:
 					pass
 			elif keys[event.key] == "Exit":
-				pygame.quit()
+				sys.exit()
 	cursorEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(cursor)
 
