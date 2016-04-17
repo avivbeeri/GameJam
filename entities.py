@@ -125,6 +125,7 @@ def createBin(world, position):
     binEntity.addComponent(component.Collidable())
     binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
     groupManager.add('hidable', binEntity)
+    groupManager.add('bin', binEntity)
     world.addEntity(binEntity)
 
 def createPlant(world, position):
@@ -133,6 +134,7 @@ def createPlant(world, position):
     plantEntity.addComponent(component.Collidable())
     binState = plantEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
     groupManager.add('hidable', plantEntity)
+    groupManager.add('plant', plantEntity)
     world.addEntity(plantEntity)
 
 def createStairs(world, position):
@@ -238,15 +240,6 @@ def createGuard(world, position, accOffset=0):
     guardEntity.addComponent(component.Script()).attach(guardScript)
     guardEntity.addComponent(component.Collidable())
     world.addEntity(guardEntity)
-
-def createTerminal(world, position):
-    groupManager = world.getManager('Group')
-    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
-    terminal.addComponent(component.Collidable())
-    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
-    termState.current = 'locked'
-    groupManager.add('terminal', terminal)
-    world.addEntity(terminal)
 
 def createText(world, position, text):
     renderedText = silkScreen.render(text, False, (255,255,255))
