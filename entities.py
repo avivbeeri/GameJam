@@ -28,7 +28,7 @@ termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
 
 # Text
 pygame.font.init()
-pressStart = pygame.font.Font(os.path.join('assets', 'fonts', 'silkscreen.ttf'), 8)
+silkScreen = pygame.font.Font(os.path.join('assets', 'fonts', 'silkscreen.ttf'), 8)
 
 ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
 def createGhost(world, position):
@@ -249,6 +249,6 @@ def createTerminal(world, position):
     world.addEntity(terminal)
 
 def createText(world, position, text):
-    renderedText = pressStart.render(text, False, (255,255,255))
+    renderedText = silkScreen.render(text, False, (255,255,255))
     blittedText = auxFunctions.create(world, position=position, sprite=renderedText, layer=6)
     world.addEntity(blittedText)

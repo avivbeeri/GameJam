@@ -101,9 +101,8 @@ def level03(display):
 	entities.createStairs(world, (42,44))
 	entities.createStairs(world, (42,20))
 
-	entities.createText(world, (1,1), "A guard!")
-	entities.createText(world, (1,8), "I'd better")
-	entities.createText(world, (1,15), "hide!")
+	entities.createText(world, (1,1), "A guard! I'd")
+	entities.createText(world, (1,8), "better hide!")
 
 	world.addSystem(InputSystem())
 	world.addSystem(RadarSystem())
@@ -157,11 +156,10 @@ def level01(display):
 	entities.createGhost(world, (4,44))
 	entities.createBin(world, (34,47))
 
-	entities.createText(world, (15,1), "If I'm")
-	entities.createText(world, (10,8), "going to")
-	entities.createText(world, (2,15), "get in, I'll")
-	entities.createText(world, (11,23), "need to")
-	entities.createText(world, (1,31), "stay hidden")
+	entities.createText(world, (4,1), "If I'm going")
+	entities.createText(world, (8,8), "to get in,")
+	entities.createText(world, (3,15), "I'll need to")
+	entities.createText(world, (1,23), "stay hidden.")
 
 	world.addSystem(InputSystem())
 	world.addSystem(PhysicsSystem())
@@ -317,7 +315,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = setupWorld(display)
+					worlds["level"] = level03(display)
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
