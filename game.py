@@ -35,32 +35,43 @@ def quitHandler(event):
 				gamescreen = worlds.keys()[-1]
 
 # Creates a world
-def setupWorld(display):
+
+def createWorld(levelFile):
 	world = World()
-	groupManager = world.getManager('Group')
 	world.on([QUIT, KEYDOWN], quitHandler)
 
 	def gameOverHandler(event):
 		if event.type == enums.GAMEOVER:
 			pygame.time.wait(1000)
-			worlds["level"] = gameOver(display)
+			worlds["level"] = gameOver()
 	world.on([enums.GAMEOVER], gameOverHandler)
+
+	mapData = auxFunctions.TileMap(levelFile)
+	for index, surface in enumerate(mapData.getSurfaces()):
+		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
+		world.addEntity(mapEntity)
+
+	world.addSystem(InputSystem())
+	world.addSystem(RadarSystem())
+	world.addSystem(ScriptSystem())
+	world.addSystem(PhysicsSystem())
+	world.addSystem(TileCollisionSystem(mapData))
+	world.addSystem(SpriteSystem())
+	world.addSystem(SoundSystem(world))
+	return world
+
+def setupWorld():
+	world = createWorld('indoors1.tmx')
 
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(display, level01)
+			worlds["level"] = missionComplete(level01)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
-
 
 	city = pygame.image.load(os.path.join('assets', 'images', 'cityscape.png'))
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
 	world.addEntity(background)
-
-	mapData = auxFunctions.TileMap('indoors1.tmx')
-	for index, surface in enumerate(mapData.getSurfaces()):
-		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
-		world.addEntity(mapEntity)
 
 	entities.createGhost(world, (8, 44))
 
@@ -75,24 +86,10 @@ def setupWorld(display):
 
 	entities.createPlant(world, (38, 24))
 
-	world.addSystem(InputSystem())
-	world.addSystem(RadarSystem())
-	world.addSystem(ScriptSystem())
-	world.addSystem(PhysicsSystem())
-	world.addSystem(TileCollisionSystem(mapData))
-	# world.addSystem(RenderSystem(display))
-	world.addSystem(SpriteSystem())
 	return world
 
-def level03(display):
-	world = World()
-	groupManager = world.getManager('Group')
-	world.on([QUIT, KEYDOWN], quitHandler)
-
-	mapData = auxFunctions.TileMap('outdoors3.tmx')
-	for index, surface in enumerate(mapData.getSurfaces()):
-		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
-		world.addEntity(mapEntity)
+def level03():
+	world = createWorld('outdoors3.tmx')
 
 	entities.createGhost(world, (4,44))
 	entities.createGuard(world, (54,42))
@@ -104,72 +101,36 @@ def level03(display):
 	entities.createText(world, (1,1), "A guard! I'd")
 	entities.createText(world, (1,8), "better hide!")
 
-	def gameOverHandler(event):
-		if event.type == enums.GAMEOVER:
-			pygame.time.wait(1000)
-			worlds["level"] = gameOver(display)
-	world.on([enums.GAMEOVER], gameOverHandler)
-
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(display, setupWorld)
+			worlds["level"] = missionComplete(setupWorld)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
-	world.addSystem(InputSystem())
-	world.addSystem(RadarSystem())
-	world.addSystem(ScriptSystem())
-	world.addSystem(PhysicsSystem())
-	world.addSystem(TileCollisionSystem(mapData))
-	# world.addSystem(RenderSystem(display))
-	world.addSystem(SpriteSystem())
 	return world
 
-def level02(display):
-	world = World()
+def level02():
+	world = createWorld('outdoors2.tmx')
 	groupManager = world.getManager('Group')
-	world.on([QUIT, KEYDOWN], quitHandler)
-
-	mapData = auxFunctions.TileMap('outdoors2.tmx')
-	for index, surface in enumerate(mapData.getSurfaces()):
-		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
-		world.addEntity(mapEntity)
 
 	entities.createGhost(world, (4,20))
 
 	entities.createStairs(world, (48,44))
 	entities.createStairs(world, (48,20))
 
+	# A door leading to the next level would give a reason to use this terminal.
 	entities.createTerminal(world, (36,48))
 
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(display, level03)
+			worlds["level"] = missionComplete(level03)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
-	# A door leading to the next level would give a reason to use this terminal.
-
-	entities.createText(world, (1,1), "Blocked.")
-	entities.createText(world, (1,8), "Heading")
-	entities.createText(world, (1,15), "down!")
-
-	world.addSystem(InputSystem())
-	world.addSystem(PhysicsSystem())
-	world.addSystem(TileCollisionSystem(mapData))
-	# world.addSystem(RenderSystem(display))
-	world.addSystem(SpriteSystem())
 	return world
 
-def level01(display):
-	world = World()
-	groupManager = world.getManager('Group')
-	world.on([QUIT, KEYDOWN], quitHandler)
-
-	mapData = auxFunctions.TileMap('outdoors1.tmx')
-	for index, surface in enumerate(mapData.getSurfaces()):
-		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
-		world.addEntity(mapEntity)
+def level01():
+	world = createWorld('outdoors1.tmx')
 
 	entities.createGhost(world, (4,44))
 	entities.createBin(world, (34,47))
@@ -182,15 +143,10 @@ def level01(display):
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(display, level02)
+			worlds["level"] = missionComplete(level02)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
-	world.addSystem(InputSystem())
-	world.addSystem(PhysicsSystem())
-	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(SoundSystem(world))
-	# world.addSystem(RenderSystem(display))
-	world.addSystem(SpriteSystem())
 	return world
 
 def optionsMenu(display):
@@ -276,11 +232,10 @@ def gameOver(display):
 	inputEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(inputEntity)
 
-	# world.addSystem(RenderSystem(display))
 	world.addSystem(InputSystem())
 	return world
 
-def missionComplete(display, nextWorldFunc):
+def missionComplete(nextWorldFunc):
 	world = World()
 	world.on([QUIT, KEYDOWN], quitHandler)
 	entities.createText(world, (13, 0), "MISSION")
@@ -295,12 +250,11 @@ def missionComplete(display, nextWorldFunc):
 		if event.type == pygame.KEYDOWN:
 			if event.key in keys:
 				if keys[event.key] in ("Interact", "Enter"):
-					worlds[gamescreen] = nextWorldFunc(display)
+					worlds[gamescreen] = nextWorldFunc()
 
 	inputEventHandler.attachHandler(pygame.KEYDOWN, move)
 	world.addEntity(inputEntity)
 
-	# world.addSystem(RenderSystem(display))
 	world.addSystem(InputSystem())
 	return world
 
@@ -340,7 +294,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level01(display)
+					worlds["level"] = level02()
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
@@ -379,6 +333,8 @@ def main():
 	# Create the world
 	# Later this could be delegated to a "State" object.
 	worlds["menu"] = setupMenu(screen)
+
+	# Set up our render system, which we share between all worlds
 	renderSystem = RenderSystem(screen)
 
 	dt = (1.0 / 60.0) * 1000;
@@ -393,6 +349,7 @@ def main():
 
 		# Retrieve input events for processing and pass them to the world
 		worlds[gamescreen].post(pygame.event.get())
+		renderSystem.world = worlds[gamescreen]
 		while (accumulator >= dt):
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt

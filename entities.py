@@ -121,7 +121,7 @@ def createGhost(world, position):
     playerInputHandler.attachHandler(pygame.KEYDOWN, handleInput)
     playerInputHandler.attachHandler(pygame.KEYUP, handleInput)
     groupManager.add('player', playerEntity)
-    world.addEntity(playerEntity)
+    return world.addEntity(playerEntity)
 
 def createBin(world, position):
     groupManager = world.getManager('Group')
@@ -131,6 +131,7 @@ def createBin(world, position):
     groupManager.add('hidable', binEntity)
     groupManager.add('bin', binEntity)
     world.addEntity(binEntity)
+    return world.addEntity(binEntity)
 
 def createPlant(world, position):
     groupManager = world.getManager('Group')
@@ -140,22 +141,14 @@ def createPlant(world, position):
     groupManager.add('hidable', plantEntity)
     groupManager.add('plant', plantEntity)
     world.addEntity(plantEntity)
+    return world.addEntity(plantEntity)
 
 def createStairs(world, position):
     groupManager = world.getManager('Group')
     stairEntity = auxFunctions.create(world, position=position, dimension=(5,12), sprite=stairSprite, layer=0, offset=(0,-1))
     stairEntity.addComponent(component.Collidable())
     groupManager.add('lift', stairEntity)
-    world.addEntity(stairEntity)
-
-def createTerminal(world, position):
-    groupManager = world.getManager('Group')
-    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
-    terminal.addComponent(component.Collidable())
-    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
-    termState.current = 'locked'
-    groupManager.add('terminal', terminal)
-    world.addEntity(terminal)
+    return world.addEntity(stairEntity)
 
 def createGuard(world, position, accOffset=0):
     groupManager = world.getManager('Group')
@@ -189,7 +182,7 @@ def createGuard(world, position, accOffset=0):
             playerPosition  = player.getComponent('Position').value
             collisionSystem = world.getSystem('TileCollisionSystem')
             if (entityDirection == 'right' and entityPosition.x <= playerPosition.x) or \
-                    (entityDirection == 'left' and entityPosition.x > playerPosition.x) :
+                    (entityDirection == 'left' and entityPosition.x > playerPosition.x):
                 return playerPing.visible
             else:
                 return False
@@ -243,9 +236,18 @@ def createGuard(world, position, accOffset=0):
 
     guardEntity.addComponent(component.Script()).attach(guardScript)
     guardEntity.addComponent(component.Collidable())
-    world.addEntity(guardEntity)
+    return world.addEntity(guardEntity)
+
+def createTerminal(world, position):
+    groupManager = world.getManager('Group')
+    terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
+    terminal.addComponent(component.Collidable())
+    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
+    termState.current = 'locked'
+    groupManager.add('terminal', terminal)
+    return world.addEntity(terminal)
 
 def createText(world, position, text):
     renderedText = silkScreen.render(text, False, (255,255,255))
     blittedText = auxFunctions.create(world, position=position, sprite=renderedText, layer=6)
-    world.addEntity(blittedText)
+    return world.addEntity(blittedText)
