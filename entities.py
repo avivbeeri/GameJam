@@ -60,7 +60,7 @@ def createGhost(world, position):
                 elif keys[event.key] in ("Interact", "Up", "Down"):
                     collisions = entity.getComponent('Collidable').collisionSet
                     for other in collisions:
-                        if other.hasComponent('Interactable'):
+                        if other.hasComponent('Interactable') and keys[event.key] == "Interact":
                             event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
                             world.post(event)
                         elif groupManager.check(other, 'lift') and keys[event.key] in ("Up", "Down"):
@@ -68,27 +68,17 @@ def createGhost(world, position):
                             originalLiftId = other.id
                             liftPosition = other.getComponent('Position').value
                             liftTilePosition = collisionSystem.getTilePosition(liftPosition)
-                            if keys[event.key] == "Up":
-                                for height in range(int(liftTilePosition.y), 0, -1):
-                                    entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
-                                    for other in entities:
-                                        if groupManager.check(other, 'lift'):
-                                            newPosition = entity.getComponent('Position').value
-                                            liftPosition = other.getComponent('Position').value
-                                            if newPosition.y > liftPosition.y:
-                                                newPosition.y, newPosition.x = liftPosition.y, liftPosition.x
-                                                return
-                            if keys[event.key] == 'Down':
-                                for height in range(int(liftTilePosition.y), collisionSystem.tileMap.getHeightInTiles()):
-                                    entities = collisionSystem.getEntitiesInTile(liftTilePosition.x, height)
-                                    for other in entities:
-                                        if groupManager.check(other, 'lift'):
-                                            newPosition = entity.getComponent('Position').value
-                                            liftPosition = other.getComponent('Position').value
-                                            if newPosition.y < liftPosition.y:
-                                                newPosition.y, newPosition.x = liftPosition.y, liftPosition.x
-                                                return
-                        elif groupManager.check(other, 'hidable'):
+                            for lift in groupManager.get('lift'):
+                                newPosition = lift.getComponent('Position').value
+                                if newPosition.x == liftPosition.x:
+                                    selfPosition = entity.getComponent('Position').value
+                                    if keys[event.key] == "Up" and newPosition.y < liftPosition.y:
+                                        selfPosition.y, selfPosition.x = newPosition.y, newPosition.x
+                                        return
+                                    elif keys[event.key] == 'Down' and newPosition.y > liftPosition.y:
+                                        selfPosition.y, selfPosition.x = newPosition.y, newPosition.x
+                                        return
+                        elif groupManager.check(other, 'hidable') and keys[event.key] == 'Interact':
                             playerState['hiding'] = True
                             entity.removeComponent('Visible')
                             entity.removeComponent('Drawable')
