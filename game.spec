@@ -39,3 +39,7 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                name='game')
+app = BUNDLE(coll,
+             name='Ghost.app',
+             icon='Ghost.ico',
+             bundle_identifier=None)
