@@ -2,11 +2,18 @@
 
 block_cipher = None
 
+added_files = 	[
+		('assets/images/*.png', 'assets/images'),
+		('assets/fonts/*','assets/fonts'),
+		('assets/levels/*','assets/levels'),
+		('assets/music/*','assets/music'),
+		('assets/sounds/*','assets/sounds'),
+		]
 
 a = Analysis(['game.py'],
-             pathex=['/Users/ssh001/Documents/GameJam'],
+             pathex=['/home/tester/GameJam'],
              binaries=None,
-             datas=None,
+             datas=added_files,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -19,19 +26,15 @@ pyz = PYZ(a.pure, a.zipped_data,
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='Ghost',
+          name='game',
           debug=False,
           strip=False,
           upx=True,
-          console=False )
+          console=True )
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
                strip=False,
                upx=True,
-               name='Ghost')
-app = BUNDLE(coll,
-             name='Ghost.app',
-             icon=Ghost.ico,
-             bundle_identifier=None)
+               name='game')
