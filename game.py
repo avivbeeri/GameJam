@@ -25,13 +25,13 @@ worlds = OrderedDict()
 def quitHandler(event):
 	global gamescreen
 	if event.type == QUIT:
-		quit()
+		sys.exit()
 	elif event.type == KEYDOWN:
 		if event.key in keys:
 			if keys[event.key] == "Exit":
 				worlds.popitem()
 				if len(worlds) == 0:
-					quit()
+					sys.exit()
 				gamescreen = worlds.keys()[-1]
 
 # Creates a world
@@ -356,7 +356,7 @@ def finishGame():
 				if keys[event.key] in ("Interact", "Enter"):
 					worlds.popitem()
 					if len(worlds) == 0:
-						quit()
+						sys.exit()
 					gamescreen = worlds.keys()[-1]
 
 	inputEventHandler.attach(pygame.KEYDOWN, move)
