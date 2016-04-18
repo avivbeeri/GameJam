@@ -4,33 +4,34 @@ import pygame, os
 from util.enums import keys
 from util import enums
 from newvector import Vector2
+from util import resource_path
 
 # Load assets
 # Stairs
-stairSprite = pygame.image.load(os.path.join('assets', 'images', 'stairs.png'))
+stairSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'stairs.png')))
 
 # Plants
-plantSprite = pygame.image.load(os.path.join('assets', 'images', 'plant.png'))
-plantHidingSprite = pygame.image.load(os.path.join('assets', 'images', 'plant_hiding.png'))
+plantSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'plant.png')))
+plantHidingSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'plant_hiding.png')))
 
 # Bins
-binSprite = pygame.image.load(os.path.join('assets', 'images', 'bin.png'))
-binFullSprite = pygame.image.load(os.path.join('assets', 'images', 'bin_full.png'))
+binSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'bin.png')))
+binFullSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'bin_full.png')))
 
 # Guards
-guardSprite = pygame.image.load(os.path.join('assets', 'images', 'guard.png'))
-guardSurprisedSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_surprised.png'))
-guardAlertSprite = pygame.image.load(os.path.join('assets', 'images', 'guard_alert.png'))
+guardSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'guard.png')))
+guardSurprisedSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'guard_surprised.png')))
+guardAlertSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'guard_alert.png')))
 
 # Terminal
-termWin = pygame.image.load(os.path.join('assets', 'images', 'terminalwin.png'))
-termSprite = pygame.image.load(os.path.join('assets', 'images', 'terminal.png'))
+termWin = pygame.image.load(resource_path(os.path.join('assets', 'images', 'terminalwin.png')))
+termSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'terminal.png')))
 
 # Text
 pygame.font.init()
-silkScreen = pygame.font.Font(os.path.join('assets', 'fonts', 'silkscreen.ttf'), 8)
+silkScreen = pygame.font.Font(resource_path(os.path.join('assets', 'fonts', 'silkscreen.ttf')), 8)
 
-ghostSprite = pygame.image.load(os.path.join('assets', 'images', 'ghost.png'))
+ghostSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'ghost.png')))
 def createGhost(world, position):
     groupManager = world.getManager('Group')
 

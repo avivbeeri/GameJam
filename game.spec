@@ -12,7 +12,7 @@ added_files = 	[
 		]
 
 a = Analysis(['game.py'],
-             pathex=['/home/tester/GameJam'],
+             pathex=['/home/aviv/Development/Ghost'],
              binaries=None,
              datas=added_files,
              hiddenimports=[],
