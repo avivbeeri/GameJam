@@ -8,6 +8,7 @@ added_files = 	[
 		('assets/levels/*','assets/levels'),
 		('assets/music/*','assets/music'),
 		('assets/sounds/*','assets/sounds'),
+    ('options.json','')
 		]
 
 a = Analysis(['game.py'],
