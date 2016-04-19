@@ -276,7 +276,7 @@ def optionsMenu(display):
 				if currentPosition.value[1] < 30:
 					currentPosition.value += Vector2(0, 12)
 			elif keys[event.key] in ("Interact", "Enter"):
-				if currentPosition.value[1] == 18:
+				if currentPosition.value[1] == 18 and pygame.mixer.get_init() is not None:
 					options["MUSIC"] = not options["MUSIC"]
 					worlds[gamescreen].getEntity(2).getComponent("Drawable").layer = 0 - \
 							worlds[gamescreen].getEntity(2).getComponent("Drawable").layer
@@ -285,7 +285,7 @@ def optionsMenu(display):
 						pygame.mixer.music.play(-1)
 					else:
 						pygame.mixer.music.stop()
-				elif currentPosition.value[1] == 30:
+				elif currentPosition.value[1] == 30 and pygame.mixer.get_init() is not None:
 					options["SOUND"] = not options["SOUND"]
 					worlds[gamescreen].getEntity(3).getComponent("Drawable").layer = 0 - \
 							worlds[gamescreen].getEntity(3).getComponent("Drawable").layer
@@ -379,9 +379,10 @@ def setupMenu(display):
 	world.on([QUIT, KEYDOWN], quitHandler)
 
 	# Add the music
-	if options["MUSIC"] == True:
-                pygame.mixer.music.load(resource_path(os.path.join('assets','music','BlueBeat.wav')))
-		pygame.mixer.music.play(-1)
+	if pygame.mixer.get_init() is not None:
+		pygame.mixer.music.load(resource_path(os.path.join('assets','music','BlueBeat.wav')))
+		if options['MUSIC']:
+			pygame.mixer.music.play(-1)
 
 	# Add the background image
 	menuImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cityscape.png')))
