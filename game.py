@@ -20,10 +20,10 @@ with open(resource_path('options.json'), "r") as f:
 	options = json.load(f)
 try:
 	pygame.mixer.init()
-	pygame.mixer.music.init()
 except:
 	options["SOUND"] = False
 	options["MUSIC"] = False
+	print "Pygame mixer failed to initialise, disabling audio!"
 
 gamescreen = "menu"
 worlds = OrderedDict()
