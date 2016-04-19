@@ -21,10 +21,11 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 includes = ["atexit","re"]
+include_files = ['assets/', 'options.json']
 
 setup(
         name = application_title,
         version = "0.1",
         description = "An excellent game",
-        options = {"build_exe" : {"includes" : includes }},
+        options = {"build_exe" : {"includes" : includes, 'include_files':include_files }},
         executables = [Executable(main_python_file, base = base, icon = 'Ghost.ico')])
