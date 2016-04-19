@@ -18,6 +18,12 @@ from util import resource_path
 
 with open(resource_path('options.json'), "r") as f:
 	options = json.load(f)
+try:
+        pygame.mixer.init()
+        pygame.mixer.music.init()
+except:
+        options["SOUND"] = False
+        options["MUSIC"] = False
 
 gamescreen = "menu"
 worlds = OrderedDict()
@@ -373,8 +379,8 @@ def setupMenu(display):
 	world.on([QUIT, KEYDOWN], quitHandler)
 
 	# Add the music
-	pygame.mixer.music.load(resource_path(os.path.join('assets','music','BlueBeat.wav')))
 	if options["MUSIC"] == True:
+                pygame.mixer.music.load(resource_path(os.path.join('assets','music','BlueBeat.wav')))
 		pygame.mixer.music.play(-1)
 
 	# Add the background image
