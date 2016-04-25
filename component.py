@@ -60,6 +60,15 @@ class Drawable(Component):
         else:
             self.flipped = flip
 
+
+class Animation(Component):
+    def __init__(self, rect, framerate, totalFrames):
+        self.framerate = framerate
+        self.accumulator = 0
+        self.currentFrame = 0
+        self.totalFrames = totalFrames
+        self.rect = rect
+
 class EventHandler(Component):
     def __init__(self):
         super(EventHandler, self).__init__()
