@@ -32,10 +32,11 @@ pygame.font.init()
 silkScreen = pygame.font.Font(resource_path(os.path.join('assets', 'fonts', 'silkscreen.ttf')), 8)
 
 ghostSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'ghost.png')))
+ghostRunningSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'ghost_run-sheet.png')))
 def createGhost(world, position):
     groupManager = world.getManager('Group')
 
-    playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(4,12), offset=(-1, 0))
+    playerEntity = auxFunctions.create(world, position=position, sprite=ghostRunningSprite, layer=1, dimension=(4,12), offset=(-1, 0))
     playerEntity.addComponent(component.Velocity((0, 0)))
     playerEntity.addComponent(component.Acceleration())
     playerEntity.addComponent(component.Visible())
@@ -44,6 +45,7 @@ def createGhost(world, position):
     playerState['moving'] = False
     playerEntity.addComponent(component.Collidable())
     playerEntity.addComponent(component.TargetVelocity())
+    playerEntity.addComponent(component.Animation(8, (8, 1), (6, 12), 8))
 
     # Demonstration of how to handle input.
     def handleInput(entity, event):

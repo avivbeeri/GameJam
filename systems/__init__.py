@@ -7,3 +7,4 @@ from RadarSystem import *
 from SpriteSystem import *
 from SoundSystem import *
 from InteractionSystem import *
+from AnimationSystem import *

@@ -1,4 +1,3 @@
-from pygame import *
 import pygame
 from newvector import Vector2
 from ecs import Component
@@ -44,11 +43,14 @@ class Drawable(Component):
     def __init__(self, surface, layer = 0, offset=(0,0)):
         super(Drawable, self).__init__()
         self.set(surface, layer)
+        self.area = surface.get_rect()
         self.flipped = False
         self.offset = Vector2(offset)
 
+
     def set(self, surface, layer=None, offset=None):
         self.image = surface
+
         if layer is not None:
             self.layer = layer
         if offset is not None:
@@ -60,14 +62,24 @@ class Drawable(Component):
         else:
             self.flipped = flip
 
+    def selectArea(self, area = None):
+        self.area = area \
+            if area is not None \
+            else self.image.get_rect()
+
 
 class Animation(Component):
-    def __init__(self, rect, framerate, totalFrames):
+    def __init__(self, framerate, frameDimensions=(0,0), spriteDimensions=(0,0), totalFrames=0):
+        super(Animation, self).__init__()
         self.framerate = framerate
         self.accumulator = 0
         self.currentFrame = 0
+
+        self.frameCols = frameDimensions[0]
+        self.frameRows = frameDimensions[1]
         self.totalFrames = totalFrames
-        self.rect = rect
+        self.spriteWidth = spriteDimensions[0]
+        self.spriteHeight = spriteDimensions[1]
 
 class EventHandler(Component):
     def __init__(self):

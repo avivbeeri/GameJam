@@ -78,6 +78,7 @@ def createWorld(levelFile):
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(SpriteSystem())
+	world.addSystem(AnimationSystem())
 	world.addSystem(SoundSystem(world, options['SOUND']))
 	return world
 

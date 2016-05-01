@@ -18,15 +18,16 @@ class RenderSystem(System):
         for entity in entities:
             drawable = entity.getComponent('Drawable')
             position = entity.getComponent('Position') .value + drawable.offset
-            flippedImage = pygame.transform.flip(drawable.image, drawable.flipped, False)
+
             # if DEBUG, we can draw hitboxes
             if DEBUG and entity.hasComponent('Dimension'):
                 dimension = entity.getComponent('Dimension').value
                 debugImage = pygame.Surface(dimension)
                 debugImage.fill(colors[entity.id % 4])
                 images.append((debugImage, position - drawable.offset, drawable.layer + 2))
-            images.append((flippedImage, position, drawable.layer))
+            images.append((drawable, position, drawable.layer))
 
         sortedImages = sorted(images, key=lambda image: image[2])
-        for surface, position, layer in sortedImages:
-            self.surface.blit(surface, position)
+        for drawable, position, layer in sortedImages:
+            image = pygame.transform.flip(drawable.image, drawable.flipped, False)
+            self.surface.blit(image, position, drawable.area)
