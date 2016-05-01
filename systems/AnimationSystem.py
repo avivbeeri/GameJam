@@ -17,19 +17,11 @@ class AnimationSystem(System):
             animation.accumulator += dt
             if animation.accumulator > (1.0 / animation.framerate):
                 animation.accumulator = 0
-                row = animation.currentFrame / animation.frameRows
-                column = animation.currentFrame / animation.frameCols
-                print column, row, animation.frameRows, animation.frameCols
+                row = animation.currentFrame / animation.frameCols
+                column = animation.currentFrame % animation.frameCols
+
                 height = animation.spriteHeight
                 width = animation.spriteWidth
-                rect = pygame.Rect(row * width, column * height, width, height)
+                rect = pygame.Rect(column * width, row * height, width, height)
                 drawable.selectArea(rect)
                 animation.currentFrame = (animation.currentFrame + 1) % animation.totalFrames
-
-                '''
-                frame = 0
-                ...
-                frame = 1
-                row = 1 / 8 = 0.125 -> 0
-                column = 1 % 8 = 1
-                '''

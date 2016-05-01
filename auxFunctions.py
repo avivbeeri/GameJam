@@ -65,7 +65,7 @@ class TileMap:
 
         for i in xrange(self.getTileTotal()):
             row = i / self.mapSize[0]
-            column = i % self.mapSize[1]
+            column = i % self.mapSize[0]
             image = self._tmx.get_tile_image(column, row, index)
             if image != None:
                 self.solidityMap[i] = self.solidityMap[i] or isSolid
