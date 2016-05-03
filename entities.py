@@ -83,7 +83,8 @@ def createGhost(world, position):
                                 lifts = sorted(lifts, key=lambda lift: (not (lift[1] > liftPosition.y), lift[2]))
                                 target = lifts[0][0].getComponent('Position').value
                                 valid = target.y > liftPosition.y
-                            selfPosition.y, selfPosition.x = target.y,  target.x
+                            if valid:
+                                selfPosition.y, selfPosition.x = target.y,  target.x
 
                         elif groupManager.check(other, 'hidable') and keys[event.key] == 'Interact':
                             playerState['hiding'] = True
