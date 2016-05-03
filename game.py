@@ -78,8 +78,8 @@ def createWorld(levelFile):
 	world.addSystem(PhysicsSystem())
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(SpriteSystem())
-	world.addSystem(AnimationSystem())
 	world.addSystem(SoundSystem(world, options['SOUND']))
+	world.addSystem(AnimationSystem())
 	return world
 
 def setupWorld():
@@ -466,16 +466,22 @@ def main():
 		accumulator += frameTime
 
 		# Retrieve input events for processing and pass them to the world
+		currentScreen = gamescreen
 		worlds[gamescreen].post(pygame.event.get())
 		renderSystem.world = worlds[gamescreen]
-		while (accumulator >= dt):
+		while accumulator >= dt and currentScreen is gamescreen:
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt
+
+		# We have to make sure that we only render when we have run all the systems in
+		# the current world.
+		if currentScreen is not gamescreen:
+			continue
 
 		# We do rendering outside the regular update loop for performance reasons
 		# See: http://gafferongames.com/game-physics/fix-your-timestep/
 		entities = renderSystem.getProcessableEntities(worlds[gamescreen])
-		renderSystem.process(entities, 0)
+		renderSystem.process(entities, dt / 1000.0)
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
 

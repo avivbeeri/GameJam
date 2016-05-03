@@ -69,17 +69,15 @@ class Drawable(Component):
 
 
 class Animation(Component):
-    def __init__(self, framerate, frameDimensions=(0,0), spriteDimensions=(0,0), totalFrames=0):
+    def __init__(self, frameDimensions=(0,0), spriteDimensions=(0,0), totalFrames=0, framerate=12):
         super(Animation, self).__init__()
         self.framerate = framerate
         self.accumulator = 0
         self.currentFrame = 0
 
-        self.frameCols = frameDimensions[0]
-        self.frameRows = frameDimensions[1]
+        self.frameCols, self.frameRows = frameDimensions
         self.totalFrames = totalFrames
-        self.spriteWidth = spriteDimensions[0]
-        self.spriteHeight = spriteDimensions[1]
+        self.spriteWidth, self.spriteHeight = spriteDimensions
 
 class EventHandler(Component):
     def __init__(self):

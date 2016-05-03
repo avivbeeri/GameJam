@@ -17,7 +17,7 @@ class RenderSystem(System):
         images = []
         for entity in entities:
             drawable = entity.getComponent('Drawable')
-            position = entity.getComponent('Position') .value + drawable.offset
+            position = entity.getComponent('Position').value + drawable.offset
 
             # if DEBUG, we can draw hitboxes
             if DEBUG and entity.hasComponent('Dimension'):

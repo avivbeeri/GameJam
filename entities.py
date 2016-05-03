@@ -45,7 +45,7 @@ def createGhost(world, position):
     playerState['moving'] = False
     playerEntity.addComponent(component.Collidable())
     playerEntity.addComponent(component.TargetVelocity())
-    playerEntity.addComponent(component.Animation(8, (8, 1), (6, 12), 8))
+    playerEntity.addComponent(component.Animation((8, 1), (6, 12), 8, 14))
 
     # Demonstration of how to handle input.
     def handleInput(entity, event):
@@ -110,7 +110,7 @@ def createGhost(world, position):
                         other = playerState['cover']
                         playerState['cover'] = None
                         entity.addComponent(component.Visible())
-                        entity.addComponent(component.Drawable(ghostSprite, 1))
+                        entity.addComponent(component.Drawable(ghostRunningSprite, 1))
                         entity.addComponent(component.Collidable())
                         other.getComponent('SpriteState').current = 'empty'
 
