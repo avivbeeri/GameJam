@@ -5,6 +5,7 @@ from util.enums import keys
 from util import enums
 from newvector import Vector2
 from util import resource_path
+from util import Sprite
 
 # Load assets
 # Stairs
@@ -45,7 +46,7 @@ def createGhost(world, position):
     playerState['moving'] = False
     playerEntity.addComponent(component.Collidable())
     playerEntity.addComponent(component.TargetVelocity())
-    playerEntity.addComponent(component.Animation((8, 1), (6, 12), 8, 14))
+    playerEntity.addComponent(component.Animation(14))
 
     # Demonstration of how to handle input.
     def handleInput(entity, event):
@@ -110,7 +111,7 @@ def createGhost(world, position):
                         other = playerState['cover']
                         playerState['cover'] = None
                         entity.addComponent(component.Visible())
-                        entity.addComponent(component.Drawable(ghostRunningSprite, 1))
+                        entity.addComponent(component.Drawable(Sprite(ghostRunningSprite), 1))
                         entity.addComponent(component.Collidable())
                         other.getComponent('SpriteState').current = 'empty'
 
@@ -137,7 +138,7 @@ def createBin(world, position):
     groupManager = world.getManager('Group')
     binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
     binEntity.addComponent(component.Collidable())
-    binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
+    binState = binEntity.addComponent(component.SpriteState(empty=Sprite(binSprite), occupied=Sprite(binFullSprite)))
     groupManager.add('hidable', binEntity)
     groupManager.add('bin', binEntity)
     world.addEntity(binEntity)
@@ -147,7 +148,7 @@ def createPlant(world, position):
     groupManager = world.getManager('Group')
     plantEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=plantSprite, layer=0)
     plantEntity.addComponent(component.Collidable())
-    binState = plantEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
+    binState = plantEntity.addComponent(component.SpriteState(empty=Sprite(plantSprite), occupied=Sprite(plantHidingSprite)))
     groupManager.add('hidable', plantEntity)
     groupManager.add('plant', plantEntity)
     world.addEntity(plantEntity)
@@ -165,7 +166,7 @@ def createTerminal(world, position):
     groupManager = world.getManager('Group')
     terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
     terminal.addComponent(component.Collidable())
-    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
+    termState = terminal.addComponent(component.SpriteState(locked=Sprite(termSprite), win=Sprite(termWin)))
     termState.current = 'locked'
 
     def interactHandler(entity, event):
@@ -183,7 +184,7 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
     guardEntity.addComponent(component.Velocity((0, 0)))
     guardEntity.addComponent(component.Acceleration())
     guardEntity.addComponent(component.Radar('player'))
-    guardEntity.addComponent(component.SpriteState(patrol=guardSprite, surprised=guardSurprisedSprite, alert=guardAlertSprite))
+    guardEntity.addComponent(component.SpriteState(patrol=Sprite(guardSprite), surprised=Sprite(guardSurprisedSprite), alert=Sprite(guardAlertSprite)))
     guardState = guardEntity.addComponent(component.State())
     guardState['direction'] = 'right'
     guardState['mode'] = 'patrol'

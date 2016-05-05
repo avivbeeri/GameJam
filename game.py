@@ -443,7 +443,7 @@ def main():
 	# Create and initialise drawable canvas
 	screen = pygame.Surface((64, 64), pygame.SRCALPHA)
 	screen.fill((0,0,0))
-	screen = screen.convert_alpha()
+	# screen = screen.convert_alpha()
 
 	# Initalise the game loop clock
 	clock = pygame.time.Clock()

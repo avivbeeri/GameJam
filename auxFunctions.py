@@ -2,6 +2,7 @@
 import pygame, os
 from pytmx.util_pygame import load_pygame
 from collections import OrderedDict
+from util import Sprite
 
 # Our other files
 import maze, component
@@ -22,7 +23,7 @@ def create(world, **kwargs):
             kwargs['layer'] = 0
         if 'offset' not in kwargs:
             kwargs['offset'] = (0, 0)
-        kwargs['sprite'].convert_alpha()
+        kwargs['sprite'] = Sprite(kwargs['sprite'])
         entity.addComponent(component.Drawable(kwargs['sprite'], kwargs['layer'], kwargs['offset']))
 
     if 'attachClass' in kwargs:

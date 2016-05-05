@@ -40,16 +40,16 @@ class TargetVelocity(Vector):
     pass
 
 class Drawable(Component):
-    def __init__(self, surface, layer = 0, offset=(0,0)):
+    def __init__(self, sprite, layer = 0, offset=(0,0)):
         super(Drawable, self).__init__()
-        self.set(surface, layer)
-        self.area = surface.get_rect()
+        self.set(sprite, layer)
+        self.area = sprite.getRect()
         self.flipped = False
         self.offset = Vector2(offset)
 
 
-    def set(self, surface, layer=None, offset=None):
-        self.image = surface
+    def set(self, sprite, layer=None, offset=None):
+        self.image = sprite
 
         if layer is not None:
             self.layer = layer
@@ -62,22 +62,12 @@ class Drawable(Component):
         else:
             self.flipped = flip
 
-    def selectArea(self, area = None):
-        self.area = area \
-            if area is not None \
-            else self.image.get_rect()
-
 
 class Animation(Component):
-    def __init__(self, frameDimensions=(0,0), spriteDimensions=(0,0), totalFrames=0, framerate=12):
+    def __init__(self, framerate=12):
         super(Animation, self).__init__()
         self.framerate = framerate
         self.accumulator = 0
-        self.currentFrame = 0
-
-        self.frameCols, self.frameRows = frameDimensions
-        self.totalFrames = totalFrames
-        self.spriteWidth, self.spriteHeight = spriteDimensions
 
 class EventHandler(Component):
     def __init__(self):

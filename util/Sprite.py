@@ -1,11 +1,11 @@
-from pygame import Surface, Rect
+from pygame import Surface, Rect, locals
 
 class Sprite(object):
 
     def __init__(self, surface, totalFrames=1, frameRate=0, frameDimensions=(1,1), spriteDimensions=None, loop=True):
         if spriteDimensions is None:
-            spriteDimensions = spritesheet.get_size()
-        self.frames = getFramesFromSpriteSheet(spritesheet, totalFrames, frameDimensions, spriteDimensions)
+            spriteDimensions = surface.get_size()
+        self.frames = getFramesFromSpriteSheet(surface, totalFrames, frameDimensions, spriteDimensions)
         self.totalFrames = totalFrames
         self.currentFrame = 0
         self.frameRate = frameRate
@@ -19,8 +19,14 @@ class Sprite(object):
         if self.loop:
             self.currentFrame %= self.totalFrames
 
+    def getSize(self):
+        return self.getCurrentFrame().get_size()
 
-def getFramesFromSpriteSheet(spritesheet, frameDimensions, spriteDimensions, totalFrames):
+    def getRect(self):
+        return self.getCurrentFrame().get_rect()
+
+
+def getFramesFromSpriteSheet(spritesheet, totalFrames, frameDimensions, spriteDimensions):
     frames = []
     frameCols, frameRows = frameDimensions
     if totalFrames < 1 or frameCols < 1 or frameRows < 1:
@@ -33,7 +39,7 @@ def getFramesFromSpriteSheet(spritesheet, frameDimensions, spriteDimensions, tot
         if row > frameRows or column > frameCols:
             raise ValueError('Too many rows!')
         rect = Rect(column * spriteWidth, row * spriteHeight, spriteWidth, spriteHeight)
-        surface = Surface((spriteWidth, spriteHeight))
+        surface = Surface((spriteWidth, spriteHeight), locals.SRCALPHA)
         surface.blit(spritesheet, (0, 0), rect)
         frames.append(surface)
     return frames
