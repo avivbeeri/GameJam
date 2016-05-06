@@ -2,14 +2,14 @@ from pygame import Surface, Rect, locals, image
 from .resourcepath import resource_path
 from os import path
 
-# from weakref import WeakValueDictionary
-
 class Manager(object):
     INSTANCE = None
     def __init__(self):
-        # Ideally we would use a WeakValueDictionary here so that garbage collection
-        # will clear memory when a Sprite is no longer being referenced, but this causes
-        # problems when we have to manually build Animation SpriteData currently.
+        '''
+        Ideally we would use a WeakValueDictionary here so that garbage collection
+        will clear memory when a Sprite is no longer being referenced, but this causes
+        problems when we have to manually build Animation SpriteData currently.
+        '''
         self.map = {}
 
     def get(self, key):
@@ -23,7 +23,7 @@ class Manager(object):
 
     def put(self, key, value):
         self.map[key] = value
-        return value
+        return Sprite(value)
 
     def unload(self, key):
         value = self.map[key]
@@ -45,18 +45,21 @@ class SpriteData(object):
     def __init__(self, surface, totalFrames=1, frameDimensions=(1,1), spriteDimensions=None):
         if isinstance(surface, Surface):
             self.frames = SpriteData.getFramesFromSpriteSheet(surface, totalFrames, frameDimensions, spriteDimensions)
+            self.totalFrames = totalFrames
         else:
             self.frames = surface
-        if spriteDimensions is None:
-            spriteDimensions = frames[0].get_size()
-        self.totalFrames = totalFrames
+            self.totalFrames = len(self.frames)
         self.lastFrame = self.totalFrames - 1
+
 
     def getKeyframe(self, frame):
         return self.frames[frame]
 
     @staticmethod
     def getFramesFromSpriteSheet(spritesheet, totalFrames, frameDimensions, spriteDimensions):
+        if spriteDimensions is None:
+            spriteDimensions = spritesheet.get_size()
+
         frames = []
         frameCols, frameRows = frameDimensions
         if totalFrames < 1 or frameCols < 1 or frameRows < 1:

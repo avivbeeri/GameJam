@@ -46,7 +46,6 @@ class Drawable(Component):
         self.flipped = False
         self.offset = Vector2(offset)
 
-
     def set(self, sprite, layer=None, offset=None):
         self.sprite = sprite
         self.image = sprite.current()

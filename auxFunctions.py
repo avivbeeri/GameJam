@@ -23,7 +23,6 @@ def create(world, **kwargs):
             kwargs['layer'] = 0
         if 'offset' not in kwargs:
             kwargs['offset'] = (0, 0)
-        print kwargs['sprite']
         kwargs['sprite'] = Asset.Manager.getInstance().get(kwargs['sprite'])
         entity.addComponent(component.Drawable(kwargs['sprite'], kwargs['layer'], kwargs['offset']))
 
