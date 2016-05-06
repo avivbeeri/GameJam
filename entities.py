@@ -39,13 +39,14 @@ Asset.Manager.getInstance().put(ghostRunningSprite, Asset.SpriteData(Asset.Manag
 def createGhost(world, position):
     groupManager = world.getManager('Group')
 
-    playerEntity = auxFunctions.create(world, position=position, sprite=ghostRunningSprite, layer=1, dimension=(4,12), offset=(-1, 0))
+    playerEntity = auxFunctions.create(world, position=position, sprite=ghostSprite, layer=1, dimension=(4,12), offset=(-1, 0))
     playerEntity.addComponent(component.Velocity((0, 0)))
     playerEntity.addComponent(component.Acceleration())
     playerEntity.addComponent(component.Visible())
     playerState = playerEntity.addComponent(component.State())
     playerState['hiding'] = False
     playerState['moving'] = False
+    playerSpriteState = playerEntity.addComponent(component.SpriteState(idle=ghostSprite, moving=ghostRunningSprite))
     playerEntity.addComponent(component.Collidable())
     playerEntity.addComponent(component.TargetVelocity())
     playerEntity.addComponent(component.Animation(14))
@@ -55,6 +56,7 @@ def createGhost(world, position):
         targetVelocityComponent = entity.getComponent('TargetVelocity')
         velocityComponent = entity.getComponent('Velocity')
         playerState = entity.getComponent('State')
+        playerSpriteState = entity.getComponent('SpriteState')
         if event.type == pygame.KEYDOWN:
             if event.key in keys:
                 if keys[event.key] == "Left":
@@ -127,6 +129,7 @@ def createGhost(world, position):
             # playerState['moving'] = False
         elif targetVelocityComponent.value.x != 0:
             entity.getComponent('Drawable').flip(targetVelocityComponent.value.x < 0)
+        playerSpriteState.current = 'moving' if playerState['moving'] else 'idle'
 
         velocityComponent.value = targetVelocityComponent.value
 
