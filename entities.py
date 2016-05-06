@@ -116,8 +116,8 @@ def createGhost(world, position):
                         other = playerState['cover']
                         playerState['cover'] = None
                         entity.addComponent(component.Visible())
-                        runningSprite = Asset.Manager.getInstance().get(ghostRunningSprite)
-                        entity.addComponent(component.Drawable(runningSprite, 1))
+                        ghostIdleSprite = Asset.Manager.getInstance().get(ghostSprite)
+                        entity.addComponent(component.Drawable(ghostIdleSprite, 1))
                         entity.addComponent(component.Collidable())
                         other.getComponent('SpriteState').current = 'empty'
 
