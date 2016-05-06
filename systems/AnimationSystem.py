@@ -16,4 +16,4 @@ class AnimationSystem(System):
             animation.accumulator += dt
             if animation.accumulator > (1.0 / animation.framerate):
                 animation.accumulator -= (1.0 / animation.framerate)
-                drawable.image.nextFrame()
+                drawable.sprite.next()

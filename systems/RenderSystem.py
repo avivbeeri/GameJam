@@ -29,5 +29,5 @@ class RenderSystem(System):
 
         sortedImages = sorted(images, key=lambda image: image[2])
         for drawable, position, layer in sortedImages:
-            image = pygame.transform.flip(drawable.image.getCurrentFrame(), drawable.flipped, False)
+            image = pygame.transform.flip(drawable.sprite.current(), drawable.flipped, False)
             self.surface.blit(image, position)

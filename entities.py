@@ -5,35 +5,37 @@ from util.enums import keys
 from util import enums
 from newvector import Vector2
 from util import resource_path
-from util import Sprite
+from util import Asset, SpriteData
 
 # Load assets
 # Stairs
-stairSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'stairs.png')))
+stairSprite = 'stairs.png'
 
 # Plants
-plantSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'plant.png')))
-plantHidingSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'plant_hiding.png')))
+plantSprite = 'plant.png'
+plantHidingSprite = 'plant_hiding.png'
 
 # Bins
-binSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'bin.png')))
-binFullSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'bin_full.png')))
+binSprite = 'bin.png'
+binFullSprite = 'bin_full.png'
 
 # Guards
-guardSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'guard.png')))
-guardSurprisedSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'guard_surprised.png')))
-guardAlertSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'guard_alert.png')))
+guardSprite = 'guard.png'
+guardSurprisedSprite = 'guard_surprised.png'
+guardAlertSprite = 'guard_alert.png'
 
 # Terminal
-termWin = pygame.image.load(resource_path(os.path.join('assets', 'images', 'terminalwin.png')))
-termSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'terminal.png')))
+termWin = 'terminalwin.png'
+termSprite = 'terminal.png'
 
 # Text
 pygame.font.init()
 silkScreen = pygame.font.Font(resource_path(os.path.join('assets', 'fonts', 'silkscreen.ttf')), 8)
 
-ghostSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'ghost.png')))
-ghostRunningSprite = pygame.image.load(resource_path(os.path.join('assets', 'images', 'ghost_run-sheet.png')))
+ghostSprite = 'ghost.png'
+ghostRunningSprite = 'ghost_run-sheet.png'
+Asset.Manager.getInstance().put(ghostRunningSprite, Asset.SpriteData(Asset.Manager.loadImage(ghostRunningSprite), 8, (8, 1), (6, 12)))
+
 def createGhost(world, position):
     groupManager = world.getManager('Group')
 
@@ -111,7 +113,8 @@ def createGhost(world, position):
                         other = playerState['cover']
                         playerState['cover'] = None
                         entity.addComponent(component.Visible())
-                        entity.addComponent(component.Drawable(Sprite(ghostRunningSprite), 1))
+                        runningSprite = Asset.Manager.getInstance().get(ghostRunningSprite)
+                        entity.addComponent(component.Drawable(runningSprite, 1))
                         entity.addComponent(component.Collidable())
                         other.getComponent('SpriteState').current = 'empty'
 
@@ -138,7 +141,7 @@ def createBin(world, position):
     groupManager = world.getManager('Group')
     binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
     binEntity.addComponent(component.Collidable())
-    binState = binEntity.addComponent(component.SpriteState(empty=Sprite(binSprite), occupied=Sprite(binFullSprite)))
+    binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
     groupManager.add('hidable', binEntity)
     groupManager.add('bin', binEntity)
     world.addEntity(binEntity)
@@ -148,7 +151,7 @@ def createPlant(world, position):
     groupManager = world.getManager('Group')
     plantEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=plantSprite, layer=0)
     plantEntity.addComponent(component.Collidable())
-    binState = plantEntity.addComponent(component.SpriteState(empty=Sprite(plantSprite), occupied=Sprite(plantHidingSprite)))
+    binState = plantEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
     groupManager.add('hidable', plantEntity)
     groupManager.add('plant', plantEntity)
     world.addEntity(plantEntity)
@@ -166,7 +169,7 @@ def createTerminal(world, position):
     groupManager = world.getManager('Group')
     terminal = auxFunctions.create(world, position=position, dimension=(4,8), sprite=termSprite, layer=0)
     terminal.addComponent(component.Collidable())
-    termState = terminal.addComponent(component.SpriteState(locked=Sprite(termSprite), win=Sprite(termWin)))
+    termState = terminal.addComponent(component.SpriteState(locked=termSprite, win=termWin))
     termState.current = 'locked'
 
     def interactHandler(entity, event):
@@ -184,7 +187,7 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
     guardEntity.addComponent(component.Velocity((0, 0)))
     guardEntity.addComponent(component.Acceleration())
     guardEntity.addComponent(component.Radar('player'))
-    guardEntity.addComponent(component.SpriteState(patrol=Sprite(guardSprite), surprised=Sprite(guardSurprisedSprite), alert=Sprite(guardAlertSprite)))
+    guardEntity.addComponent(component.SpriteState(patrol=guardSprite, surprised=guardSurprisedSprite, alert=guardAlertSprite))
     guardState = guardEntity.addComponent(component.State())
     guardState['direction'] = 'right'
     guardState['mode'] = 'patrol'
@@ -270,6 +273,7 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
 
 def createText(world, position, text):
     renderedText = silkScreen.render(text, False, (255,255,255))
-    blittedText = auxFunctions.create(world, position=position, sprite=renderedText, layer=6)
+    Asset.Manager.getInstance().put(text, SpriteData(renderedText))
+    blittedText = auxFunctions.create(world, position=position, sprite=text, layer=6)
     world.addEntity(blittedText)
     return blittedText

@@ -1,12 +1,16 @@
 from pygame import Surface, Rect, locals, image
 from .resourcepath import resource_path
 from os import path
-from weakref import WeakValueDictionary
+
+# from weakref import WeakValueDictionary
 
 class Manager(object):
     INSTANCE = None
     def __init__(self):
-        self.map = {}# WeakValueDictionary()
+        # Ideally we would use a WeakValueDictionary here so that garbage collection
+        # will clear memory when a Sprite is no longer being referenced, but this causes
+        # problems when we have to manually build Animation SpriteData currently.
+        self.map = {}
 
     def get(self, key):
         if key not in self.map:
@@ -19,6 +23,11 @@ class Manager(object):
 
     def put(self, key, value):
         self.map[key] = value
+        return value
+
+    def unload(self, key):
+        value = self.map[key]
+        self.map[key] = None
         return value
 
     @staticmethod
@@ -34,14 +43,36 @@ class Manager(object):
 
 class SpriteData(object):
     def __init__(self, surface, totalFrames=1, frameDimensions=(1,1), spriteDimensions=None):
+        if isinstance(surface, Surface):
+            self.frames = SpriteData.getFramesFromSpriteSheet(surface, totalFrames, frameDimensions, spriteDimensions)
+        else:
+            self.frames = surface
         if spriteDimensions is None:
-            spriteDimensions = surface.get_size()
-        self.frames = getFramesFromSpriteSheet(surface, totalFrames, frameDimensions, spriteDimensions)
+            spriteDimensions = frames[0].get_size()
         self.totalFrames = totalFrames
         self.lastFrame = self.totalFrames - 1
 
     def getKeyframe(self, frame):
         return self.frames[frame]
+
+    @staticmethod
+    def getFramesFromSpriteSheet(spritesheet, totalFrames, frameDimensions, spriteDimensions):
+        frames = []
+        frameCols, frameRows = frameDimensions
+        if totalFrames < 1 or frameCols < 1 or frameRows < 1:
+            raise ValueError('Invalid frame dimensions')
+
+        spriteWidth, spriteHeight = spriteDimensions
+        for currentFrame in range(totalFrames):
+            row = currentFrame / frameCols
+            column = currentFrame % frameCols
+            if row > frameRows or column > frameCols:
+                raise ValueError('Too many rows!')
+            rect = Rect(column * spriteWidth, row * spriteHeight, spriteWidth, spriteHeight)
+            surface = Surface((spriteWidth, spriteHeight), locals.SRCALPHA)
+            surface.blit(spritesheet, (0, 0), rect)
+            frames.append(surface)
+        return frames
 
 class Sprite(object):
     def __init__(self, spriteData, loop=True, currentFrame=0):
@@ -60,21 +91,3 @@ class Sprite(object):
         if self.loop:
             self.currentFrame %= self.spriteData.totalFrames
         self.currentFrame = min(self.currentFrame, self.spriteData.lastFrame)
-
-def getFramesFromSpriteSheet(spritesheet, totalFrames, frameDimensions, spriteDimensions):
-    frames = []
-    frameCols, frameRows = frameDimensions
-    if totalFrames < 1 or frameCols < 1 or frameRows < 1:
-        raise ValueError('Invalid frame dimensions')
-
-    spriteWidth, spriteHeight = spriteDimensions
-    for currentFrame in range(totalFrames):
-        row = currentFrame / frameCols
-        column = currentFrame % frameCols
-        if row > frameRows or column > frameCols:
-            raise ValueError('Too many rows!')
-        rect = Rect(column * spriteWidth, row * spriteHeight, spriteWidth, spriteHeight)
-        surface = Surface((spriteWidth, spriteHeight), locals.SRCALPHA)
-        surface.blit(spritesheet, (0, 0), rect)
-        frames.append(surface)
-    return frames

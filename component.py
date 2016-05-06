@@ -43,13 +43,13 @@ class Drawable(Component):
     def __init__(self, sprite, layer = 0, offset=(0,0)):
         super(Drawable, self).__init__()
         self.set(sprite, layer)
-        self.area = sprite.getRect()
         self.flipped = False
         self.offset = Vector2(offset)
 
 
     def set(self, sprite, layer=None, offset=None):
-        self.image = sprite
+        self.sprite = sprite
+        self.image = sprite.current()
 
         if layer is not None:
             self.layer = layer
@@ -67,7 +67,9 @@ class Animation(Component):
     def __init__(self, framerate=12):
         super(Animation, self).__init__()
         self.framerate = framerate
+        self.loop = True
         self.accumulator = 0
+        self.currentFrame = 0
 
 class EventHandler(Component):
     def __init__(self):
@@ -111,6 +113,7 @@ class SpriteState(State):
     def __init__(self, **kwargs):
         super(SpriteState, self).__init__(**kwargs)
         self.current = None
+        self.last = None
 
 
 class Collidable(Component):
