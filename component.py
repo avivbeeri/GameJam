@@ -1,4 +1,3 @@
-from pygame import *
 import pygame
 from newvector import Vector2
 from ecs import Component
@@ -41,14 +40,16 @@ class TargetVelocity(Vector):
     pass
 
 class Drawable(Component):
-    def __init__(self, surface, layer = 0, offset=(0,0)):
+    def __init__(self, sprite, layer = 0, offset=(0,0)):
         super(Drawable, self).__init__()
-        self.set(surface, layer)
+        self.set(sprite, layer)
         self.flipped = False
         self.offset = Vector2(offset)
 
-    def set(self, surface, layer=None, offset=None):
-        self.image = surface
+    def set(self, sprite, layer=None, offset=None):
+        self.sprite = sprite
+        self.image = sprite.current()
+
         if layer is not None:
             self.layer = layer
         if offset is not None:
@@ -59,6 +60,15 @@ class Drawable(Component):
             self.flipped = not self.flipped
         else:
             self.flipped = flip
+
+
+class Animation(Component):
+    def __init__(self, framerate=12):
+        super(Animation, self).__init__()
+        self.framerate = framerate
+        self.loop = True
+        self.accumulator = 0
+        self.currentFrame = 0
 
 class EventHandler(Component):
     def __init__(self):
@@ -102,6 +112,7 @@ class SpriteState(State):
     def __init__(self, **kwargs):
         super(SpriteState, self).__init__(**kwargs)
         self.current = None
+        self.last = None
 
 
 class Collidable(Component):

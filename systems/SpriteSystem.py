@@ -1,5 +1,6 @@
 import pygame
 from ecs import System
+from util import Asset
 
 class SpriteSystem(System):
 
@@ -11,6 +12,9 @@ class SpriteSystem(System):
         for entity in entities:
             currentSprite = entity.getComponent("Drawable")
             possibleStates = entity.getComponent("SpriteState")
-            currentState = entity.getComponent("SpriteState").current
-            if currentState is not None:
-                currentSprite.set(possibleStates[currentState])
+            currentState = possibleStates.current
+            lastState = possibleStates.last
+            if currentState is not None and currentState is not lastState:
+                newSprite = Asset.Manager.getInstance().get(possibleStates[currentState])
+                currentSprite.set(newSprite)
+                possibleStates.last = currentState

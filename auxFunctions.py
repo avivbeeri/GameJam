@@ -2,6 +2,7 @@
 import pygame, os
 from pytmx.util_pygame import load_pygame
 from collections import OrderedDict
+from util import Asset
 
 # Our other files
 import maze, component
@@ -22,7 +23,7 @@ def create(world, **kwargs):
             kwargs['layer'] = 0
         if 'offset' not in kwargs:
             kwargs['offset'] = (0, 0)
-        kwargs['sprite'].convert_alpha()
+        kwargs['sprite'] = Asset.Manager.getInstance().get(kwargs['sprite'])
         entity.addComponent(component.Drawable(kwargs['sprite'], kwargs['layer'], kwargs['offset']))
 
     if 'attachClass' in kwargs:
@@ -65,7 +66,7 @@ class TileMap:
 
         for i in xrange(self.getTileTotal()):
             row = i / self.mapSize[0]
-            column = i % self.mapSize[1]
+            column = i % self.mapSize[0]
             image = self._tmx.get_tile_image(column, row, index)
             if image != None:
                 self.solidityMap[i] = self.solidityMap[i] or isSolid

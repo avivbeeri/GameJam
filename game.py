@@ -14,6 +14,7 @@ from pytmx.util_pygame import load_pygame
 from util.enums import keys
 from util import enums
 from util import resource_path
+from util import Asset, SpriteData
 
 
 with open(resource_path('options.json'), "r") as f:
@@ -67,8 +68,11 @@ def createWorld(levelFile):
 	world.on(enums.OFFSCREEN, offscreenHandler)
 
 	mapData = auxFunctions.TileMap(levelFile)
+	assetManager = Asset.Manager.getInstance()
 	for index, surface in enumerate(mapData.getSurfaces()):
-		mapEntity = auxFunctions.create(world, position=(0,0), sprite=surface, layer=index)
+		fileName = levelFile + str(index)
+		result = assetManager.put(fileName, SpriteData(surface))
+		mapEntity = auxFunctions.create(world, position=(0,0), sprite=fileName, layer=index)
 		world.addEntity(mapEntity)
 
 	world.addSystem(InputSystem())
@@ -79,6 +83,7 @@ def createWorld(levelFile):
 	world.addSystem(TileCollisionSystem(mapData))
 	world.addSystem(SpriteSystem())
 	world.addSystem(SoundSystem(world, options['SOUND']))
+	world.addSystem(AnimationSystem())
 	return world
 
 def setupWorld():
@@ -90,7 +95,7 @@ def setupWorld():
 			worlds["level"] = missionComplete(level01)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
-	city = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cityscape.png')))
+	city = 'cityscape.png'
 	background = auxFunctions.create(world, position=(0,0), sprite=city, layer=-1)
 	world.addEntity(background)
 
@@ -112,7 +117,7 @@ def setupWorld():
 
 def level05():
 	world = createWorld('indoors3.tmx')
-	menuImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cityscape.png')))
+	menuImage = 'cityscape.png'
 	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
 	world.addEntity(background)
 
@@ -171,7 +176,7 @@ def level04():
 
 def level03():
 	world = createWorld('outdoors3.tmx')
-	menuImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cityscape.png')))
+	menuImage = 'cityscape.png'
 	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
 	world.addEntity(background)
 
@@ -196,7 +201,7 @@ def level03():
 
 def level02():
 	world = createWorld('outdoors2.tmx')
-	menuImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cityscape.png')))
+	menuImage = 'cityscape.png'
 	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
 	world.addEntity(background)
 
@@ -218,7 +223,7 @@ def level02():
 def level01():
 	world = createWorld('outdoors1.tmx')
 
-	menuImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cityscape.png')))
+	menuImage = 'cityscape.png'
 	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
 	world.addEntity(background)
 
@@ -242,7 +247,7 @@ def optionsMenu(display):
 	world.on([QUIT, KEYDOWN], quitHandler)
 	### NOTE: DON'T ADD ENTITES YET! ###
 	# See setupMenu for the comments on this :)
-	menuImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cityscape.png')))
+	menuImage = 'cityscape.png'
 	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-2)
 	world.addEntity(background)
 
@@ -261,7 +266,7 @@ def optionsMenu(display):
 	world.addEntity(soundOn)
 	### FEEL FREE TO ADD ENTITIES AGAIN ###
 
-	cursorImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cursor.png')))
+	cursorImage = 'cursor.png'
 	cursor = auxFunctions.create(world, position=(2,18), sprite=cursorImage, layer=3)
 
 	cursorEventHandler = cursor.addComponent(component.EventHandler())
@@ -385,17 +390,17 @@ def setupMenu(display):
 			pygame.mixer.music.play(-1)
 
 	# Add the background image
-	menuImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cityscape.png')))
+	menuImage = 'cityscape.png'
 	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-2)
 	world.addEntity(background)
 
 	# The text that goes on top of the world is here.
-	menuText = pygame.image.load(resource_path(os.path.join('assets', 'images', 'menu.png')))
+	menuText = 'menu.png'
 	text = auxFunctions.create(world, position=(0,0), sprite=menuText, layer=-1)
 	world.addEntity(text)
 
 	# Add the movable component
-	cursorImage = pygame.image.load(resource_path(os.path.join('assets', 'images', 'cursor.png')))
+	cursorImage = 'cursor.png'
 	cursor = auxFunctions.create(world, position=(2,22), lastPosition=(2,22), sprite=cursorImage, layer=0)
 	# Which can move (a bit).
 	cursorEventHandler = cursor.addComponent(component.EventHandler())
@@ -442,7 +447,7 @@ def main():
 	# Create and initialise drawable canvas
 	screen = pygame.Surface((64, 64), pygame.SRCALPHA)
 	screen.fill((0,0,0))
-	screen = screen.convert_alpha()
+	# screen = screen.convert_alpha()
 
 	# Initalise the game loop clock
 	clock = pygame.time.Clock()
@@ -465,16 +470,22 @@ def main():
 		accumulator += frameTime
 
 		# Retrieve input events for processing and pass them to the world
+		currentScreen = gamescreen
 		worlds[gamescreen].post(pygame.event.get())
 		renderSystem.world = worlds[gamescreen]
-		while (accumulator >= dt):
+		while accumulator >= dt and currentScreen is gamescreen:
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt
+
+		# We have to make sure that we only render when we have run all the systems in
+		# the current world.
+		if currentScreen is not gamescreen:
+			continue
 
 		# We do rendering outside the regular update loop for performance reasons
 		# See: http://gafferongames.com/game-physics/fix-your-timestep/
 		entities = renderSystem.getProcessableEntities(worlds[gamescreen])
-		renderSystem.process(entities, 0)
+		renderSystem.process(entities, dt / 1000.0)
 		display.blit(pygame.transform.scale(screen, outputSize), (0, 0))
 		pygame.display.flip()
 
