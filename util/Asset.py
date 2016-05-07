@@ -1,4 +1,4 @@
-from pygame import Surface, Rect, locals, image
+from pygame import Surface, Rect, locals, image, mixer
 from .resourcepath import resource_path
 from os import path
 
@@ -20,15 +20,9 @@ class Manager(object):
         return value
 
     def getSound(self, key):
-        value = self.get(key)
-        if value is None:
-            sound = Manager.loadSound(key)
-            # TODO: Look up sprite animation info from somewhere.
-            # We assume that we re only loading static from here for now
-            spriteInfo = SpriteData(surface)
-            return self.putSprite(key, spriteInfo)
-        else:
-            return Sprite(value)
+        if key not in self.map:
+            self.put(key, Manager.loadSound(key))
+        return self.get(key)
 
     def getSprite(self, key):
         value = self.get(key)
@@ -59,6 +53,10 @@ class Manager(object):
     @staticmethod
     def loadImage(filename):
         return image.load(resource_path(path.join('assets', 'images', filename)))
+
+    @staticmethod
+    def loadSound(filename):
+        return mixer.Sound(resource_path(path.join('assets', 'sounds', filename)))
 
 
 class SpriteData(object):

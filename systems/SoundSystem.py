@@ -1,7 +1,6 @@
 from ecs import System
 from util.enums import SOUNDEVENT
-import pygame, os
-from util import resource_path
+from util import Asset
 
 class SoundSystem(System):
 
@@ -10,10 +9,11 @@ class SoundSystem(System):
         self.requirements = ('EventHandler',)
         self.SOUND = SOUND
         if self.SOUND == True:
-            self.binSound = pygame.mixer.Sound(resource_path(os.path.join('assets', 'sounds', 'bin.wav')))
-            self.hackSound = pygame.mixer.Sound(resource_path(os.path.join('assets', 'sounds', 'hack.wav')))
-            self.leafSound = pygame.mixer.Sound(resource_path(os.path.join('assets', 'sounds', 'leaves2.wav')))
-            self.shootSound = pygame.mixer.Sound(resource_path(os.path.join('assets', 'sounds', 'shoot.wav')))
+            assetManager = Asset.Manager.getInstance()
+            self.binSound = assetManager.getSound('bin.wav')
+            self.hackSound = assetManager.getSound('hack.wav')
+            self.leafSound = assetManager.getSound('leaves2.wav')
+            self.shootSound = assetManager.getSound('shoot.wav')
 
 
     def process(self, entities, dt):

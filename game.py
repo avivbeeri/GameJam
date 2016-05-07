@@ -222,7 +222,6 @@ def level02():
 
 def level01():
 	world = createWorld('outdoors1.tmx')
-
 	menuImage = 'cityscape.png'
 	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
 	world.addEntity(background)
@@ -385,7 +384,7 @@ def setupMenu(display):
 
 	# Add the music
 	if pygame.mixer.get_init() is not None:
-		pygame.mixer.music.load(resource_path(os.path.join('assets','music','BlueBeat.wav')))
+		pygame.mixer.music.load(resource_path(os.path.join('assets', 'music', 'BlueBeat.wav')))
 		if options['MUSIC']:
 			pygame.mixer.music.play(-1)
 
