@@ -1,7 +1,8 @@
-from pygame import Surface, Rect, locals, image, mixer
+from pygame import Surface, Rect, locals, image, mixer, font
 from .resourcepath import resource_path
 from os import path
 
+font.init()
 class Manager(object):
     INSTANCE = None
     def __init__(self):
@@ -18,6 +19,11 @@ class Manager(object):
     def put(self, key, value):
         self.map[key] = value
         return value
+
+    def getFont(self, key, size=8):
+        if (key, size) not in self.map:
+            self.put((key, size), Manager.loadFont(key, size))
+        return self.get((key, size))
 
     def getSound(self, key):
         if key not in self.map:
@@ -57,6 +63,10 @@ class Manager(object):
     @staticmethod
     def loadSound(filename):
         return mixer.Sound(resource_path(path.join('assets', 'sounds', filename)))
+
+    @staticmethod
+    def loadFont(filename, size):
+        return font.Font(resource_path(path.join('assets', 'fonts', filename)), size)
 
 
 class SpriteData(object):

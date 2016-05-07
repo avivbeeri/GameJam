@@ -29,12 +29,12 @@ termWin = 'terminalwin.png'
 termSprite = 'terminal.png'
 
 # Text
-pygame.font.init()
-silkScreen = pygame.font.Font(resource_path(os.path.join('assets', 'fonts', 'silkscreen.ttf')), 8)
+assetManager = Asset.Manager.getInstance()
+silkScreen = assetManager.getFont('silkscreen.ttf')
 
 ghostSprite = 'ghost.png'
 ghostRunningSprite = 'ghost_run-sheet.png'
-Asset.Manager.getInstance().putSprite(ghostRunningSprite, Asset.SpriteData(Asset.Manager.loadImage(ghostRunningSprite), 8, (8, 1), (6, 12)))
+assetManager.putSprite(ghostRunningSprite, Asset.SpriteData(Asset.Manager.loadImage(ghostRunningSprite), 8, (8, 1), (6, 12)))
 
 def createGhost(world, position):
     groupManager = world.getManager('Group')
@@ -43,9 +43,7 @@ def createGhost(world, position):
     playerEntity.addComponent(component.Velocity((0, 0)))
     playerEntity.addComponent(component.Acceleration())
     playerEntity.addComponent(component.Visible())
-    playerState = playerEntity.addComponent(component.State())
-    playerState['hiding'] = False
-    playerState['moving'] = False
+    playerState = playerEntity.addComponent(component.State(hiding=False, moving=False))
     playerSpriteState = playerEntity.addComponent(component.SpriteState(idle=ghostSprite, moving=ghostRunningSprite))
     playerEntity.addComponent(component.Collidable())
     playerEntity.addComponent(component.TargetVelocity())
