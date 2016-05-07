@@ -13,15 +13,35 @@ class Manager(object):
         self.map = {}
 
     def get(self, key):
-        if key not in self.map:
+        return self.map.get(key)
+
+    def put(self, key, value):
+        self.map[key] = value
+        return value
+
+    def getSound(self, key):
+        value = self.get(key)
+        if value is None:
+            sound = Manager.loadSound(key)
+            # TODO: Look up sprite animation info from somewhere.
+            # We assume that we re only loading static from here for now
+            spriteInfo = SpriteData(surface)
+            return self.putSprite(key, spriteInfo)
+        else:
+            return Sprite(value)
+
+    def getSprite(self, key):
+        value = self.get(key)
+        if value is None:
             surface = Manager.loadImage(key)
             # TODO: Look up sprite animation info from somewhere.
             # We assume that we re only loading static from here for now
             spriteInfo = SpriteData(surface)
-            self.map[key] = spriteInfo
-        return Sprite(self.map[key])
+            return self.putSprite(key, spriteInfo)
+        else:
+            return Sprite(value)
 
-    def put(self, key, value):
+    def putSprite(self, key, value):
         self.map[key] = value
         return Sprite(value)
 

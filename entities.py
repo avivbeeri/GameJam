@@ -34,7 +34,7 @@ silkScreen = pygame.font.Font(resource_path(os.path.join('assets', 'fonts', 'sil
 
 ghostSprite = 'ghost.png'
 ghostRunningSprite = 'ghost_run-sheet.png'
-Asset.Manager.getInstance().put(ghostRunningSprite, Asset.SpriteData(Asset.Manager.loadImage(ghostRunningSprite), 8, (8, 1), (6, 12)))
+Asset.Manager.getInstance().putSprite(ghostRunningSprite, Asset.SpriteData(Asset.Manager.loadImage(ghostRunningSprite), 8, (8, 1), (6, 12)))
 
 def createGhost(world, position):
     groupManager = world.getManager('Group')
@@ -116,7 +116,7 @@ def createGhost(world, position):
                         other = playerState['cover']
                         playerState['cover'] = None
                         entity.addComponent(component.Visible())
-                        ghostIdleSprite = Asset.Manager.getInstance().get(ghostSprite)
+                        ghostIdleSprite = Asset.Manager.getInstance().getSprite(ghostSprite)
                         entity.addComponent(component.Drawable(ghostIdleSprite, 1))
                         entity.addComponent(component.Collidable())
                         other.getComponent('SpriteState').current = 'empty'
@@ -277,7 +277,7 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
 
 def createText(world, position, text):
     renderedText = silkScreen.render(text, False, (255,255,255))
-    Asset.Manager.getInstance().put(text, SpriteData(renderedText))
+    Asset.Manager.getInstance().putSprite(text, SpriteData(renderedText))
     blittedText = auxFunctions.create(world, position=position, sprite=text, layer=6)
     world.addEntity(blittedText)
     return blittedText

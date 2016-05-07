@@ -15,6 +15,6 @@ class SpriteSystem(System):
             currentState = possibleStates.current
             lastState = possibleStates.last
             if currentState is not None and currentState is not lastState:
-                newSprite = Asset.Manager.getInstance().get(possibleStates[currentState])
+                newSprite = Asset.Manager.getInstance().getSprite(possibleStates[currentState])
                 currentSprite.set(newSprite)
                 possibleStates.last = currentState

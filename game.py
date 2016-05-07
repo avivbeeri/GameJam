@@ -71,7 +71,7 @@ def createWorld(levelFile):
 	assetManager = Asset.Manager.getInstance()
 	for index, surface in enumerate(mapData.getSurfaces()):
 		fileName = levelFile + str(index)
-		result = assetManager.put(fileName, SpriteData(surface))
+		result = assetManager.putSprite(fileName, SpriteData(surface))
 		mapEntity = auxFunctions.create(world, position=(0,0), sprite=fileName, layer=index)
 		world.addEntity(mapEntity)
 
