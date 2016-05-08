@@ -75,6 +75,13 @@ def createWorld(levelFile):
 		mapEntity = auxFunctions.create(world, position=(0,0), sprite=fileName, layer=index)
 		world.addEntity(mapEntity)
 
+	camera = world.createEntity()
+	camera.addComponent(component.Position())
+	camera.addComponent(component.Velocity())
+	camera.addComponent(component.Acceleration())
+	camera.addComponent(component.Camera((64, 64)))
+	world.addEntity(camera)
+
 	world.addSystem(InputSystem())
 	world.addSystem(InteractionSystem())
 	world.addSystem(RadarSystem())
@@ -479,6 +486,7 @@ def main():
 		# We have to make sure that we only render when we have run all the systems in
 		# the current world.
 		if currentScreen is not gamescreen:
+			# renderSystem.onAttach(worlds[gamescreen])
 			continue
 
 		# We do rendering outside the regular update loop for performance reasons

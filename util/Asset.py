@@ -16,6 +16,12 @@ class Manager(object):
     def get(self, key):
         return self.map.get(key)
 
+    def getAllSprites(self, keys):
+        values = []
+        for key in keys:
+            values.append(self.getSprite(key))
+        return values
+
     def put(self, key, value):
         self.map[key] = value
         return value

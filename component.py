@@ -7,6 +7,19 @@ from util import Asset
 class Visible(Component):
     pass
 
+class Camera(Component):
+    def __init__(self, viewportSize, viewportPosition=(0, 0), layer=0):
+        super(Camera, self).__init__()
+        self.setViewport(viewportSize)
+        self.viewportPosition = viewportPosition
+        self.layer = layer
+
+    def getViewport(self):
+        return self.viewport
+
+    def setViewport(self, viewportSize):
+        self.viewport = pygame.Surface(viewportSize, pygame.locals.SRCALPHA)
+
 class Constant(Component):
     def __init__(self, value=0):
         super(Constant, self).__init__()

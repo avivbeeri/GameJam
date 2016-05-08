@@ -28,6 +28,20 @@ class World(PubSub, object):
     def getAllEntities(self):
         return self.entities.values()
 
+    def getEntitiesWithComponents(self, componentNames):
+        entities = self.getAllEntities()
+        entitiesToProcess = []
+        # if we have specific requirements, filter those entities
+        if len(componentNames) > 0:
+            for entity in entities:
+                applicable = True
+                for componentName in componentNames:
+                    applicable = applicable and entity.hasComponent(componentName)
+
+                if applicable:
+                    entitiesToProcess.append(entity)
+
+        return tuple(entitiesToProcess)
 
     def addSystem(self, system):
         self.systems.append(system)

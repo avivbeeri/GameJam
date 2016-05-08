@@ -35,6 +35,7 @@ silkScreen = assetManager.getFont('silkscreen.ttf')
 ghostSprite = 'ghost.png'
 ghostRunningSprite = 'ghost_run-sheet.png'
 assetManager.putSprite(ghostRunningSprite, Asset.SpriteData(Asset.Manager.loadImage(ghostRunningSprite), 8, (8, 1), (6, 12)))
+assetManager.getAllSprites([ghostSprite, termWin, termSprite, guardAlertSprite, guardSurprisedSprite, guardSprite, binSprite, binFullSprite, plantSprite, plantHidingSprite, stairSprite])
 
 def createGhost(world, position):
     groupManager = world.getManager('Group')
