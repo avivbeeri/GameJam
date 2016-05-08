@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pygame
 from ecs import System
 from newvector import Vector2
