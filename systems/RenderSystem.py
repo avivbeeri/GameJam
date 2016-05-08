@@ -33,8 +33,7 @@ class RenderSystem(System):
             camera = cameraEntity.getComponent('Camera')
             cameraPosition = cameraEntity.getComponent('Position').value
             cameras.append(camera)
-            viewport = camera.getViewport()
-            viewport.fill((0, 0, 0))
+
             images = []
             for entity in entities:
                 if not isOnCamera(cameraEntity, entity):
@@ -53,6 +52,8 @@ class RenderSystem(System):
                     debugImage.fill(colors[entity.id % 4])
                     images.append((debugImage, position - drawable.offset, drawable.layer + 2))
 
+            viewport = camera.getViewport()
+            viewport.fill((0, 0, 0))
             sortedImages = sorted(images, key=lambda image: image[2])
             for image, position, layer in sortedImages:
                 viewport.blit(image, position - cameraPosition)

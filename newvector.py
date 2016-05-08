@@ -156,7 +156,6 @@ class Vector2(object):
         if isinstance(other, Vector2):
             self.x *= other.x
             self.y *= other.y
-            print self
         elif (hasattr(other, "__getitem__")):
             self.x *= other[0]
             self.y *= other[1]

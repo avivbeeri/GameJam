@@ -79,9 +79,8 @@ def createWorld(levelFile):
 	cameraEntity.addComponent(component.Position())
 	cameraEntity.addComponent(component.Velocity())
 	cameraEntity.addComponent(component.Acceleration())
-	camera = cameraEntity.addComponent(component.Camera((34, 34)))
+	camera = cameraEntity.addComponent(component.Camera((64, 64)))
 	camera.type = 'follow'
-
 	world.addEntity(cameraEntity)
 
 	world.addSystem(InputSystem())
@@ -479,17 +478,16 @@ def main():
 		accumulator += frameTime
 
 		# Retrieve input events for processing and pass them to the world
-		currentScreen = gamescreen
+		currentWorld = worlds[gamescreen]
 		worlds[gamescreen].post(pygame.event.get())
 		renderSystem.world = worlds[gamescreen]
-		while accumulator >= dt and currentScreen is gamescreen:
+		while accumulator >= dt:
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt
 
 		# We have to make sure that we only render when we have run all the systems in
 		# the current world.
-		if currentScreen is not gamescreen:
-			# renderSystem.onAttach(worlds[gamescreen])
+		if currentWorld is not worlds[gamescreen]:
 			continue
 
 		# We do rendering outside the regular update loop for performance reasons
