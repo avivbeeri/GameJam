@@ -31,9 +31,10 @@ class RenderSystem(System):
         cameras = []
         for cameraEntity in cameraEntities:
             camera = cameraEntity.getComponent('Camera')
+            cameraPosition = cameraEntity.getComponent('Position').value
             cameras.append(camera)
             viewport = camera.getViewport()
-            viewport.fill((0, 0, 0, 0))
+            viewport.fill((0, 0, 0))
             images = []
             for entity in entities:
                 if not isOnCamera(cameraEntity, entity):
@@ -54,7 +55,7 @@ class RenderSystem(System):
 
             sortedImages = sorted(images, key=lambda image: image[2])
             for image, position, layer in sortedImages:
-                viewport.blit(image, position)
+                viewport.blit(image, position - cameraPosition)
 
         # Render individual viewports to the screen surface display
         sortedCameras = sorted(cameras, key=lambda camera: camera.layer)

@@ -75,12 +75,14 @@ def createWorld(levelFile):
 		mapEntity = auxFunctions.create(world, position=(0,0), sprite=fileName, layer=index)
 		world.addEntity(mapEntity)
 
-	camera = world.createEntity()
-	camera.addComponent(component.Position())
-	camera.addComponent(component.Velocity())
-	camera.addComponent(component.Acceleration())
-	camera.addComponent(component.Camera((64, 64)))
-	world.addEntity(camera)
+	cameraEntity = world.createEntity()
+	cameraEntity.addComponent(component.Position())
+	cameraEntity.addComponent(component.Velocity())
+	cameraEntity.addComponent(component.Acceleration())
+	camera = cameraEntity.addComponent(component.Camera((34, 34)))
+	camera.type = 'follow'
+
+	world.addEntity(cameraEntity)
 
 	world.addSystem(InputSystem())
 	world.addSystem(InteractionSystem())
@@ -91,6 +93,7 @@ def createWorld(levelFile):
 	world.addSystem(SpriteSystem())
 	world.addSystem(SoundSystem(world, options['SOUND']))
 	world.addSystem(AnimationSystem())
+	world.addSystem(CameraSystem())
 	return world
 
 def setupWorld():

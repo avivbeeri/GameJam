@@ -13,6 +13,7 @@ class Camera(Component):
         self.setViewport(viewportSize)
         self.viewportPosition = viewportPosition
         self.layer = layer
+        self.type = None
 
     def getViewport(self):
         return self.viewport

@@ -8,3 +8,4 @@ from SpriteSystem import *
 from SoundSystem import *
 from InteractionSystem import *
 from AnimationSystem import *
+from CameraSystem import *

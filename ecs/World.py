@@ -41,7 +41,7 @@ class World(PubSub, object):
                 if applicable:
                     entitiesToProcess.append(entity)
 
-        return tuple(entitiesToProcess)
+            return tuple(entitiesToProcess)
 
     def addSystem(self, system):
         self.systems.append(system)
