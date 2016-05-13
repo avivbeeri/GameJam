@@ -52,93 +52,62 @@ def createGhost(world, position):
     playerEntity.addComponent(component.PlayerInput())
     facing = playerEntity.addComponent(component.Facing())
 
-
-    '''
-    Current Input Handler Responsibilities:
-    1) Convert input to target velocity
-    2) Apply targetVelocity as true velocity
-    3) Initiate interaction code with terminals or hidable objects
-    4) Move player based on interaction with lifts
-    5) Prevent movement while hiding
-    '''
     # Demonstration of how to handle input.
     def handleInput(entity, event):
         targetVelocityComponent = entity.getComponent('TargetVelocity')
         velocityComponent = entity.getComponent('Velocity')
+        player = entity.getComponent('PlayerInput')
         playerState = entity.getComponent('State')
         playerSpriteState = entity.getComponent('SpriteState')
-        if event.type == pygame.KEYDOWN:
-            if event.key in keys:
-                if keys[event.key] == "Left":
-                    targetVelocityComponent.value += Vector2(-0.5, 0)
-                    playerState['moving'] = True
-                elif keys[event.key] == "Right":
-                    playerState['moving'] = True
-                    targetVelocityComponent.value += Vector2(0.5, 0)
-                elif keys[event.key] in ("Interact", "Up", "Down"):
-                    collisions = entity.getComponent('Collidable').collisionSet
-                    for other in collisions:
-                        if other.hasComponent('Interactable') and keys[event.key] == "Interact":
-                            event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
-                            world.post(event)
-                        elif groupManager.check(other, 'lift') and keys[event.key] in ("Up", "Down"):
-                            originalLiftId = other.id
-                            liftPosition = other.getComponent('Position').value
-                            lifts = []
-                            for lift in groupManager.get('lift'):
-                                newPosition = lift.getComponent('Position').value
-                                if newPosition.x == liftPosition.x and lift.id != originalLiftId:
-                                    lifts.append((lift, newPosition.y, abs(newPosition.y - liftPosition.y)))
+        if event.type == pygame.KEYDOWN and event.key in keys:
+            if keys[event.key] in ("Interact", "Up", "Down") and player.enabled:
+                collisions = entity.getComponent('Collidable').collisionSet
+                for other in collisions:
+                    if other.hasComponent('Interactable') and keys[event.key] == "Interact":
+                        event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
+                        world.post(event)
+                    elif groupManager.check(other, 'lift') and keys[event.key] in ("Up", "Down"):
+                        originalLiftId = other.id
+                        liftPosition = other.getComponent('Position').value
+                        lifts = []
+                        for lift in groupManager.get('lift'):
+                            newPosition = lift.getComponent('Position').value
+                            if newPosition.x == liftPosition.x and lift.id != originalLiftId:
+                                lifts.append((lift, newPosition.y, abs(newPosition.y - liftPosition.y)))
 
-                            selfPosition = entity.getComponent('Position').value
-                            valid = True
-                            if keys[event.key] == "Up":
-                                lifts = sorted(lifts, key=lambda lift: (not (lift[1] < liftPosition.y), lift[2]))
-                                target = lifts[0][0].getComponent('Position').value
-                                valid = target.y < liftPosition.y
-                            elif keys[event.key] == "Down":
-                                lifts = sorted(lifts, key=lambda lift: (not (lift[1] > liftPosition.y), lift[2]))
-                                target = lifts[0][0].getComponent('Position').value
-                                valid = target.y > liftPosition.y
-                            if valid:
-                                selfPosition.y, selfPosition.x = target.y,  target.x
-
-                        elif groupManager.check(other, 'hidable') and keys[event.key] == 'Interact':
-                            playerState['hiding'] = True
-                            entity.removeComponent('Visible')
-                            entity.removeComponent('Drawable')
-                            entity.removeComponent('Collidable')
-                            other.getComponent('SpriteState').current = 'occupied'
-                            playerState['cover'] = other
-                            if groupManager.check(other, 'plant'):
-                                world.post(pygame.event.Event(enums.SOUNDEVENT, code='plant'))
-                            elif groupManager.check(other, 'bin'):
-                                world.post(pygame.event.Event(enums.SOUNDEVENT, code='bin'))
-        elif event.type == pygame.KEYUP:
-            if event.key in keys:
-                if keys[event.key] == "Left" and playerState['moving']:
-                    targetVelocityComponent.value += Vector2(+0.5, 0)
-                elif keys[event.key] == "Right" and playerState['moving']:
-                    targetVelocityComponent.value += Vector2(-0.5, 0)
-                elif keys[event.key] == "Interact":
-                    if playerState['hiding']:
-                        playerState['hiding'] = False
-                        other = playerState['cover']
-                        playerState['cover'] = None
-                        entity.addComponent(component.Visible())
-                        ghostIdleSprite = Asset.Manager.getInstance().getSprite(ghostSprite)
-                        entity.addComponent(component.Drawable(ghostIdleSprite, 1))
-                        entity.addComponent(component.Collidable())
-                        other.getComponent('SpriteState').current = 'empty'
-
-            if targetVelocityComponent.value.get_length() == 0:
-                playerState['moving'] = False
-
-        # Make sure we don't move while hiding.
-        if playerState['hiding']:
-            targetVelocityComponent.value = Vector2(0, 0)
-        playerSpriteState.current = 'moving' if playerState['moving'] else 'idle'
-        velocityComponent.value = targetVelocityComponent.value
+                        selfPosition = entity.getComponent('Position').value
+                        valid = True
+                        if keys[event.key] == "Up":
+                            lifts = sorted(lifts, key=lambda lift: (not (lift[1] < liftPosition.y), lift[2]))
+                            target = lifts[0][0].getComponent('Position').value
+                            valid = target.y < liftPosition.y
+                        elif keys[event.key] == "Down":
+                            lifts = sorted(lifts, key=lambda lift: (not (lift[1] > liftPosition.y), lift[2]))
+                            target = lifts[0][0].getComponent('Position').value
+                            valid = target.y > liftPosition.y
+                        if valid:
+                            selfPosition.y, selfPosition.x = target.y,  target.x
+                    elif groupManager.check(other, 'hidable') and keys[event.key] == 'Interact':
+                        player.enabled = False
+                        entity.removeComponent('Visible')
+                        entity.removeComponent('Drawable')
+                        entity.removeComponent('Collidable')
+                        other.getComponent('SpriteState').current = 'occupied'
+                        playerState['cover'] = other
+                        if groupManager.check(other, 'plant'):
+                            world.post(pygame.event.Event(enums.SOUNDEVENT, code='plant'))
+                        elif groupManager.check(other, 'bin'):
+                            world.post(pygame.event.Event(enums.SOUNDEVENT, code='bin'))
+        elif event.type == pygame.KEYUP and event.key in keys:
+            if keys[event.key] == "Interact" and not player.enabled:
+                player.enabled = True
+                other = playerState['cover']
+                playerState['cover'] = None
+                entity.addComponent(component.Visible())
+                ghostIdleSprite = Asset.Manager.getInstance().getSprite(ghostSprite)
+                entity.addComponent(component.Drawable(ghostIdleSprite, 1))
+                entity.addComponent(component.Collidable())
+                other.getComponent('SpriteState').current = 'empty'
 
     playerInputHandler = playerEntity.addComponent(component.EventHandler())
     playerInputHandler.attach(pygame.KEYDOWN, handleInput)
@@ -195,14 +164,13 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
     groupManager = world.getManager('Group')
     guardEntity = auxFunctions.create(world, position=position, dimension=(4,14), sprite=guardSprite, layer=1)
     guardEntity.addComponent(component.Velocity((0, 0)))
+    guardEntity.addComponent(component.Facing(component.Facing.RIGHT))
     guardEntity.addComponent(component.Acceleration())
     guardEntity.addComponent(component.Radar('player'))
     guardEntity.addComponent(component.SpriteState(patrol=guardSprite, surprised=guardSurprisedSprite, alert=guardAlertSprite))
     guardState = guardEntity.addComponent(component.State())
-    guardState['direction'] = 'right'
     guardState['mode'] = 'patrol'
     guardState['modeTime'] = accOffset
-
 
     def guardScript(entity, dt):
         global worlds
@@ -210,6 +178,7 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
         state = entity.getComponent('State')
         spriteState = entity.getComponent('SpriteState')
         drawable = entity.getComponent('Drawable')
+        facing = entity.getComponent('Facing')
 
         def isVisible(entity, radar):
             if 'player' not in radar.targets or len(radar.targets['player']) == 0:
@@ -219,11 +188,10 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
             player = playerPing.entity
 
             entityPosition  = entity.getComponent('Position').value
-            entityDirection = entity.getComponent('State')['direction']
+            entityDirection = facing.direction
             playerPosition  = player.getComponent('Position').value
-            collisionSystem = world.getSystem('TileCollisionSystem')
-            if (entityDirection == 'right' and entityPosition.x <= playerPosition.x) or \
-                    (entityDirection == 'left' and entityPosition.x > playerPosition.x):
+            if (entityDirection == facing.RIGHT and entityPosition.x <= playerPosition.x) or \
+                    (entityDirection == facing.LEFT and entityPosition.x > playerPosition.x):
                 return playerPing.visible
             else:
                 return False
@@ -233,15 +201,11 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
             player = playerPing.entity
             return playerPing.distance.normalize() * 0.3
 
-        def shouldImageFlip():
-            return state['direction'] == 'left'
-
-
         state['modeTime'] += dt
         if state['mode'] == 'patrol':
             if state['modeTime'] > cycleTime:
                 state['modeTime'] = 0
-                state['direction'] = 'left' if state['direction'] == 'right' else 'right'
+                facing.direction = facing.LEFT if facing.direction == facing.RIGHT else facing.RIGHT
 
             if isVisible(entity, radar):
                 state['mode'] = 'surprised'
@@ -261,7 +225,6 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
                     world.post(event)
             else:
                 state['mode'] = 'surprised'
-                drawable.flip(shouldImageFlip())
                 state['modeTime'] = 0
         elif state['mode'] == 'chase':
             # We aren't currently using this, but it is useful!
@@ -271,8 +234,6 @@ def createGuard(world, position, accOffset=0, cycleTime=5):
             else:
                 velocity.value = Vector2()
                 state['mode'] = 'patrol'
-
-        drawable.flip(shouldImageFlip())
         spriteState.current = state['mode']
 
 

@@ -84,6 +84,7 @@ def createWorld(levelFile):
 	world.addEntity(cameraEntity)
 
 	world.addSystem(InputSystem())
+	world.addSystem(PlayerInputSystem())
 	world.addSystem(InteractionSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())

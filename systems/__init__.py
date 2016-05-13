@@ -10,3 +10,4 @@ from InteractionSystem import *
 from AnimationSystem import *
 from CameraSystem import *
 from VelocityFacingSystem import *
+from PlayerInputSystem import *

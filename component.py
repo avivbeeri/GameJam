@@ -8,10 +8,12 @@ class Visible(Component):
     pass
 
 class PlayerInput(Component):
-    pass
+    def __init__(self):
+        super(PlayerInput, self).__init__()
+        self.enabled = True
 
 class Facing(Component):
-    LEFT, RIGHT = range(2)
+    LEFT, RIGHT = 'left', 'right'
     def __init__(self, direction=None):
         super(Facing, self).__init__()
         self.direction = direction if direction is not None else Facing.RIGHT
