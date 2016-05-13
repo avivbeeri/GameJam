@@ -49,7 +49,18 @@ def createGhost(world, position):
     playerEntity.addComponent(component.Collidable())
     playerEntity.addComponent(component.TargetVelocity())
     playerEntity.addComponent(component.Animation(14))
+    playerEntity.addComponent(component.PlayerInput())
+    facing = playerEntity.addComponent(component.Facing())
 
+
+    '''
+    Current Input Handler Responsibilities:
+    1) Convert input to target velocity
+    2) Apply targetVelocity as true velocity
+    3) Initiate interaction code with terminals or hidable objects
+    4) Move player based on interaction with lifts
+    5) Prevent movement while hiding
+    '''
     # Demonstration of how to handle input.
     def handleInput(entity, event):
         targetVelocityComponent = entity.getComponent('TargetVelocity')
@@ -126,11 +137,7 @@ def createGhost(world, position):
         # Make sure we don't move while hiding.
         if playerState['hiding']:
             targetVelocityComponent.value = Vector2(0, 0)
-            # playerState['moving'] = False
-        elif targetVelocityComponent.value.x != 0:
-            entity.getComponent('Drawable').flip(targetVelocityComponent.value.x < 0)
         playerSpriteState.current = 'moving' if playerState['moving'] else 'idle'
-
         velocityComponent.value = targetVelocityComponent.value
 
     playerInputHandler = playerEntity.addComponent(component.EventHandler())

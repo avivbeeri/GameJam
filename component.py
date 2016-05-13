@@ -7,6 +7,15 @@ from util import Asset
 class Visible(Component):
     pass
 
+class PlayerInput(Component):
+    pass
+
+class Facing(Component):
+    LEFT, RIGHT = range(2)
+    def __init__(self, direction=None):
+        super(Facing, self).__init__()
+        self.direction = direction if direction is not None else Facing.RIGHT
+
 class Camera(Component):
     def __init__(self, viewportSize, viewportPosition=(0, 0), layer=0):
         super(Camera, self).__init__()
