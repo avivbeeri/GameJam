@@ -44,9 +44,11 @@ class CoverSystem(System):
                     playerEntity.addComponent(component.Drawable(ghostIdleSprite, 1))
                     playerEntity.addComponent(component.Collidable())
                     playerEntity.addComponent(component.Visible())
-                    # Enabling this line locks Ghost to reappear at the position of the cover.
-                    # If the cover is poorly placed, this will cause collision issues.
-                    # playerEntity.getComponent('Position').value.x = entity.getComponent('Position').value.x
+                    '''
+                    Enabling this line locks Ghost to reappear at the position of the cover.
+                    If the cover is poorly placed, this will cause collision issues.
+                    playerEntity.getComponent('Position').value.x = entity.getComponent('Position').value.x
+                    '''
                     spriteState.current = 'empty'
         del self.eventQueue[:]
 

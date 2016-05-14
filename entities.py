@@ -59,52 +59,31 @@ def createGhost(world, position):
         player = entity.getComponent('PlayerInput')
         playerState = entity.getComponent('State')
         playerSpriteState = entity.getComponent('SpriteState')
-        if event.type == pygame.KEYDOWN and event.key in keys:
-            if keys[event.key] in ("Interact", "Up", "Down") and player.enabled:
-                collisions = entity.getComponent('Collidable').collisionSet
-                for other in collisions:
-                    if groupManager.check(other, 'lift') and keys[event.key] in ("Up", "Down"):
-                        originalLiftId = other.id
-                        liftPosition = other.getComponent('Position').value
-                        lifts = []
-                        for lift in groupManager.get('lift'):
-                            newPosition = lift.getComponent('Position').value
-                            if newPosition.x == liftPosition.x and lift.id != originalLiftId:
-                                lifts.append((lift, newPosition.y, abs(newPosition.y - liftPosition.y)))
+        if player.enabled and event.type == pygame.KEYDOWN \
+        and keys[event.key] in ("Up", "Down"):
+            collisions = entity.getComponent('Collidable').collisionSet
+            for other in collisions:
+                if groupManager.check(other, 'lift') and keys[event.key] in ("Up", "Down"):
+                    originalLiftId = other.id
+                    liftPosition = other.getComponent('Position').value
+                    lifts = []
+                    for lift in groupManager.get('lift'):
+                        newPosition = lift.getComponent('Position').value
+                        if newPosition.x == liftPosition.x and lift.id != originalLiftId:
+                            lifts.append((lift, newPosition.y, abs(newPosition.y - liftPosition.y)))
 
-                        selfPosition = entity.getComponent('Position').value
-                        valid = True
-                        if keys[event.key] == "Up":
-                            lifts = sorted(lifts, key=lambda lift: (not (lift[1] < liftPosition.y), lift[2]))
-                            target = lifts[0][0].getComponent('Position').value
-                            valid = target.y < liftPosition.y
-                        elif keys[event.key] == "Down":
-                            lifts = sorted(lifts, key=lambda lift: (not (lift[1] > liftPosition.y), lift[2]))
-                            target = lifts[0][0].getComponent('Position').value
-                            valid = target.y > liftPosition.y
-                        if valid:
-                            selfPosition.y, selfPosition.x = target.y,  target.x
-                    elif False and groupManager.check(other, 'hidable') and keys[event.key] == 'Interact':
-                        player.enabled = False
-                        entity.removeComponent('Visible')
-                        entity.removeComponent('Drawable')
-                        entity.removeComponent('Collidable')
-                        other.getComponent('SpriteState').current = 'occupied'
-                        playerState['cover'] = other
-                        if groupManager.check(other, 'plant'):
-                            world.post(pygame.event.Event(enums.SOUNDEVENT, code='plant'))
-                        elif groupManager.check(other, 'bin'):
-                            world.post(pygame.event.Event(enums.SOUNDEVENT, code='bin'))
-        elif event.type == pygame.KEYUP and event.key in keys:
-            if False and keys[event.key] == "Interact" and not player.enabled:
-                player.enabled = True
-                other = playerState['cover']
-                playerState['cover'] = None
-                entity.addComponent(component.Visible())
-                ghostIdleSprite = Asset.Manager.getInstance().getSprite(ghostSprite)
-                entity.addComponent(component.Drawable(ghostIdleSprite, 1))
-                entity.addComponent(component.Collidable())
-                other.getComponent('SpriteState').current = 'empty'
+                    selfPosition = entity.getComponent('Position').value
+                    valid = True
+                    if keys[event.key] == "Up":
+                        lifts = sorted(lifts, key=lambda lift: (not (lift[1] < liftPosition.y), lift[2]))
+                        target = lifts[0][0].getComponent('Position').value
+                        valid = target.y < liftPosition.y
+                    elif keys[event.key] == "Down":
+                        lifts = sorted(lifts, key=lambda lift: (not (lift[1] > liftPosition.y), lift[2]))
+                        target = lifts[0][0].getComponent('Position').value
+                        valid = target.y > liftPosition.y
+                    if valid:
+                        selfPosition.y, selfPosition.x = target.y,  target.x
 
     playerInputHandler = playerEntity.addComponent(component.EventHandler())
     playerInputHandler.attach(pygame.KEYDOWN, handleInput)
