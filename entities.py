@@ -149,7 +149,7 @@ def createTerminal(world, position):
     termState.current = 'locked'
 
     def interactHandler(entity, event):
-        terminal.getComponent('SpriteState').current = "win"
+        termState.current = "win"
         world.post(pygame.event.Event(enums.SOUNDEVENT, code="terminal"))
     terminal.addComponent(component.Interactable(interactHandler))
 
