@@ -86,6 +86,7 @@ def createWorld(levelFile):
 	world.addSystem(InputSystem())
 	world.addSystem(PlayerInputSystem())
 	world.addSystem(InteractionSystem())
+	world.addSystem(CoverSystem())
 	world.addSystem(RadarSystem())
 	world.addSystem(ScriptSystem())
 	world.addSystem(PhysicsSystem())

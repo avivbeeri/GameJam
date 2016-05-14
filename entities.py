@@ -84,7 +84,7 @@ def createGhost(world, position):
                             valid = target.y > liftPosition.y
                         if valid:
                             selfPosition.y, selfPosition.x = target.y,  target.x
-                    elif groupManager.check(other, 'hidable') and keys[event.key] == 'Interact':
+                    elif False and groupManager.check(other, 'hidable') and keys[event.key] == 'Interact':
                         player.enabled = False
                         entity.removeComponent('Visible')
                         entity.removeComponent('Drawable')
@@ -96,7 +96,7 @@ def createGhost(world, position):
                         elif groupManager.check(other, 'bin'):
                             world.post(pygame.event.Event(enums.SOUNDEVENT, code='bin'))
         elif event.type == pygame.KEYUP and event.key in keys:
-            if keys[event.key] == "Interact" and not player.enabled:
+            if False and keys[event.key] == "Interact" and not player.enabled:
                 player.enabled = True
                 other = playerState['cover']
                 playerState['cover'] = None
@@ -117,6 +117,8 @@ def createBin(world, position):
     groupManager = world.getManager('Group')
     binEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=binSprite, layer=0)
     binEntity.addComponent(component.Collidable())
+    binEntity.addComponent(component.Interactable())
+    binEntity.addComponent(component.Cover())
     binState = binEntity.addComponent(component.SpriteState(empty=binSprite, occupied=binFullSprite))
     groupManager.add('hidable', binEntity)
     groupManager.add('bin', binEntity)
@@ -127,6 +129,8 @@ def createPlant(world, position):
     groupManager = world.getManager('Group')
     plantEntity = auxFunctions.create(world, position=position, dimension=(10,12), sprite=plantSprite, layer=0)
     plantEntity.addComponent(component.Collidable())
+    plantEntity.addComponent(component.Interactable())
+    plantEntity.addComponent(component.Cover())
     binState = plantEntity.addComponent(component.SpriteState(empty=plantSprite, occupied=plantHidingSprite))
     groupManager.add('hidable', plantEntity)
     groupManager.add('plant', plantEntity)

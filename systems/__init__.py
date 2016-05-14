@@ -11,3 +11,4 @@ from AnimationSystem import *
 from CameraSystem import *
 from VelocityFacingSystem import *
 from PlayerInputSystem import *
+from CoverSystem import *

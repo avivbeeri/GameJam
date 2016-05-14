@@ -16,30 +16,35 @@ class PlayerInputSystem(System):
             player = entity.getComponent("PlayerInput")
             playerSpriteState = entity.getComponent('SpriteState')
             targetVelocity = Vector2(velocityComponent.value)
-            if player.enabled:
-                for event in self.eventQueue:
-                    if event.type == pygame.KEYDOWN:
-                        if event.key in keys:
-                            if keys[event.key] == "Left":
-                                targetVelocity += Vector2(-0.5, 0)
-                            elif keys[event.key] == "Right":
-                                targetVelocity += Vector2(0.5, 0)
-                            elif keys[event.key] == ("Interact") and player.enabled:
-                                collisions = entity.getComponent('Collidable').collisionSet
-                                for other in collisions:
-                                    if other.hasComponent('Interactable'):
-                                        event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
-                                        self.world.post(event)
-                    elif event.type == pygame.KEYUP and velocityComponent.value.length() != 0:
-                        if event.key in keys:
+            for event in self.eventQueue:
+                if player.enabled and event.type == pygame.KEYDOWN:
+                    if event.key in keys:
+                        if keys[event.key] == "Left":
+                            targetVelocity += Vector2(-0.5, 0)
+                        elif keys[event.key] == "Right":
+                            targetVelocity += Vector2(0.5, 0)
+                        elif keys[event.key] == ("Interact"):
+                            collisions = entity.getComponent('Collidable').collisionSet
+                            for other in collisions:
+                                if other.hasComponent('Interactable'):
+                                    event = pygame.event.Event(enums.INTERACT, { 'target': other.id, 'entity': entity.id })
+                                    self.world.post(event)
+                elif event.type == pygame.KEYUP:
+                    if event.key in keys:
+                        if velocityComponent.value.length() != 0:
                             if keys[event.key] == "Left":
                                 targetVelocity -= Vector2(-0.5, 0)
                             elif keys[event.key] == "Right":
                                 targetVelocity -= Vector2(0.5, 0)
-                playerSpriteState.current = 'moving' if targetVelocity.length() != 0 else 'idle'
+                        elif keys[event.key] == ("Interact"):
+                            event = pygame.event.Event(enums.STOPINTERACT, { 'target': entity.id })
+                            self.world.post(event)
+            playerSpriteState.current = 'moving' if targetVelocity.length() != 0 else 'idle'
+            if player.enabled:
+                velocityComponent.value = targetVelocity
             else:
-                targetVelocity = Vector2()
-            velocityComponent.value = targetVelocity
+                velocityComponent.value = Vector2()
+
         del self.eventQueue[:]
 
     def onAttach(self, world):

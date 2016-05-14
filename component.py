@@ -7,6 +7,16 @@ from util import Asset
 class Visible(Component):
     pass
 
+class Concealable(Component):
+    def __init__(self):
+        super(Concealable, self).__init__()
+        self.cover = None
+
+class Cover(Component):
+    def __init__(self):
+        super(Cover, self).__init__()
+        self.occupant = None
+
 class PlayerInput(Component):
     def __init__(self):
         super(PlayerInput, self).__init__()
@@ -114,9 +124,10 @@ class EventHandler(Component):
 
 
 class Interactable(EventHandler):
-    def __init__(self, handler):
+    def __init__(self, handler=None):
         super(Interactable, self).__init__()
-        self.attach(handler)
+        if handler is not None:
+            self.attach(handler)
 
     def attach(self, handler):
         eventName = enums.INTERACT
