@@ -484,13 +484,11 @@ def main():
 		worlds[gamescreen].post(pygame.event.get())
 		renderSystem.world = worlds[gamescreen]
 		while accumulator >= dt:
+			# If we switched world due to events, stop updating mid-cycle
+			if currentWorld is not worlds[gamescreen]:
+				break
 			worlds[gamescreen].update(dt / 1000.0)
 			accumulator -= dt
-
-		# We have to make sure that we only render when we have run all the systems in
-		# the current world.
-		if currentWorld is not worlds[gamescreen]:
-			continue
 
 		# We do rendering outside the regular update loop for performance reasons
 		# See: http://gafferongames.com/game-physics/fix-your-timestep/
