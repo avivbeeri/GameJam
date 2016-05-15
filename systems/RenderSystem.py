@@ -56,7 +56,9 @@ class RenderSystem(System):
             viewport.fill((0, 0, 0))
             sortedImages = sorted(images, key=lambda image: image[2])
             for image, position, layer in sortedImages:
-                viewport.blit(image, position - cameraPosition)
+                renderPosition = position - cameraPosition
+                renderPosition = Vector2(round(renderPosition.x), round(renderPosition.y))
+                viewport.blit(image, renderPosition)
 
         # Render individual viewports to the screen surface display
         sortedCameras = sorted(cameras, key=lambda camera: camera.layer)

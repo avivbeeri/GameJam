@@ -253,6 +253,34 @@ def level01():
 
 	return world
 
+def tutorialLevel():
+	world = createWorld('tutorial.tmx')
+	menuImage = 'cityscape.png'
+	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
+	background2 = auxFunctions.create(world, position=(64,0), sprite=menuImage, layer=-1)
+	world.addEntity(background)
+	world.addEntity(background2)
+
+	entities.createGhost(world, (4, 44))
+	entities.createBin(world, (34, 47))
+
+	entities.createText(world, (11,1), "You can")
+	entities.createText(world, (11,8), "interact")
+	entities.createText(world, (-1,16), "with objects")
+
+	entities.createStairs(world, (64+48,44+24))
+	entities.createStairs(world, (64+48,20+24))
+
+	entities.createTerminal(world, (64+36,48+24))
+
+	def levelCompleteHandler(event):
+		if event.type == enums.LEVELCOMPLETE:
+			pygame.time.wait(1000)
+			worlds["level"] = missionComplete(level03)
+	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
+
+	return world
+
 def optionsMenu(display):
 	world = World()
 	world.on([QUIT, KEYDOWN], quitHandler)
@@ -427,7 +455,7 @@ def setupMenu(display):
 					currentPosition.value += Vector2(0, 13)
 			elif keys[event.key] in ("Interact", "Enter"):
 				if currentPosition.value == Vector2(2,22):
-					worlds["level"] = level01()
+					worlds["level"] = tutorialLevel()
 					gamescreen = "level"
 				elif currentPosition.value == Vector2(2,35):
 					worlds["options"] = optionsMenu(display)
