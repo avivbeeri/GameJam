@@ -104,7 +104,7 @@ def setupWorld():
 	def levelCompleteHandler(event):
 		if event.type == enums.LEVELCOMPLETE:
 			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(level01)
+			worlds["level"] = missionComplete(tutorialLevel)
 	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
 
 	city = 'cityscape.png'
@@ -211,48 +211,6 @@ def level03():
 
 	return world
 
-def level02():
-	world = createWorld('outdoors2.tmx')
-	menuImage = 'cityscape.png'
-	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
-	world.addEntity(background)
-
-	entities.createGhost(world, (4,20))
-
-	entities.createStairs(world, (48,44))
-	entities.createStairs(world, (48,20))
-
-	entities.createTerminal(world, (36,48))
-
-	def levelCompleteHandler(event):
-		if event.type == enums.LEVELCOMPLETE:
-			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(level03)
-	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
-
-	return world
-
-def level01():
-	world = createWorld('outdoors1.tmx')
-	menuImage = 'cityscape.png'
-	background = auxFunctions.create(world, position=(0,0), sprite=menuImage, layer=-1)
-	world.addEntity(background)
-
-	def levelCompleteHandler(event):
-		if event.type == enums.LEVELCOMPLETE:
-			pygame.time.wait(1000)
-			worlds["level"] = missionComplete(level02)
-	world.on([enums.LEVELCOMPLETE], levelCompleteHandler)
-
-	entities.createGhost(world, (4,44))
-	entities.createBin(world, (34,47))
-
-	entities.createText(world, (11,1), "You can")
-	entities.createText(world, (11,8), "interact")
-	entities.createText(world, (-1,16), "with objects")
-
-	return world
-
 def tutorialLevel():
 	world = createWorld('tutorial.tmx')
 	menuImage = 'cityscape.png'
@@ -264,9 +222,9 @@ def tutorialLevel():
 	entities.createGhost(world, (4, 44))
 	entities.createBin(world, (34, 47))
 
-	entities.createText(world, (11,1), "You can")
-	entities.createText(world, (11,8), "interact")
-	entities.createText(world, (-1,16), "with objects")
+	# entities.createText(world, (11,1), "You can")
+	# entities.createText(world, (11,8), "interact")
+	# entities.createText(world, (-1,16), "with objects")
 
 	entities.createStairs(world, (64+48,44+24))
 	entities.createStairs(world, (64+48,20+24))
@@ -359,7 +317,7 @@ def gameOver():
 		if event.type == pygame.KEYDOWN:
 			if event.key in keys:
 				if keys[event.key] in ("Interact", "Enter"):
-					worlds[gamescreen] = level01()
+					worlds[gamescreen] = tutorialLevel()
 
 	inputEventHandler.attach(pygame.KEYDOWN, move)
 	world.addEntity(inputEntity)
